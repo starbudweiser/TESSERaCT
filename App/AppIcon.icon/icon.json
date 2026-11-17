@@ -1,61 +1,27 @@
 {
   "fill" : {
-    "automatic-gradient" : "extended-srgb:0.11000,0.40000,0.96000,1.00000"
+    "linear-gradient" : [
+      "srgb:0.54510,0.36078,0.96471,1.00000",
+      "srgb:0.29804,0.11373,0.58431,1.00000"
+    ],
+    "orientation" : { "start" : { "x" : 0.2, "y" : 0 }, "stop" : { "x" : 0.8, "y" : 1 } }
   },
   "groups" : [
     {
       "layers" : [
         {
-          "fill" : "automatic",
           "glass" : false,
           "hidden" : false,
-          "image-name" : "symbols.svg",
-          "name" : "Symbols"
-        },
-        {
-          "fill" : "automatic",
-          "glass" : true,
-          "hidden" : false,
-          "image-name" : "front.svg",
-          "name" : "Window"
+          "image-name" : "motif.svg",
+          "name" : "Motif"
         }
       ],
       "lighting" : "individual",
-      "name" : "Front",
-      "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 0.5
-      },
-      "translucency" : {
-        "enabled" : false,
-        "value" : 0.5
-      }
-    },
-    {
-      "layers" : [
-        {
-          "fill" : "automatic",
-          "glass" : true,
-          "hidden" : false,
-          "image-name" : "back.svg",
-          "name" : "Display"
-        }
-      ],
-      "lighting" : "individual",
-      "name" : "Back",
-      "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 0.5
-      },
-      "translucency" : {
-        "enabled" : true,
-        "value" : 0.5
-      }
+      "shadow" : { "kind" : "neutral", "opacity" : 0.4 },
+      "translucency" : { "enabled" : false, "value" : 0.5 }
     }
   ],
   "supported-platforms" : {
-    "squares" : [
-      "macOS"
-    ]
+    "squares" : [ "macOS" ]
   }
 }
