@@ -55,37 +55,46 @@
      return 0;
 --- a/hw/nvme/ctrl.c
 +++ b/hw/nvme/ctrl.c
-@@ -9614,7 +9614,36 @@
- 
+@@ -9615,6 +9615,45 @@
      return 0;
  }
-+
+ 
 +/*
 + * A namespace has a new size: tell the controllers it is attached to that its attributes changed. The
 + * guest reads the namespace again when it has seen the event.
 + */
++static void nvme_ns_notify_ctrl_resize(NvmeCtrl *ctrl, NvmeNamespace *ns)
++{
++    uint32_t nsid = ns->params.nsid;
++
++    if (!ctrl || !ctrl->qs_created || nvme_ns(ctrl, nsid) != ns) {
++        return;
++    }
++
++    if (!test_and_set_bit(nsid, ctrl->changed_nsids)) {
++        nvme_enqueue_event(ctrl, NVME_AER_TYPE_NOTICE,
++                           NVME_AER_INFO_NOTICE_NS_ATTR_CHANGED,
++                           NVME_LOG_CHANGED_NSLIST);
++    }
++}
++
 +void nvme_ns_notify_resize(NvmeNamespace *ns)
 +{
 +    NvmeSubsystem *subsys = ns->subsys;
-+    uint32_t nsid = ns->params.nsid;
 +    int i;
- 
++
++    /* A drive given to the controller itself has no namespace device and no subsystem of its own. */
++    if (ns->ctrl) {
++        nvme_ns_notify_ctrl_resize(ns->ctrl, ns);
++        return;
++    }
++
 +    if (!subsys) {
 +        return;
 +    }
 +
 +    for (i = 0; i < NVME_MAX_CONTROLLERS; i++) {
-+        NvmeCtrl *ctrl = nvme_subsys_ctrl(subsys, i);
-+
-+        if (!ctrl || !ctrl->qs_created || nvme_ns(ctrl, nsid) != ns) {
-+            continue;
-+        }
-+
-+        if (!test_and_set_bit(nsid, ctrl->changed_nsids)) {
-+            nvme_enqueue_event(ctrl, NVME_AER_TYPE_NOTICE,
-+                               NVME_AER_INFO_NOTICE_NS_ATTR_CHANGED,
-+                               NVME_LOG_CHANGED_NSLIST);
-+        }
++        nvme_ns_notify_ctrl_resize(nvme_subsys_ctrl(subsys, i), ns);
 +    }
 +}
 +
