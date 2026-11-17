@@ -58,7 +58,7 @@ Usage: tctl <command> [arguments]
   unshare <machine> <folder>        Stop sharing a folder
   attach <machine> <image> [--read-only]   Plug in a disc or disk image as a USB drive
   eject <machine> <image>           Unplug it again
-  resize <machine> <GB>             Grow the disk of a machine that is shut down
+  resize <machine> <GB>             Grow the disk (live on a QEMU machine that runs, else shut down)
   compression <machine> on|off      Keep the disk of a Linux machine that is shut down compressed, which
                                     usually takes less than half the space on this Mac, or not. Waits until
                                     the disk is converted

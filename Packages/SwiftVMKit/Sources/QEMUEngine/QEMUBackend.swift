@@ -464,6 +464,27 @@ public final class QEMUBackend: VMBackend {
         }
     }
 
+    /// Only a disk that QEMU reads from a file can grow: one that is compressed is handed over by the app.
+    public var canGrowDiskLive: Bool {
+        monitor != nil && isRunning && configuration.systemDisk.map { $0.format != .compressed && !$0.readOnly } == true
+    }
+
+    /// Asks QEMU to make the disk's image larger (`block_resize`). The virtual disk tells the guest, which
+    /// sees the new capacity at once.
+    public func growDisk(_ id: UUID, to capacity: UInt64) async throws {
+        guard let monitor, isRunning else { throw VMError.notRunning(name: configuration.name) }
+        guard let index = configuration.disks.firstIndex(where: { $0.id == id }) else {
+            throw VMError.invalidConfiguration("“\(configuration.name)” has no such disk.")
+        }
+        guard configuration.disks[index].format != .compressed else {
+            throw VMError.invalidConfiguration("A compressed disk can only be made larger while the machine is shut down.")
+        }
+        _ = try await monitor.execute("block_resize", [
+            "node-name": .string(QEMUCommandLine.diskNodeName(index)),
+            "size": .number(Double(capacity)),
+        ])
+    }
+
     public func pause() async throws {
         guard let monitor else { throw VMError.notRunning(name: configuration.name) }
         try await monitor.execute("stop")

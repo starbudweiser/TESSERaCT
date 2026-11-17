@@ -1,5 +1,6 @@
 import DiskTools
 import Foundation
+import GuestChannel
 import Installers
 import VMCore
 import VZEngine
@@ -181,7 +182,20 @@ extension AppModel {
 
     /// Grows the disk of a machine that is shut down. The guest has to grow its own partition into the new
     /// space; systems set up by TESSERaCT from a cloud image do that at their next start.
-    func resizeDisk(of machine: VirtualMachine, to capacity: UInt64) async throws {
+    ///
+    /// A machine that runs on QEMU grows while it runs: the guest sees the new size at once and, with
+    /// `extendGuest`, its partition and file system are grown into it through the guest tools. The result
+    /// says what was done in the guest, or nothing for a machine that was shut down.
+    @discardableResult
+    func resizeDisk(of machine: VirtualMachine, to capacity: UInt64, extendGuest: Bool = true) async throws -> String? {
+        if machine.state != .stopped {
+            guard machine.canGrowDiskLive else {
+                throw VMError.invalidConfiguration("The disk of “\(machine.name)” can only be made larger while it is shut down.")
+            }
+            try await machine.growSystemDiskLive(to: capacity)
+            guard extendGuest else { return nil }
+            return await extendGuestPartition(of: machine)
+        }
         try await machine.whileStopped(.resizingDisk) {
             guard let disk = machine.configuration.systemDisk else {
                 throw VMError.invalidConfiguration("“\(machine.name)” has no disk.")
@@ -199,6 +213,36 @@ extension AppModel {
                 guard let index = configuration.disks.firstIndex(where: { $0.id == disk.id }) else { return }
                 configuration.disks[index].capacity = capacity
             }
+        }
+        return nil
+    }
+
+    /// Grows the guest's last partition and its file system into the space a disk has gained, through the
+    /// guest tools. Says in a sentence what happened: it never throws, because the disk has grown already.
+    func extendGuestPartition(of machine: VirtualMachine) async -> String {
+        let job: GuestJob
+        switch machine.configuration.os.family {
+        case .windows:
+            let script = "Update-HostStorageCache; $p = Get-Partition -DriveLetter C; $max = (Get-PartitionSupportedSize -DriveLetter C).SizeMax; "
+                + "if ($max -gt $p.Size) { Resize-Partition -DriveLetter C -Size $max; 'extended' } else { 'blocked' }"
+            job = .exec(.init(arguments: ["powershell", "-NoProfile", "-NonInteractive", "-Command", script]))
+        case .linux:
+            let script = "src=$(findmnt -n -o SOURCE /); disk=/dev/$(lsblk -no PKNAME \"$src\"); part=$(cat /sys/class/block/$(basename \"$src\")/partition); "
+                + "growpart \"$disk\" \"$part\" >/dev/null 2>&1; case $(findmnt -n -o FSTYPE /) in ext*) resize2fs \"$src\" >/dev/null 2>&1;; xfs) xfs_growfs / >/dev/null 2>&1;; btrfs) btrfs filesystem resize max / >/dev/null 2>&1;; esac; echo extended"
+            job = .exec(.init(arguments: ["sh", "-c", script], user: "root"))
+        default:
+            return "The disk is larger. macOS can't grow its startup volume: add a volume in the new space with Disk Utility."
+        }
+        do {
+            let output = try await machine.collect(job, patience: 120)
+            let text = String(decoding: output, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
+            if text.hasSuffix("extended") { return "The disk and the guest's system partition are larger." }
+            if text.hasSuffix("blocked") {
+                return "The disk is larger, but the system partition can't grow: another partition sits right after it. Move or delete it in the guest."
+            }
+            return "The disk is larger. The guest answered: \(text.isEmpty ? "nothing" : text)"
+        } catch {
+            return "The disk is larger. Its partition wasn't grown (\(error.localizedDescription)): grow it in the guest."
         }
     }
 

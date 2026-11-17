@@ -187,6 +187,11 @@ public protocol VMBackend: AnyObject {
     /// isn't. The connection is closed when the returned handle is released.
     func connectToGuest(port: UInt32) async throws -> FileHandle
 
+    /// Whether a disk can be made larger while the guest runs.
+    var canGrowDiskLive: Bool { get }
+    /// Makes a disk of the running guest larger. The guest sees the new size without a restart.
+    func growDisk(_ id: UUID, to capacity: UInt64) async throws
+
     /// What the machine's display shows right now. This Mac reads it itself: nothing in the guest is
     /// asked, and nothing there has to allow it.
     func frame() async throws -> ScreenFrame
@@ -231,6 +236,11 @@ public protocol GuestRegionView: NSView {
 
 extension VMBackend {
     public var canSaveState: Bool { true }
+
+    public var canGrowDiskLive: Bool { false }
+    public func growDisk(_ id: UUID, to capacity: UInt64) async throws {
+        throw VMError.invalidConfiguration("This machine's disk can only be made larger while it is shut down.")
+    }
 
     // An engine with no way to a machine's display and input devices says so when asked.
     public func frame() async throws -> ScreenFrame {

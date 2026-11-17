@@ -1132,6 +1132,32 @@ public final class VirtualMachine: Identifiable {
         snapshots.removeAll { $0.id == snapshot.id }
     }
 
+    /// Whether the machine's system disk can be made larger while the machine runs.
+    public var canGrowDiskLive: Bool {
+        (state == .running || state == .paused) && (backend?.canGrowDiskLive ?? false)
+    }
+
+    /// Makes the system disk of a running machine larger, without a restart. The guest still has to grow
+    /// its own partition into the new space.
+    public func growSystemDiskLive(to capacity: UInt64) async throws {
+        try await whileClaimed(.resizingDisk) {
+            guard let disk = configuration.systemDisk else {
+                throw VMError.invalidConfiguration("“\(name)” has no disk.")
+            }
+            guard capacity > disk.capacity else {
+                throw VMError.invalidConfiguration("The disk is already \(disk.capacity / (1 << 30)) GB. A disk can grow, but it can't shrink.")
+            }
+            guard let backend, canGrowDiskLive else {
+                throw VMError.invalidConfiguration("This machine's disk can only be made larger while it is shut down.")
+            }
+            try await backend.growDisk(disk.id, to: capacity)
+            try updateConfiguration { configuration in
+                guard let index = configuration.disks.firstIndex(where: { $0.id == disk.id }) else { return }
+                configuration.disks[index].capacity = capacity
+            }
+        }
+    }
+
     /// Runs `operation` on a machine that is shut down and keeps it that way until the operation is over.
     public func whileStopped<T>(_ activity: VMActivity, _ operation: () async throws -> T) async throws -> T {
         try begin(activity)

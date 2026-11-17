@@ -347,8 +347,8 @@ struct MachineSettingsView: View {
                 HStack {
                     Text("\(Formatting.bytes(machine.allocatedDiskSize)) used of \(Formatting.bytes(configuration.totalDiskCapacity))")
                     Button("Resize…") { isResizingDisk = true }
-                        .disabled(machine.state != .stopped || machine.activity != nil || configuration.systemDisk == nil)
-                        .help(machine.state == .stopped ? "Make the disk larger" : "Shut down the virtual machine to resize its disk")
+                        .disabled((machine.state != .stopped && !machine.canGrowDiskLive) || machine.activity != nil || configuration.systemDisk == nil)
+                        .help(machine.state == .stopped || machine.canGrowDiskLive ? "Make the disk larger" : "Shut down the virtual machine to resize its disk")
                         .popover(isPresented: $isResizingDisk, arrowEdge: .bottom) {
                             ResizeDiskView(machine: machine)
                         }

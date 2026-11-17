@@ -464,7 +464,10 @@ extension AppModel {
                 return .failure("\(gigabytes) GB is more than a disk can have (\(HostResources.maximumDiskGigabytes) GB). The size is in GB.")
             }
             do {
-                try await resizeDisk(of: machine, to: UInt64(gigabytes) * HostResources.gibibyte)
+                let note = try await resizeDisk(of: machine, to: UInt64(gigabytes) * HostResources.gibibyte)
+                var response = success(machine)
+                response.note = note
+                return response
             } catch {
                 return .failure(error.localizedDescription)
             }
