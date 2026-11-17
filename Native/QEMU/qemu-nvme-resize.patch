@@ -1,0 +1,104 @@
+--- a/hw/nvme/ns.c
++++ b/hw/nvme/ns.c
+@@ -161,8 +161,30 @@
+     nvme_ns_init_format(ns);
+ 
+     return 0;
++}
++
++/*
++ * The image of the namespace was made larger or smaller while the guest runs: work out the new size and
++ * tell the controller, which has the guest read the namespace again.
++ */
++static void nvme_ns_resize(void *opaque)
++{
++    NvmeNamespace *ns = opaque;
++    int64_t size = blk_getlength(ns->blkconf.blk);
++
++    if (size < 0 || size == ns->size) {
++        return;
++    }
++
++    ns->size = size;
++    nvme_ns_init_format(ns);
++    nvme_ns_notify_resize(ns);
+ }
+ 
++static const BlockDevOps nvme_ns_blk_ops = {
++    .resize_cb = nvme_ns_resize,
++};
++
+ static int nvme_ns_init_blk(NvmeNamespace *ns, Error **errp)
+ {
+     bool read_only;
+@@ -172,7 +194,9 @@
+     }
+ 
+     read_only = !blk_supports_write_perm(ns->blkconf.blk);
+-    if (!blkconf_apply_backend_options(&ns->blkconf, read_only, false, errp)) {
++    /* A zoned namespace has its zones laid out once: only the others can be resized. */
++    if (!blkconf_apply_backend_options(&ns->blkconf, read_only,
++                                       !ns->params.zoned, errp)) {
+         return -1;
+     }
+ 
+@@ -185,6 +209,10 @@
+     if (ns->size < 0) {
+         error_setg_errno(errp, -ns->size, "could not get blockdev size");
+         return -1;
++    }
++
++    if (!ns->params.zoned) {
++        blk_set_dev_ops(ns->blkconf.blk, &nvme_ns_blk_ops, ns);
+     }
+ 
+     return 0;
+--- a/hw/nvme/ctrl.c
++++ b/hw/nvme/ctrl.c
+@@ -9614,7 +9614,36 @@
+ 
+     return 0;
+ }
++
++/*
++ * A namespace has a new size: tell the controllers it is attached to that its attributes changed. The
++ * guest reads the namespace again when it has seen the event.
++ */
++void nvme_ns_notify_resize(NvmeNamespace *ns)
++{
++    NvmeSubsystem *subsys = ns->subsys;
++    uint32_t nsid = ns->params.nsid;
++    int i;
+ 
++    if (!subsys) {
++        return;
++    }
++
++    for (i = 0; i < NVME_MAX_CONTROLLERS; i++) {
++        NvmeCtrl *ctrl = nvme_subsys_ctrl(subsys, i);
++
++        if (!ctrl || !ctrl->qs_created || nvme_ns(ctrl, nsid) != ns) {
++            continue;
++        }
++
++        if (!test_and_set_bit(nsid, ctrl->changed_nsids)) {
++            nvme_enqueue_event(ctrl, NVME_AER_TYPE_NOTICE,
++                               NVME_AER_INFO_NOTICE_NS_ATTR_CHANGED,
++                               NVME_LOG_CHANGED_NSLIST);
++        }
++    }
++}
++
+ void nvme_attach_ns(NvmeCtrl *n, NvmeNamespace *ns)
+ {
+     uint32_t nsid = ns->params.nsid;
+--- a/hw/nvme/nvme.h
++++ b/hw/nvme/nvme.h
+@@ -751,6 +751,7 @@
+ }
+ 
+ void nvme_attach_ns(NvmeCtrl *n, NvmeNamespace *ns);
++void nvme_ns_notify_resize(NvmeNamespace *ns);
+ uint16_t nvme_bounce_data(NvmeCtrl *n, void *ptr, uint32_t len,
+                           NvmeTxDirection dir, NvmeRequest *req);
+ uint16_t nvme_bounce_mdata(NvmeCtrl *n, void *ptr, uint32_t len,
