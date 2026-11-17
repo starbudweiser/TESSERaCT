@@ -10,7 +10,7 @@ import vmnet
 public final class VmnetPort: @unchecked Sendable {
     private let interface: interface_ref
     private let peer: Int32
-    private let queue = DispatchQueue(label: "app.swiftvm.vmnet-port")
+    private let queue = DispatchQueue(label: "app.tctl.vmnet-port")
     private let lock = NSLock()
     private var isClosed = false
     /// The thread that reads from the engine closes the socket once the engine is gone. Whoever uses
@@ -72,7 +72,7 @@ public final class VmnetPort: @unchecked Sendable {
     }
 
     private static func open(network: VmnetNetwork?, description: xpc_object_t, peer: Int32) async throws -> VmnetPort {
-        let queue = DispatchQueue(label: "app.swiftvm.vmnet-port.start")
+        let queue = DispatchQueue(label: "app.tctl.vmnet-port.start")
         let outcome = StartOutcome()
         var started: interface_ref?
         let (status, packetSize): (vmnet_return_t, Int) = await withCheckedContinuation { continuation in
@@ -131,7 +131,7 @@ public final class VmnetPort: @unchecked Sendable {
         }
         // From the guest to the network: one frame to a datagram, on a thread that waits for them.
         let thread = Thread { [self] in forwardFromGuest() }
-        thread.name = "app.swiftvm.vmnet-port"
+        thread.name = "app.tctl.vmnet-port"
         thread.start()
     }
 

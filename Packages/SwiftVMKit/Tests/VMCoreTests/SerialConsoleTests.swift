@@ -30,7 +30,7 @@ private final class Recorder: @unchecked Sendable {
 
 @Suite struct SerialConsoleTests {
     private func temporaryLog() -> URL {
-        FileManager.default.temporaryDirectory.appending(path: "swiftvm-console-\(UUID().uuidString)/logs/console.log")
+        FileManager.default.temporaryDirectory.appending(path: "tctl-console-\(UUID().uuidString)/logs/console.log")
     }
 
     private func waitFor(_ condition: () -> Bool) async {

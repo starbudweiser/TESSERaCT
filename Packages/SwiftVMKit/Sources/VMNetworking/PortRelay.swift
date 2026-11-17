@@ -55,7 +55,7 @@ public final class PortRelay: @unchecked Sendable {
     public init(route: Route, onStatusChange: @escaping @Sendable (Status) -> Void) {
         self.route = route
         self.onStatusChange = onStatusChange
-        self.queue = DispatchQueue(label: "SwiftVM port relay \(route.transport.rawValue) \(route.hostPort)")
+        self.queue = DispatchQueue(label: "TESSERaCT port relay \(route.transport.rawValue) \(route.hostPort)")
     }
 
     public func start() {

@@ -16,12 +16,12 @@ import Testing
         #expect(text(.hello(protocol: 1)) == #"{"protocol":1,"type":"hello"}"# + "\n")
         #expect(text(.setClock(id: 7, nanoseconds: 1_790_000_000_123_456_789))
             == #"{"id":7,"nanoseconds":1790000000123456789,"type":"set-clock"}"# + "\n")
-        #expect(text(.mountSharedFolders(id: 8, tag: "swiftvm", mountPoint: "/mnt/shared"))
-            == #"{"id":8,"mountPoint":"/mnt/shared","tag":"swiftvm","type":"mount-shared-folders"}"# + "\n")
+        #expect(text(.mountSharedFolders(id: 8, tag: "tctl", mountPoint: "/mnt/shared"))
+            == #"{"id":8,"mountPoint":"/mnt/shared","tag":"tctl","type":"mount-shared-folders"}"# + "\n")
         // On QEMU, a device for each folder, mounted under the folder's name.
-        let folder = SharedFolderDevice(tag: "swiftvm-1a2b3c4d", name: "Projects", readOnly: true)
-        #expect(text(.mountSharedFolders(id: 8, tag: "swiftvm", mountPoint: "/mnt/shared", folders: [folder]))
-            == #"{"folders":[{"name":"Projects","readOnly":true,"tag":"swiftvm-1a2b3c4d"}],"id":8,"mountPoint":"/mnt/shared","tag":"swiftvm","type":"mount-shared-folders"}"# + "\n")
+        let folder = SharedFolderDevice(tag: "tctl-1a2b3c4d", name: "Projects", readOnly: true)
+        #expect(text(.mountSharedFolders(id: 8, tag: "tctl", mountPoint: "/mnt/shared", folders: [folder]))
+            == #"{"folders":[{"name":"Projects","readOnly":true,"tag":"tctl-1a2b3c4d"}],"id":8,"mountPoint":"/mnt/shared","tag":"tctl","type":"mount-shared-folders"}"# + "\n")
         #expect(text(.shutDown(id: 9)) == #"{"id":9,"type":"shut-down"}"# + "\n")
         #expect(text(.setTimeZone(id: 10, identifier: "Europe/Berlin"))
             == #"{"id":10,"identifier":"Europe/Berlin","type":"set-time-zone"}"# + "\n")
@@ -33,7 +33,7 @@ import Testing
 
     @Test func onlyRequestsCarryAnID() {
         #expect(HostMessage.setClock(id: 1, nanoseconds: 2).requestID == 1)
-        #expect(HostMessage.mountSharedFolders(id: 2, tag: "swiftvm", mountPoint: "/mnt/shared").requestID == 2)
+        #expect(HostMessage.mountSharedFolders(id: 2, tag: "tctl", mountPoint: "/mnt/shared").requestID == 2)
         #expect(HostMessage.shutDown(id: 3).requestID == 3)
         #expect(HostMessage.setTimeZone(id: 4, identifier: "UTC").requestID == 4)
         #expect(HostMessage.hello(protocol: 1).requestID == nil)
@@ -159,7 +159,7 @@ import Testing
 
     @Test func messagesSurviveARoundTrip() throws {
         let fromTheApp: [HostMessage] = [
-            .hello(protocol: 1), .setClock(id: 1, nanoseconds: .max), .mountSharedFolders(id: 2, tag: "swiftvm", mountPoint: "/mnt/a b"),
+            .hello(protocol: 1), .setClock(id: 1, nanoseconds: .max), .mountSharedFolders(id: 2, tag: "tctl", mountPoint: "/mnt/a b"),
             .shutDown(id: 3), .setTimeZone(id: 4, identifier: "America/Argentina/Buenos_Aires"),
             .clipboard(text: "Über “quotes”\n\ttab \u{1F642} \\ / \u{0}"), .unknown(type: "later"),
             .seamless(enabled: true), .activateWindow(.max),

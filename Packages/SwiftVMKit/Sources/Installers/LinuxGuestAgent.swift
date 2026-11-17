@@ -14,13 +14,13 @@ public enum LinuxGuestAgent {
 
         public var errorDescription: String? {
             switch self {
-            case .missingResource(let name): "This copy of SwiftVM is missing “\(name)”."
+            case .missingResource(let name): "This copy of TESSERaCT is missing “\(name)”."
             }
         }
     }
 
     /// Where the agent and a copy of its installer live in a guest.
-    public static let directory = "/usr/local/lib/swiftvm"
+    public static let directory = "/usr/local/lib/tctl"
     public static let installerPath = "\(directory)/install.sh"
 
     /// The volume label of the guest tools disc, which is how a guest finds it.
@@ -29,10 +29,10 @@ public enum LinuxGuestAgent {
     /// What a person runs in the guest to install from the guest tools disc. It mounts the disc itself, so
     /// it works whether or not the guest's desktop has done so, and in a guest without a desktop.
     public static let toolsInstallCommand =
-        "sudo sh -c 'mkdir -p /run/swiftvm-tools && mount -o ro /dev/disk/by-label/\(toolsVolumeName) /run/swiftvm-tools"
-        + " && sh /run/swiftvm-tools/install.sh; umount /run/swiftvm-tools'"
+        "sudo sh -c 'mkdir -p /run/tctl-tools && mount -o ro /dev/disk/by-label/\(toolsVolumeName) /run/tctl-tools"
+        + " && sh /run/tctl-tools/install.sh; umount /run/tctl-tools'"
 
-    static let fileNames = ["swiftvm-agent.py", "swiftvm-agent.service", "swiftvm-sshd-vsock.socket", "swiftvm-sshd-vsock@.service"]
+    static let fileNames = ["tctl-agent.py", "tctl-agent.service", "tctl-sshd-vsock.socket", "tctl-sshd-vsock@.service"]
 
     static func resourceURL(_ name: String) -> URL? {
         let url = URL(fileURLWithPath: name)
@@ -47,7 +47,7 @@ public enum LinuxGuestAgent {
     }
 
     /// The version of the agent this build carries, as the agent reports it when it connects.
-    public static let version: String? = (try? resource("swiftvm-agent.py")).flatMap(version(ofScript:))
+    public static let version: String? = (try? resource("tctl-agent.py")).flatMap(version(ofScript:))
 
     static func version(ofScript script: String) -> String? {
         for line in script.split(separator: "\n") where line.hasPrefix("AGENT_VERSION") {
@@ -89,7 +89,7 @@ public enum LinuxGuestAgent {
         try GuestToolsDisc.image(prefix: toolsImagePrefix, volumeName: toolsVolumeName, files: toolsFiles(), in: directory, inUse: inUse)
     }
 
-    static let toolsImagePrefix = "SwiftVM Guest Tools "
+    static let toolsImagePrefix = "TESSERaCT Guest Tools "
 
     /// Whether `path` is a guest tools disc made by ``toolsImage(in:inUse:)``.
     public static func isToolsImage(_ path: String) -> Bool {
@@ -102,7 +102,7 @@ public enum LinuxGuestAgent {
     /// Receives the installer in a private folder, never overwriting the installed copy before the
     /// installer's lock has excluded an earlier attempt that may still be running.
     static func installArguments(alias: String, configURL: URL) -> [String] {
-        let asRoot = "umask 077; d=$(mktemp -d /tmp/swiftvm-tools.XXXXXXXX) || exit 1; "
+        let asRoot = "umask 077; d=$(mktemp -d /tmp/tctl-tools.XXXXXXXX) || exit 1; "
             + "cat > \"$d/install.sh\" && sh \"$d/install.sh\"; code=$?; rm -rf \"$d\"; exit $code"
         return [
             "-F", configURL.path,
@@ -117,7 +117,7 @@ public enum LinuxGuestAgent {
     }
 
     /// Installs the agent over SSH. Needs key sign-in and `sudo` without a password, as guests set up by
-    /// SwiftVM have. Blocks until `ssh` exits; call it off the main thread.
+    /// TESSERaCT have. Blocks until `ssh` exits; call it off the main thread.
     public static func install(on alias: String, configURL: URL) throws {
         try ProcessRunner.run("/usr/bin/ssh", installArguments(alias: alias, configURL: configURL), input: Data(try installer().utf8))
     }
@@ -134,5 +134,5 @@ public enum LinuxGuestAgent {
     }
 
     /// How every line starts that `install.sh` prints when it fails.
-    static let installerPrefix = "swiftvm:"
+    static let installerPrefix = "tctl:"
 }

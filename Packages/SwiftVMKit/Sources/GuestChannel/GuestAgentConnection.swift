@@ -13,10 +13,10 @@ public final class GuestAgentConnection: @unchecked Sendable {
     public let messages: AsyncStream<AgentMessage>
 
     private let handle: FileHandle
-    private let queue = DispatchQueue(label: "SwiftVM guest agent connection")
+    private let queue = DispatchQueue(label: "TESSERaCT guest agent connection")
     /// Where what didn't fit at once is written. Never the queue that reads: an agent that waits for
     /// its own words to be taken before it listens again would wait for good.
-    private let writeQueue = DispatchQueue(label: "SwiftVM guest agent connection, writing")
+    private let writeQueue = DispatchQueue(label: "TESSERaCT guest agent connection, writing")
     private let source: any DispatchSourceRead
     private let incoming: AsyncStream<AgentMessage>.Continuation
     private let lock = NSLock()

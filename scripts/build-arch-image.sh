@@ -1,5 +1,5 @@
 #!/bin/bash
-# Builds the disk image that SwiftVM's Arch Linux ARM machines start from: Arch Linux ARM, set up the
+# Builds the disk image that TESSERaCT's Arch Linux ARM machines start from: Arch Linux ARM, set up the
 # way a cloud image is, for cloud-init to configure on a machine's first start. Arch Linux publishes no
 # such image for 64-bit ARM, which is all a Mac runs. The release workflow (build-arch-image.yml) runs
 # this, and the image it publishes goes into Packages/SwiftVMKit/Sources/Installers/Resources/
@@ -14,11 +14,11 @@
 # to it, and why:
 #   - The packages are brought up to date, and cloud-init, GRUB and growpart added.
 #   - The accounts the tarball comes with are taken out: both have a password everyone knows. The one
-#     account a machine has is the one SwiftVM asks cloud-init for.
-#   - cloud-init looks for SwiftVM's seed disc and nothing else, so that it doesn't spend minutes asking
+#     account a machine has is the one TESSERaCT asks cloud-init for.
+#   - cloud-init looks for TESSERaCT's seed disc and nothing else, so that it doesn't spend minutes asking
 #     a cloud for settings first. It configures the network with systemd-networkd, which asks DHCP for
 #     an address by the card's MAC address: that is what the Mac keeps the machine's address by.
-#   - The kernel writes to the serial console (hvc0) too, where `swiftvm console` reads it.
+#   - The kernel writes to the serial console (hvc0) too, where `tctl console` reads it.
 #   - What makes a system one of a kind (machine ID, SSH host keys, the package manager's keys) is left
 #     out, for each machine to make its own on its first start.
 set -euo pipefail
@@ -153,7 +153,7 @@ fi
 
 # Only the seed disc a machine is made with: the clouds that cloud-init would ask first would keep a
 # first start waiting for minutes.
-cat > /etc/cloud/cloud.cfg.d/90-swiftvm.cfg << 'CONFIG'
+cat > /etc/cloud/cloud.cfg.d/90-tctl.cfg << 'CONFIG'
 datasource_list: [NoCloud, None]
 system_info:
   distro: arch
@@ -218,7 +218,7 @@ sync
 umount -R "$root"
 losetup -d "$loop"
 loop=''
-# Compressed with zlib, which SwiftVM reads.
+# Compressed with zlib, which TESSERaCT reads.
 qemu-img convert -c -f raw -O qcow2 -o compression_type=zlib "$disk" "$output/$name.qcow2"
 (cd "$output" && sha256sum "$name.qcow2" > SHA256SUMS)
 cat "$output/SHA256SUMS"

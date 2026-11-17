@@ -7,9 +7,9 @@
 # disk: 16
 # restart: yes
 #
-# A setup script for SwiftVM. It runs as root in a new virtual machine the first time the machine
+# A setup script for TESSERaCT. It runs as root in a new virtual machine the first time the machine
 # starts. The lines above say what it is; a line it prints that starts with "==> " is the step
-# SwiftVM shows. How these scripts are written: https://swiftvm.app/docs/features/setup-scripts/
+# TESSERaCT shows. How these scripts are written: https://swiftvm.app/docs/features/setup-scripts/
 #
 # Hyprland draws with OpenGL: enable graphics acceleration when creating the machine for a
 # smoother desktop. Without it, the processors do the drawing. Super is the Command key:
@@ -29,7 +29,7 @@ esac
 packages="hyprland foot dolphin hyprlauncher waybar woff2-font-awesome noto-fonts xdg-desktop-portal-hyprland
     hyprpolkitagent qt6-wayland xorg-xwayland pipewire-pulse wireplumber sddm firefox spice-vdagent"
 # What the guest tools read the screen with, part by part, for whoever drives this machine from
-# the Mac (swiftvm control): the desktop's own accessibility, and what Python takes to ask it.
+# the Mac (tctl control): the desktop's own accessibility, and what Python takes to ask it.
 packages="$packages at-spi2-core python-gobject wl-clipboard xclip"
 # A compiler for the few lines that make Hyprland wait for its drawing (below). It goes again
 # afterwards, unless the system had one already.
@@ -53,16 +53,16 @@ echo "==> Finishing"
 # before it is drawn: it waits only for software renderers it recognises by the graphics card's
 # driver, which is virtio_gpu here. The Mac then keeps what the frame held before, a window that
 # was closed for one. This makes Hyprland wait when llvmpipe draws, and leaves everything else be.
-mkdir -p /usr/local/lib/swiftvm-hyprland
-cat > /usr/local/lib/swiftvm-hyprland/hyprland-finish.c << 'END'
-/* Added by SwiftVM: Hyprland waits for llvmpipe to draw a frame before it shows it. Only Hyprland
+mkdir -p /usr/local/lib/tctl-hyprland
+cat > /usr/local/lib/tctl-hyprland/hyprland-finish.c << 'END'
+/* Added by TESSERaCT: Hyprland waits for llvmpipe to draw a frame before it shows it. Only Hyprland
    loads this, through /usr/local/bin/Hyprland, and the programs it starts don't inherit it. */
 #define _GNU_SOURCE
 #include <dlfcn.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define SELF "/usr/local/lib/swiftvm-hyprland/hyprland-finish.so"
+#define SELF "/usr/local/lib/tctl-hyprland/hyprland-finish.so"
 #define GL_RENDERER 0x1F01
 
 const unsigned char *glGetString(unsigned int name);
@@ -95,12 +95,12 @@ void glFlush(void) {
     flush();
 }
 END
-gcc -O2 -shared -fPIC -o /usr/local/lib/swiftvm-hyprland/hyprland-finish.so /usr/local/lib/swiftvm-hyprland/hyprland-finish.c
+gcc -O2 -shared -fPIC -o /usr/local/lib/tctl-hyprland/hyprland-finish.so /usr/local/lib/tctl-hyprland/hyprland-finish.c
 # Hyprland's launcher finds it by name, and /usr/local/bin comes first.
 cat > /usr/local/bin/Hyprland << 'END'
 #!/bin/sh
-# Added by SwiftVM: Hyprland with /usr/local/lib/swiftvm-hyprland/hyprland-finish.so, whose source says why.
-LD_PRELOAD=/usr/local/lib/swiftvm-hyprland/hyprland-finish.so${LD_PRELOAD:+:$LD_PRELOAD} exec /usr/bin/Hyprland "$@"
+# Added by TESSERaCT: Hyprland with /usr/local/lib/tctl-hyprland/hyprland-finish.so, whose source says why.
+LD_PRELOAD=/usr/local/lib/tctl-hyprland/hyprland-finish.so${LD_PRELOAD:+:$LD_PRELOAD} exec /usr/bin/Hyprland "$@"
 END
 chmod 0755 /usr/local/bin/Hyprland
 # Kept when something installed since depends on it.
@@ -108,16 +108,16 @@ chmod 0755 /usr/local/bin/Hyprland
 
 # Hyprland's own configuration, without the note that it was made for nobody in particular, and
 # with the bar. One the account has already stays as it is.
-home=$(getent passwd "$SWIFTVM_USER" | cut -d: -f6)
+home=$(getent passwd "$TESSERACT_USER" | cut -d: -f6)
 config=$home/.config/hypr/hyprland.lua
 if [ -n "$home" ] && [ ! -e "$config" ]; then
     mkdir -p "$home/.config/hypr"
     {
         sed -E 's/^(local terminal[[:space:]]*=[[:space:]]*)"kitty"/\1"foot"/' /usr/share/hypr/hyprland.lua
-        printf '\n-- Added by SwiftVM: the bar.\nhl.on("hyprland.start", function ()\n    hl.exec_cmd("waybar")\nend)\n'
+        printf '\n-- Added by TESSERaCT: the bar.\nhl.on("hyprland.start", function ()\n    hl.exec_cmd("waybar")\nend)\n'
         cat << 'END'
 
--- Added by SwiftVM: keep effects inexpensive for machines without graphics acceleration.
+-- Added by TESSERaCT: keep effects inexpensive for machines without graphics acceleration.
 -- Remove this block to turn them back on.
 hl.config({
   animations = { enabled = false },
@@ -125,17 +125,17 @@ hl.config({
 })
 END
     } > "$config"
-    chown -R "$SWIFTVM_USER:" "$home/.config"
+    chown -R "$TESSERACT_USER:" "$home/.config"
 fi
 # The Mac suspends the virtual machine. A system that goes to sleep by itself may not wake up.
 systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 # One login screen at a time: a desktop installed before this one keeps its own.
 [ -e /etc/systemd/system/display-manager.service ] || systemctl enable sddm
-# The account logs in by itself, as it does in a macOS or Windows machine that SwiftVM sets up:
-# whoever drives the desktop from the Mac (swiftvm control) finds it there after every start. The
+# The account logs in by itself, as it does in a macOS or Windows machine that TESSERaCT sets up:
+# whoever drives the desktop from the Mac (tctl control) finds it there after every start. The
 # password still unlocks a locked screen, sudo and SSH.
-if [ -n "${SWIFTVM_USER:-}" ]; then
+if [ -n "${TESSERACT_USER:-}" ]; then
     mkdir -p /etc/sddm.conf.d
-    printf '[Autologin]\nUser=%s\nSession=hyprland.desktop\n' "$SWIFTVM_USER" > /etc/sddm.conf.d/80-swiftvm-autologin.conf
+    printf '[Autologin]\nUser=%s\nSession=hyprland.desktop\n' "$TESSERACT_USER" > /etc/sddm.conf.d/80-tctl-autologin.conf
 fi
 systemctl set-default graphical.target

@@ -5,7 +5,7 @@ import Testing
 
 @Suite struct ControlSocketTests {
     @Test func reportsWhenAppIsNotRunning() {
-        let client = ControlClient(socketURL: URL(fileURLWithPath: "/tmp/swiftvm-missing-\(UUID().uuidString).sock"))
+        let client = ControlClient(socketURL: URL(fileURLWithPath: "/tmp/tctl-missing-\(UUID().uuidString).sock"))
         #expect(throws: ControlSocketError.self) { try client.send(ControlRequest(command: .list)) }
     }
 
@@ -121,7 +121,7 @@ import Testing
 
     @Test func guestToolsTravelWithAMachinesDetails() throws {
         let details = MachineDetails(
-            location: "/Machines/Web.swiftvm", macAddress: "02:00:00:00:00:01", drives: [], sharedFolders: [], snapshotCount: 0,
+            location: "/Machines/Web.tctl", macAddress: "02:00:00:00:00:01", drives: [], sharedFolders: [], snapshotCount: 0,
             guestTools: .init(version: "1.0", kernel: "7.0.0-34-generic")
         )
         let machine = MachineSummary(

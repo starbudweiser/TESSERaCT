@@ -14,7 +14,7 @@ public enum MacGuestAgent {
 
         public var errorDescription: String? {
             switch self {
-            case .missingProgram: "This copy of SwiftVM is missing the guest agent for macOS."
+            case .missingProgram: "This copy of TESSERaCT is missing the guest agent for macOS."
             }
         }
     }
@@ -32,7 +32,7 @@ public enum MacGuestAgent {
     /// Dismisses the system's setup notices in the logged-in guest session, after desktop access has
     /// been allowed. This is a one-time cleanup, not a change to the account's notification settings.
     public static let dismissSetupNotifications = GuestJob.exec(.init(
-        arguments: ["\(directory)/swiftvm-agent", "dismiss-setup-notifications"]
+        arguments: ["\(directory)/tctl-agent", "dismiss-setup-notifications"]
     ))
 
     /// A shell script that installs the agent, or replaces an older one, with everything it needs inside.
@@ -44,7 +44,7 @@ public enum MacGuestAgent {
         // of the file without it, and hands it out to whoever asks for `install.sh`.
         let script = try LinuxGuestAgent.resource("macos-install.sh")
         let encoded = binary.base64EncodedString(options: [.lineLength76Characters, .endLineWithLineFeed])
-        return script.replacingOccurrences(of: "@@swiftvm-agent@@", with: encoded)
+        return script.replacingOccurrences(of: "@@tctl-agent@@", with: encoded)
     }
 
     // MARK: The guest tools disc
@@ -67,7 +67,7 @@ public enum MacGuestAgent {
     }
 
     /// Not a name that begins like the discs for Linux do: each kind clears away its own older discs.
-    static let toolsImagePrefix = "SwiftVM macOS Guest Tools "
+    static let toolsImagePrefix = "TESSERaCT macOS Guest Tools "
 
     /// Whether `path` is a guest tools disc made by ``toolsImage(in:inUse:program:)``.
     public static func isToolsImage(_ path: String) -> Bool {
@@ -92,7 +92,7 @@ public enum MacGuestAgent {
     static func installArguments(alias: String, configURL: URL, marker: String, readsPassword: Bool) -> [String] {
         let sudo = readsPassword ? "sudo -S -p \"\"" : "sudo -n"
         let asRoot = "found=; while IFS= read -r line; do if [ \"$line\" = \"\(marker)\" ]; then found=1; break; fi; done; "
-            + "[ -n \"$found\" ] || exit 1; umask 077; d=$(mktemp -d /tmp/swiftvm-tools.XXXXXXXX) || exit 1; "
+            + "[ -n \"$found\" ] || exit 1; umask 077; d=$(mktemp -d /tmp/tctl-tools.XXXXXXXX) || exit 1; "
             + "cat > \"$d/install.sh\" && sh \"$d/install.sh\"; code=$?; rm -rf \"$d\"; exit $code"
         return [
             "-F", configURL.path,
@@ -117,7 +117,7 @@ public enum MacGuestAgent {
     /// The password only ever travels on `ssh`'s standard input, to `sudo`'s.
     public static func install(on alias: String, configURL: URL, password: String?, program: URL) throws {
         // A line that nothing in the installer or in a password can be.
-        let marker = "swiftvm-installer-\(UUID().uuidString)"
+        let marker = "tctl-installer-\(UUID().uuidString)"
         try ProcessRunner.run(
             "/usr/bin/ssh",
             installArguments(alias: alias, configURL: configURL, marker: marker, readsPassword: password != nil),

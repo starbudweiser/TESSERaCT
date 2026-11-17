@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/logo.png" alt="SwiftVM" width="128" height="128">
+  <img src="assets/logo.png" alt="TESSERaCT" width="128" height="128">
 </p>
 
-<h1 align="center">SwiftVM</h1>
+<h1 align="center">TESSERaCT</h1>
 
 <p align="center">Native macOS app for running macOS, Linux, and Windows virtual machines.</p>
 
@@ -27,20 +27,20 @@
 - Port forwarding
 - USB devices and disk images
 - Lives in the menu bar
-- `swiftvm` command-line tool
-- Automation for scripts and AI agents: [see and work a guest's desktop](docs/features/automation.md#the-desktop), at login screens too, run commands in it, and copy files, from the `swiftvm` command or [its MCP server](docs/features/automation.md#mcp)
+- `tctl` command-line tool
+- Automation for scripts and AI agents: [see and work a guest's desktop](docs/features/automation.md#the-desktop), at login screens too, run commands in it, and copy files, from the `tctl` command or [its MCP server](docs/features/automation.md#mcp)
 
 ## Install
 
-SwiftVM runs on macOS 27 or newer, on Apple silicon.
+TESSERaCT runs on macOS 27 or newer, on Apple silicon.
 
 ```bash
-brew install --cask swiftvm-app/tap/swiftvm
+brew install --cask tctl-app/tap/tctl
 ```
 
 Or download the DMG from the [latest release](https://github.com/swiftvm-app/swiftvm/releases/latest).
 
-See [Getting started](docs/user-guide/getting-started.md) for your first virtual machine, the `swiftvm` command, and beta builds.
+See [Getting started](docs/user-guide/getting-started.md) for your first virtual machine, the `tctl` command, and beta builds.
 
 ## Documentation
 

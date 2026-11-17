@@ -21,7 +21,7 @@ public struct ImageDownloader: Sendable {
             case .invalidManifest:
                 "The image release has invalid or incompatible download metadata. Try again later."
             case .noCompatibleImage:
-                "Couldn't find a published image compatible with this version of SwiftVM."
+                "Couldn't find a published image compatible with this version of TESSERaCT."
             }
         }
     }
@@ -50,7 +50,7 @@ public struct ImageDownloader: Sendable {
     }
 
     public static var defaultCacheDirectory: URL {
-        URL.cachesDirectory.appending(path: "SwiftVM/Downloads", directoryHint: .isDirectory)
+        URL.cachesDirectory.appending(path: "TESSERaCT/Downloads", directoryHint: .isDirectory)
     }
 
     /// Where the verified copy of `image` lives once downloaded.

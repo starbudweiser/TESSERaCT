@@ -15,8 +15,8 @@ public struct SSHKeyManager: Sendable {
         self.sshDirectory = sshDirectory
     }
 
-    /// Name of the key SwiftVM generates when the user has none.
-    static let generatedKeyName = "swiftvm_ed25519"
+    /// Name of the key TESSERaCT generates when the user has none.
+    static let generatedKeyName = "tctl_ed25519"
     static let preferredKeyNames = ["id_ed25519", "id_ecdsa", "id_rsa", generatedKeyName]
 
     /// The user's existing key pair, preferring Ed25519.
@@ -46,7 +46,7 @@ public struct SSHKeyManager: Sendable {
         }
         let privateKey = sshDirectory.appending(path: Self.generatedKeyName)
         try ProcessRunner.run("/usr/bin/ssh-keygen", [
-            "-q", "-t", "ed25519", "-N", "", "-C", "swiftvm", "-f", privateKey.path,
+            "-q", "-t", "ed25519", "-N", "", "-C", "tctl", "-f", privateKey.path,
         ])
         let line = try String(contentsOf: sshDirectory.appending(path: "\(Self.generatedKeyName).pub"), encoding: .utf8)
         return KeyPair(publicKey: line.trimmingCharacters(in: .whitespacesAndNewlines), privateKeyPath: privateKey.path)

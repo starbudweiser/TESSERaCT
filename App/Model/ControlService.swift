@@ -10,7 +10,7 @@ import VMNetworking
 import VZEngine
 import Virtualization
 
-/// Handles requests from the `swiftvm` command-line tool.
+/// Handles requests from the `tctl` command-line tool.
 extension AppModel {
     func handle(_ request: ControlRequest) async -> ControlResponse {
         guard !isQuittingUnattended, !isClosingDown else { return .failure("\(AppIdentity.current.name) is quitting.") }
@@ -95,7 +95,7 @@ extension AppModel {
             let creating = creationsInProgress
             guard creating.isEmpty || request.cancelsCreations == true else {
                 let subject = creating.count == 1 ? "“\(creating[0].name)” is" : "\(creating.count) virtual machines are"
-                return .failure("\(subject) still being created. To quit anyway, use `swiftvm quit --cancel-creations`: a download carries on where it stopped the next time, an installation starts over.")
+                return .failure("\(subject) still being created. To quit anyway, use `tctl quit --cancel-creations`: a download carries on where it stopped the next time, an installation starts over.")
             }
             if let moving = machinesBeingMoved.first {
                 return .failure("“\(moving.name)” is being moved to another folder. Wait until it is there, or call the move off in the machine's settings.")
@@ -265,7 +265,7 @@ extension AppModel {
                     try? await Task.sleep(for: .milliseconds(50))
                 }
                 if case .failed(let reason) = portForwarder.statuses[forward.id] {
-                    return .failure("The forward was added, but the port isn't open: \(reason) SwiftVM keeps trying while “\(machine.name)” runs.")
+                    return .failure("The forward was added, but the port isn't open: \(reason) TESSERaCT keeps trying while “\(machine.name)” runs.")
                 }
             }
             return details(machine)
@@ -285,7 +285,7 @@ extension AppModel {
         case .network:
             do {
                 if request.networkMode != "mac", request.macAddress != nil {
-                    return .failure("Use swiftvm network <machine> mac <address> to change the MAC address.")
+                    return .failure("Use tctl network <machine> mac <address> to change the MAC address.")
                 }
                 switch request.networkMode {
                 case "shared":
@@ -295,7 +295,7 @@ extension AppModel {
                     try setNetwork(of: machine, bridgedTo: nil)
                 case "bridged":
                     guard let host = request.bridgedInterfaceIdentifier, !host.isEmpty else {
-                        return .failure("Choose a host interface from swiftvm network-interfaces.")
+                        return .failure("Choose a host interface from tctl network-interfaces.")
                     }
                     try setNetwork(of: machine, bridgedTo: host)
                 case "mac":
@@ -338,7 +338,7 @@ extension AppModel {
 
                             \(guestToolsInstallCommand(for: machine))
 
-                        Afterwards, eject the disc: swiftvm eject \(alias.isEmpty ? machine.id.uuidString : alias) "\(disc.name)"
+                        Afterwards, eject the disc: tctl eject \(alias.isEmpty ? machine.id.uuidString : alias) "\(disc.name)"
                         """
                     return response
                 }
@@ -350,7 +350,7 @@ extension AppModel {
                     } catch {
                         // The tools are in. What they may do on the desktop is for later.
                         var response = details(machine)
-                        response.note = "macOS in “\(machine.name)” doesn't let the guest tools read its desktop yet: \(Self.explanation(of: error, for: machine)) `swiftvm control \(machine.configuration.ssh.alias) allow --password <password>` tries again."
+                        response.note = "macOS in “\(machine.name)” doesn't let the guest tools read its desktop yet: \(Self.explanation(of: error, for: machine)) `tctl control \(machine.configuration.ssh.alias) allow --password <password>` tries again."
                         return response
                     }
                 }
@@ -365,11 +365,11 @@ extension AppModel {
                 let detail = reason.isEmpty ? "" : " (\(reason))"
                 if machine.configuration.os.family == .macOS {
                     let advice = request.password == nil
-                        ? "Give the password with --password <password>, or install from inside the guest with `swiftvm install-tools <machine> --disc`."
-                        : "To install from inside the guest instead, use `swiftvm install-tools <machine> --disc`."
+                        ? "Give the password with --password <password>, or install from inside the guest with `tctl install-tools <machine> --disc`."
+                        : "To install from inside the guest instead, use `tctl install-tools <machine> --disc`."
                     return .failure("The guest tools couldn't be installed over SSH, which takes key sign-in and the account's password\(detail). \(advice)")
                 }
-                return .failure("The guest tools couldn't be installed over SSH, which takes key sign-in and sudo without a password\(detail). To install from inside the guest instead, use `swiftvm install-tools <machine> --disc`.")
+                return .failure("The guest tools couldn't be installed over SSH, which takes key sign-in and sudo without a password\(detail). To install from inside the guest instead, use `tctl install-tools <machine> --disc`.")
             } catch {
                 return .failure(error.localizedDescription)
             }
@@ -567,7 +567,7 @@ extension AppModel {
             // The agent serves one connection, the app's. Another one would take its place. And what
             // the guest tools do in the guest is asked for by name, where it can be turned off.
             guard port != GuestAgent.port, port != GuestProtocol.jobPort else {
-                return (.failure("Port \(port) is the line between SwiftVM and the guest tools, and not for anything else."), nil)
+                return (.failure("Port \(port) is the line between TESSERaCT and the guest tools, and not for anything else."), nil)
             }
             do {
                 let guest = try await machine.connectToGuest(port: port)
@@ -614,7 +614,7 @@ extension AppModel {
     /// How long a guest's agent gets to end a job that was called off, before the app closes the line.
     private static let jobCallOffPatience: TimeInterval = 15
 
-    /// Does what `swiftvm control` asked, and sends how it went as frames, the way a job's output comes.
+    /// Does what `tctl control` asked, and sends how it went as frames, the way a job's output comes.
     private func serveControl(_ call: ControlCall, of machine: VirtualMachine, connection: Int32) async {
         let controller = controller(of: machine)
         let work = Task { await controller.perform(call) }
@@ -663,9 +663,9 @@ extension AppModel {
         let alias = machine.configuration.ssh.alias
         let name = alias.isEmpty ? machine.id.uuidString : alias
         let advice: String? = switch error as? GuestJobError {
-        case .notAllowed: "Turn it on in the machine's settings, or with `swiftvm automation \(name) on`."
-        case .noAgent: "`swiftvm wait \(name)` waits for them, and `swiftvm install-tools \(name)` installs them."
-        case .notOffered: "Update them with `swiftvm install-tools \(name)`."
+        case .notAllowed: "Turn it on in the machine's settings, or with `tctl automation \(name) on`."
+        case .noAgent: "`tctl wait \(name)` waits for them, and `tctl install-tools \(name)` installs them."
+        case .notOffered: "Update them with `tctl install-tools \(name)`."
         case .noAnswer, .tooLong, .refused, nil: nil
         }
         return [error.localizedDescription, advice].compactMap { $0 }.joined(separator: " ")
@@ -682,7 +682,7 @@ extension AppModel {
 
     /// Waits until a machine that is up, or coming up, is ready to be worked by scripts and agents: its
     /// guest tools answer, the setup it was created with has come to its end, restarts included, and a
-    /// desktop it logs in to by itself is logged in, so that `swiftvm control` knows what is on it. Returns what is in
+    /// desktop it logs in to by itself is logged in, so that `tctl control` knows what is on it. Returns what is in
     /// the way if it doesn't get there in time.
     private func waitUntilReady(_ machine: VirtualMachine, timeout: Duration) async -> String? {
         let deadline = ContinuousClock.now + timeout
@@ -700,7 +700,7 @@ extension AppModel {
             case .waiting(let what):
                 guard ContinuousClock.now < deadline else {
                     let alias = machine.configuration.ssh.alias.isEmpty ? machine.id.uuidString : machine.configuration.ssh.alias
-                    return "“\(machine.name)” isn't ready yet: \(what). `swiftvm wait \(alias)` waits on."
+                    return "“\(machine.name)” isn't ready yet: \(what). `tctl wait \(alias)` waits on."
                 }
             }
             try? await Task.sleep(for: .milliseconds(500))
@@ -709,7 +709,7 @@ extension AppModel {
 
     /// Says `yes` in a macOS or Linux guest whose desktop logs in to an account by itself when the
     /// system starts: macOS's automatic login, or that of GDM, SDDM or LightDM, the login screens of
-    /// SwiftVM's desktops.
+    /// TESSERaCT's desktops.
     private static let logsInByItself = """
         if [ "$(uname -s)" = Darwin ]; then
             defaults read /Library/Preferences/com.apple.loginwindow autoLoginUser > /dev/null 2>&1 && echo yes || echo no
@@ -728,7 +728,7 @@ extension AppModel {
         guard machine.state == .running, machine.agent.isConnected else {
             if isWindowsBeingInstalled { return .waiting("Windows is being installed") }
             if machinesBeingSetUp.contains(machine.id) { return .waiting("macOS is setting up its account") }
-            return .waiting("its guest tools haven't answered. If they aren't installed, `swiftvm install-tools` installs them")
+            return .waiting("its guest tools haven't answered. If they aren't installed, `tctl install-tools` installs them")
         }
         if let setup = machine.agent.setup {
             let step = setup.step.map { ": \($0)" } ?? ""
@@ -742,7 +742,7 @@ extension AppModel {
                     return .failed("\(what) couldn't be set up in “\(machine.name)”\(place).")
                 }
                 let alias = machine.configuration.ssh.alias.isEmpty ? machine.id.uuidString : machine.configuration.ssh.alias
-                return .failed("\(what) couldn't be set up in “\(machine.name)”\(place). What it printed is in \(GuestIntegration.setupLogPath) in the guest. To run it again: swiftvm exec \(alias) --root -- systemctl start swiftvm-setup")
+                return .failed("\(what) couldn't be set up in “\(machine.name)”\(place). What it printed is in \(GuestIntegration.setupLogPath) in the guest. To run it again: tctl exec \(alias) --root -- systemctl start tctl-setup")
             case .finished:
                 break
             }
@@ -761,7 +761,7 @@ extension AppModel {
         guard machine.configuration.automation.isAllowed, machine.agent.offers(GuestFeature.accessibility),
               machine.agent.offers(GuestFeature.exec)
         else { return .ready }
-        // A desktop is waited for only where it logs in by itself, as SwiftVM sets them up: one that
+        // A desktop is waited for only where it logs in by itself, as TESSERaCT sets them up: one that
         // waits for someone at its login screen would be waited for in vain.
         if hasDesktop == nil {
             switch machine.configuration.os.family {
@@ -792,7 +792,7 @@ extension AppModel {
         }
     }
 
-    /// Connects a `swiftvm console` session to a machine's serial console and returns when the tool hangs
+    /// Connects a `tctl console` session to a machine's serial console and returns when the tool hangs
     /// up. Like a cable, the session survives the machine being stopped and started.
     private nonisolated static func serveConsole(_ console: SerialConsole, name: String, connection: Int32) async {
         let writer = ConsoleClientWriter(descriptor: connection)
@@ -919,7 +919,7 @@ extension AppModel {
             guard !usesRosetta else { return .failure("A machine with --gpu runs on QEMU, which has no Rosetta. Use --no-gpu to use Rosetta, or leave out --rosetta to use the GPU.") }
             guard !usesNestedVirtualization else { return .failure("A machine with --gpu runs on QEMU, which can't run virtual machines inside it. Use --no-gpu with --nested-virt, or leave out --nested-virt to use the GPU.") }
             guard qemuProvider?.canAccelerateGraphics == true else {
-                return .failure("Graphics acceleration needs QEMU with OpenGL, which this copy of SwiftVM was built without.")
+                return .failure("Graphics acceleration needs QEMU with OpenGL, which this copy of TESSERaCT was built without.")
             }
         }
 
@@ -1011,7 +1011,7 @@ extension AppModel {
         guard qemuProvider?.isAvailable == true else { return .failure(QEMUError.notInstalled.localizedDescription) }
         let canAccelerateGraphics = qemuProvider?.canAccelerateWindowsGraphics == true
         if parameters.acceleratesGraphics == true, !canAccelerateGraphics {
-            return .failure("This copy of SwiftVM can't give Windows the Mac's GPU: its QEMU was built without Direct3D. Leave out --gpu.")
+            return .failure("This copy of TESSERaCT can't give Windows the Mac's GPU: its QEMU was built without Direct3D. Leave out --gpu.")
         }
         var name = parameters.name ?? "Windows 11"
         if parameters.name == nil {
@@ -1145,13 +1145,13 @@ extension AppModel {
         switch result {
         case .success(let machine):
             // Machines made from the command line are often worked by scripts and AI agents, which
-            // shouldn't be handed whatever was copied on this Mac. `swiftvm share-clipboard` turns it on.
+            // shouldn't be handed whatever was copied on this Mac. `tctl share-clipboard` turns it on.
             var note: String?
             if machine.configuration.clipboard.isShared {
                 do {
                     try machine.updateConfiguration { $0.clipboard.isShared = false }
                 } catch {
-                    note = "“\(machine.name)” shares this Mac's clipboard, because turning that off failed: \(error.localizedDescription) `swiftvm share-clipboard \(machine.configuration.ssh.alias) off` tries again."
+                    note = "“\(machine.name)” shares this Mac's clipboard, because turning that off failed: \(error.localizedDescription) `tctl share-clipboard \(machine.configuration.ssh.alias) off` tries again."
                 }
             }
             if startsMachine {
@@ -1170,7 +1170,7 @@ extension AppModel {
         case .failure(let error):
             // The caller reports the failure; don't leave a failed row behind in the menu bar panel.
             creations.removeAll { $0.name == name && $0.errorMessage != nil }
-            // Called off from the menu bar panel, or by `swiftvm delete` in another terminal.
+            // Called off from the menu bar panel, or by `tctl delete` in another terminal.
             if error is CancellationError || (error as? URLError)?.code == .cancelled {
                 return .failure("Creating “\(name)” was cancelled.")
             }
@@ -1183,7 +1183,7 @@ extension AppModel {
     /// What to add to the news that a guest asked on its screen instead of shutting down: with the
     /// guest tools it wouldn't have. Nothing for a guest that has them and whose agent didn't answer.
     private func guestToolsHint(for machine: VirtualMachine) -> String {
-        machine.agent.isConnected ? "" : " With the guest tools it does so without asking: swiftvm install-tools."
+        machine.agent.isConnected ? "" : " With the guest tools it does so without asking: tctl install-tools."
     }
 
     /// The machine being created, or that failed to be, that `identifier` names, by its name or the SSH
@@ -1195,7 +1195,7 @@ extension AppModel {
 
     /// The creation that `identifier` names, where a machine could be named by it too. A name goes before
     /// an SSH name: a machine that was renamed keeps its SSH name, which can be a new machine's name, and
-    /// `swiftvm delete` of the new one mustn't delete the old.
+    /// `tctl delete` of the new one mustn't delete the old.
     private func creationRatherThanMachine(_ identifier: String) -> MachineCreation? {
         let lowered = identifier.lowercased()
         if let id = UUID(uuidString: identifier), library.machine(id: id) != nil { return nil }
@@ -1213,9 +1213,9 @@ extension AppModel {
         }
         let identifier = shellWord(creation.name)
         guard let error = creation.errorMessage else {
-            return "“\(creation.name)” is being created already: \(progress(of: creation)). `swiftvm wait \(identifier)` waits until it is ready, `swiftvm delete \(identifier)` cancels it."
+            return "“\(creation.name)” is being created already: \(progress(of: creation)). `tctl wait \(identifier)` waits until it is ready, `tctl delete \(identifier)` cancels it."
         }
-        return "“\(creation.name)” couldn't be created: \(Self.sentence(error)) `swiftvm delete \(identifier)` clears it, so that the name can be used again."
+        return "“\(creation.name)” couldn't be created: \(Self.sentence(error)) `tctl delete \(identifier)` clears it, so that the name can be used again."
     }
 
     /// `Downloading… (42%)`
@@ -1239,7 +1239,7 @@ extension AppModel {
             }
             guard ContinuousClock.now < deadline else {
                 let progress = creation.fraction.map { " (\(Int(($0 * 100).rounded()))%)" } ?? ""
-                return "“\(creation.name)” isn't ready yet: it is still being created, \(creation.status)\(progress). `swiftvm wait \(shellWord(creation.name))` waits on."
+                return "“\(creation.name)” isn't ready yet: it is still being created, \(creation.status)\(progress). `tctl wait \(shellWord(creation.name))` waits on."
             }
             try? await Task.sleep(for: .milliseconds(500))
         }
@@ -1270,7 +1270,7 @@ extension AppModel {
             return .failure(.init(message: "“\(machine.name)” has no snapshot named “\(identifier)”."))
         }
         guard matches.count == 1 else {
-            return .failure(.init(message: "More than one snapshot is named “\(identifier)”. Use its ID from `swiftvm snapshots`."))
+            return .failure(.init(message: "More than one snapshot is named “\(identifier)”. Use its ID from `tctl snapshots`."))
         }
         return .success(snapshot)
     }
@@ -1285,7 +1285,7 @@ extension AppModel {
             throw VMError.invalidConfiguration(["No template named “\(identifier)”.", missingTemplatesFolderNote].compactMap { $0 }.joined(separator: " "))
         }
         guard matches.count == 1 else {
-            throw VMError.invalidConfiguration("More than one template is named “\(identifier)”. Use its ID from `swiftvm templates`.")
+            throw VMError.invalidConfiguration("More than one template is named “\(identifier)”. Use its ID from `tctl templates`.")
         }
         return template
     }
@@ -1326,10 +1326,10 @@ extension AppModel {
             matches = Array(matches.prefix(1))
         }
         guard let device = matches.first else {
-            throw VMError.invalidConfiguration("No USB device “\(text)”. `swiftvm usb` lists the ones this Mac has given \(AppIdentity.current.name).")
+            throw VMError.invalidConfiguration("No USB device “\(text)”. `tctl usb` lists the ones this Mac has given \(AppIdentity.current.name).")
         }
         guard matches.count == 1 else {
-            throw VMError.invalidConfiguration("More than one USB device fits “\(text)”. Use its number from `swiftvm usb`.")
+            throw VMError.invalidConfiguration("More than one USB device fits “\(text)”. Use its number from `tctl usb`.")
         }
         return device
     }
@@ -1430,9 +1430,9 @@ extension AppModel {
         if let creation = creation(named: identifier) {
             let name = shellWord(creation.name)
             guard let error = creation.errorMessage else {
-                return .failure("“\(creation.name)” is still being created: \(progress(of: creation)). `swiftvm wait \(name)` waits until it is ready, `swiftvm delete \(name)` cancels it.")
+                return .failure("“\(creation.name)” is still being created: \(progress(of: creation)). `tctl wait \(name)` waits until it is ready, `tctl delete \(name)` cancels it.")
             }
-            return .failure("“\(creation.name)” couldn't be created: \(Self.sentence(error)) `swiftvm delete \(name)` clears it, so that the name can be used again.")
+            return .failure("“\(creation.name)” couldn't be created: \(Self.sentence(error)) `tctl delete \(name)` clears it, so that the name can be used again.")
         }
         if let away = library.unavailableMachines.first(where: { $0.name.lowercased() == lowered || $0.sshAlias == lowered }) {
             return .failure(away.explanation)
@@ -1441,12 +1441,12 @@ extension AppModel {
     }
 }
 
-/// Writes console output to one `swiftvm console` session without ever holding up the guest: the writes
+/// Writes console output to one `tctl console` session without ever holding up the guest: the writes
 /// queue up behind a slow terminal instead. A terminal that has stopped taking output altogether (a
 /// tool that was stopped or sent to the background) is cut off once too much has piled up.
 private nonisolated final class ConsoleClientWriter: @unchecked Sendable {
     private let descriptor: Int32
-    private let queue = DispatchQueue(label: "SwiftVM console session")
+    private let queue = DispatchQueue(label: "TESSERaCT console session")
     private let lock = NSLock()
     /// Bytes handed to ``write(_:)`` that haven't reached the terminal yet.
     private var backlog = 0

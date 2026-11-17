@@ -23,7 +23,7 @@ public struct CloudInitSeed: Sendable, Hashable {
     public var sharedFoldersTag: String?
     /// Register Rosetta (shared with this virtio-fs tag) to run x86-64 binaries.
     public var rosettaTag: String?
-    /// Have the kernel write its messages to the serial console too, where `swiftvm console` and the
+    /// Have the kernel write its messages to the serial console too, where `tctl console` and the
     /// machine's console log pick them up. Takes effect from the second boot.
     public var kernelMessagesOnSerialConsole: Bool
     /// The script that installs the guest agent (``LinuxGuestAgent/installer()``), to run on the first
@@ -332,15 +332,15 @@ public struct CloudInitSeed: Sendable, Hashable {
 
     /// Where a guest that boots with GRUB picks up additions to the kernel's command line. Its name sorts
     /// after the settings the cloud images bring, so that what it adds comes last.
-    static let serialConsoleSettingsPath = "/etc/default/grub.d/99-swiftvm-console.cfg"
+    static let serialConsoleSettingsPath = "/etc/default/grub.d/99-tctl-console.cfg"
 
     /// Adds the serial console (`hvc0`) to the consoles the kernel writes its messages to.
     ///
     /// The display (`tty1`) is named once more after it. The console named last is the one systemd reports
     /// to and the one an emergency shell comes up on, and that has to stay where someone is looking.
     static let serialConsoleSettings = """
-        # Added by SwiftVM. Kernel messages also go to the serial console (hvc0), where
-        # "swiftvm console" and the virtual machine's console log pick them up. tty1 is
+        # Added by TESSERaCT. Kernel messages also go to the serial console (hvc0), where
+        # "tctl console" and the virtual machine's console log pick them up. tty1 is
         # named last so that the display stays the system console.
         GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT console=hvc0 console=tty1"
 
@@ -350,7 +350,7 @@ public struct CloudInitSeed: Sendable, Hashable {
     static let firstPersonID = 1000
     /// SDDM's settings for whom it lists. Read whenever it starts, and there to stay should it be
     /// installed later.
-    static let loginScreenSettingsPath = "/etc/sddm.conf.d/90-swiftvm-users.conf"
+    static let loginScreenSettingsPath = "/etc/sddm.conf.d/90-tctl-users.conf"
     static let shellsOfServices = "/usr/bin/nologin,/usr/sbin/nologin,/sbin/nologin,/bin/false,/usr/bin/false"
 
     /// Writes the boot menu anew with the settings above. Fedora reads none of them: it writes its boot

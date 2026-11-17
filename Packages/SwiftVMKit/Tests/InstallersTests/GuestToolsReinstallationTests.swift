@@ -32,7 +32,7 @@ import VMCore
     }
 
     @Test func losingTheLaunchAnswerDoesNotStartASecondInstaller() async throws {
-        let program = FileManager.default.temporaryDirectory.appending(path: "swiftvm-agent-test-\(UUID().uuidString)")
+        let program = FileManager.default.temporaryDirectory.appending(path: "tctl-agent-test-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: program) }
         try Data("a test program".utf8).write(to: program)
         let install = try GuestToolsReinstallation(family: .macOS, macProgram: program)

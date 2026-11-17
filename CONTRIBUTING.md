@@ -1,6 +1,6 @@
-# Contributing to SwiftVM
+# Contributing to TESSERaCT
 
-Thank you for your interest in contributing to SwiftVM! This guide will help you get started.
+Thank you for your interest in contributing to TESSERaCT! This guide will help you get started.
 
 ## Getting Started
 
@@ -13,7 +13,7 @@ Start with [Building](docs/tech/building.md) and [Architecture](docs/tech/archit
 - For the QEMU that runs Windows guests and Linux guests with graphics
   acceleration, which the build scripts build the first time:
   `brew install cmake ninja meson pkgconf glib pixman openssl@3 python`, plus
-  Xcode's Metal toolchain. Without them, `SWIFTVM_QEMU=-` builds the app
+  Xcode's Metal toolchain. Without them, `TESSERACT_QEMU=-` builds the app
   without it
 
 No Apple Developer account is needed, except for [USB devices](docs/tech/building.md#usb-devices).
@@ -22,18 +22,18 @@ No Apple Developer account is needed, except for [USB devices](docs/tech/buildin
 
 ```bash
 git clone https://github.com/swiftvm-app/swiftvm.git
-cd swiftvm
+cd tctl
 ```
 
 ### Running
 
 ```bash
-swift run SwiftVM         # builds and opens a development copy
+swift run TESSERaCT         # builds and opens a development copy
 ```
 
-The development copy is an app of its own, **SwiftVM Dev**. It keeps its
-machines in `~/Library/Application Support/SwiftVM-Dev`, so it never touches the
-machines of the SwiftVM you use. See [Building](docs/tech/building.md) for the
+The development copy is an app of its own, **TESSERaCT Dev**. It keeps its
+machines in `~/Library/Application Support/TESSERaCT-Dev`, so it never touches the
+machines of the TESSERaCT you use. See [Building](docs/tech/building.md) for the
 rest.
 
 ## Development Workflow
@@ -51,8 +51,8 @@ scripts/test.sh           # all tests
 
 ## Code Standards
 
-- **Engine first** — logic goes in `Packages/SwiftVMKit`, with a `swiftvm` command to drive it. The interface comes last
-- **Check against a real guest** — drive the running app with `swiftvm` and see that it does what you meant
+- **Engine first** — logic goes in `Packages/SwiftVMKit`, with a `tctl` command to drive it. The interface comes last
+- **Check against a real guest** — drive the running app with `tctl` and see that it does what you meant
 - **Comments say why**, not what
 - **Fix root causes**, not symptoms
 - **Follow existing patterns** but suggest refactors if they improve quality
@@ -64,14 +64,14 @@ Two rules protect your own Mac while you work:
 
 - Never kill the app while a machine is running. Its network's address range
   stays blocked for a long time. Stop the machines, then quit.
-- Keep test machines in a data folder of their own, with `SWIFTVM_HOME`.
+- Keep test machines in a data folder of their own, with `TESSERACT_HOME`.
 
 ## Checks
 
 All PRs must pass CI, which builds the app and runs the tests on macOS 27:
 
 ```bash
-scripts/build.sh --output /tmp/SwiftVM.app
+scripts/build.sh --output /tmp/TESSERaCT.app
 scripts/test.sh
 ```
 

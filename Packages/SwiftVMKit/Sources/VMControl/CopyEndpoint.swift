@@ -1,6 +1,6 @@
 import Foundation
 
-/// One side of `swiftvm cp`: a path on this Mac, or one in a guest, written `<machine>:<path>`.
+/// One side of `tctl cp`: a path on this Mac, or one in a guest, written `<machine>:<path>`.
 public enum CopyEndpoint: Sendable, Equatable {
     case local(String)
     case guest(machine: String, path: String)

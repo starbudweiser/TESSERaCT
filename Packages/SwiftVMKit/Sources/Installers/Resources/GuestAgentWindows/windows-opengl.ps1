@@ -1,4 +1,4 @@
-# OpenGL for Windows machines with SwiftVM's 3D driver. The driver brings Direct3D, not OpenGL: OpenGL
+# OpenGL for Windows machines with TESSERaCT's 3D driver. The driver brings Direct3D, not OpenGL: OpenGL
 # comes from Microsoft's OpenCL, OpenGL and Vulkan Compatibility Pack, from the Microsoft Store, which
 # draws it with Direct3D 12. That has Direct3D 12 to draw with when the Mac runs the machine's Direct3D
 # on D3DMetal; otherwise Windows draws it in software.
@@ -14,7 +14,7 @@ $storeId = '9NQPSL29BFFF'
 $package = 'Microsoft.D3DMappingLayers'
 
 if ($Register) {
-    $program = Join-Path $env:ProgramFiles 'SwiftVM'
+    $program = Join-Path $env:ProgramFiles 'TESSERaCT'
     New-Item -ItemType Directory -Force -Path $program | Out-Null
     $script = Join-Path $program 'opengl.ps1'
     if ($PSCommandPath -ne $script) {
@@ -25,14 +25,14 @@ if ($Register) {
     # Everyone in Users, by its SID: Windows in another language names the group otherwise.
     $principal = New-ScheduledTaskPrincipal -GroupId 'S-1-5-32-545' -RunLevel Limited
     $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Minutes 30)
-    Register-ScheduledTask -Force -TaskName 'SwiftVM OpenGL' -Action $action -Trigger (New-ScheduledTaskTrigger -AtLogOn) `
+    Register-ScheduledTask -Force -TaskName 'TESSERaCT OpenGL' -Action $action -Trigger (New-ScheduledTaskTrigger -AtLogOn) `
         -Principal $principal -Settings $settings | Out-Null
     return
 }
 
 if (Get-AppxPackage -Name $package -ErrorAction SilentlyContinue) { return }
 
-$logs = Join-Path $env:LOCALAPPDATA 'SwiftVM'
+$logs = Join-Path $env:LOCALAPPDATA 'TESSERaCT'
 New-Item -ItemType Directory -Force -Path $logs | Out-Null
 $log = Join-Path $logs 'opengl.log'
 function Write-Log([string]$Text) {

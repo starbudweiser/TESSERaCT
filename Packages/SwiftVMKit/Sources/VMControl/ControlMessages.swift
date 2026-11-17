@@ -348,7 +348,7 @@ public struct MachineSummary: Codable, Sendable, Equatable {
 /// A machine the app is still creating, or failed to create, which holds its name until it is done or
 /// deleted.
 public struct CreationSummary: Codable, Sendable, Equatable {
-    /// Also what `swiftvm wait` and `swiftvm delete` take for it.
+    /// Also what `tctl wait` and `tctl delete` take for it.
     public var name: String
     public var system: String
     /// What it is busy with, such as downloading.
@@ -643,17 +643,17 @@ public struct ControlResponse: Codable, Sendable, Equatable {
 
 /// Where the app listens and where its generated files live.
 public enum ControlPaths {
-    /// Environment variable that points the app and the `swiftvm` tool at another data directory, for
+    /// Environment variable that points the app and the `tctl` tool at another data directory, for
     /// a copy with machines of its own.
-    public static let homeEnvironmentKey = "SWIFTVM_HOME"
+    public static let homeEnvironmentKey = "TESSERACT_HOME"
 
-    /// The data directory of the copy of SwiftVM that this program is part of. The app keeps its
-    /// machines there and listens there, and the `swiftvm` tool looks for the app there.
+    /// The data directory of the copy of TESSERaCT that this program is part of. The app keeps its
+    /// machines there and listens there, and the `tctl` tool looks for the app there.
     public static var applicationSupport: URL {
         applicationSupport(for: .current, environment: ProcessInfo.processInfo.environment)
     }
 
-    /// `SWIFTVM_HOME` goes first. Without it the app and its development copy each have a folder of
+    /// `TESSERACT_HOME` goes first. Without it the app and its development copy each have a folder of
     /// their own in Application Support.
     static func applicationSupport(for identity: AppIdentity, environment: [String: String]) -> URL {
         if let override = environment[homeEnvironmentKey], !override.isEmpty {

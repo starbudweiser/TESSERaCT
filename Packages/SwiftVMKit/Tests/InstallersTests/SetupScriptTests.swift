@@ -74,7 +74,7 @@ import VMCore
         #expect(throws: SetupScript.ScriptError.tooLarge(file: "a.sh")) { try SetupScript(source: large, fileName: "a.sh") }
 
         // The same for a file, which isn't read at all when it is too large to be one.
-        let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-scripts-\(UUID().uuidString)")
+        let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-scripts-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: directory) }
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let image = directory.appending(path: "disk.img")
@@ -151,7 +151,7 @@ import VMCore
 @Suite struct SetupScriptCatalogTests {
     /// A folder of scripts, as a user would keep them, which is gone once `body` is over.
     private func withFolder(_ files: [String: String], _ body: (URL) throws -> Void) throws {
-        let folder = FileManager.default.temporaryDirectory.appending(path: "swiftvm-scripts-\(UUID().uuidString)", directoryHint: .isDirectory)
+        let folder = FileManager.default.temporaryDirectory.appending(path: "tctl-scripts-\(UUID().uuidString)", directoryHint: .isDirectory)
         defer { try? FileManager.default.removeItem(at: folder) }
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         for (name, text) in files {
@@ -189,7 +189,7 @@ import VMCore
             #expect(skipped.first { $0.fileName == "postgres.zsh" }?.reason == "Another script in the folder is called “postgres” too.")
         }
         // A folder that isn't there holds nothing, and that is nothing to complain of.
-        let missing = FileManager.default.temporaryDirectory.appending(path: "swiftvm-scripts-\(UUID().uuidString)")
+        let missing = FileManager.default.temporaryDirectory.appending(path: "tctl-scripts-\(UUID().uuidString)")
         #expect(SetupScriptCatalog.userScripts(in: missing).scripts.isEmpty)
         #expect(SetupScriptCatalog.userScripts(in: missing).skipped.isEmpty)
         #expect(SetupScriptCatalog.all(in: missing) == SetupScriptCatalog.builtIn)
@@ -208,7 +208,7 @@ import VMCore
     }
 
     @Test func archLinuxHasScriptsOfItsOwn() throws {
-        let missing = FileManager.default.temporaryDirectory.appending(path: "swiftvm-scripts-\(UUID().uuidString)")
+        let missing = FileManager.default.temporaryDirectory.appending(path: "tctl-scripts-\(UUID().uuidString)")
         let arch = try #require(DistributionCatalog.quickCreate.first { $0.distribution == "arch" })
         let ubuntu = try #require(DistributionCatalog.quickCreate.first { $0.distribution == "ubuntu" })
         // Arch Linux ARM's Plasma packages aren't built together yet. Hyprland and Omarchy work only on Arch.
@@ -225,7 +225,7 @@ import VMCore
     @Test func findsTheScriptsThatAreAskedFor() throws {
         let debian = try #require(DistributionCatalog.quickCreate.first { $0.distribution == "debian" })
         try withFolder(["postgres.sh": Self.postgres]) { folder in
-            let file = folder.deletingLastPathComponent().appending(path: "swiftvm-one-off-\(UUID().uuidString).sh")
+            let file = folder.deletingLastPathComponent().appending(path: "tctl-one-off-\(UUID().uuidString).sh")
             defer { try? FileManager.default.removeItem(at: file) }
             try Data("# name: One Off\necho hi\n".utf8).write(to: file)
 
@@ -254,9 +254,9 @@ import VMCore
     }
 
     @Test func makesTheFolderForTheUserAlone() throws {
-        let parent = FileManager.default.temporaryDirectory.appending(path: "swiftvm-scripts-\(UUID().uuidString)", directoryHint: .isDirectory)
+        let parent = FileManager.default.temporaryDirectory.appending(path: "tctl-scripts-\(UUID().uuidString)", directoryHint: .isDirectory)
         defer { try? FileManager.default.removeItem(at: parent) }
-        let folder = parent.appending(path: "swiftvm/setup-scripts", directoryHint: .isDirectory)
+        let folder = parent.appending(path: "tctl/setup-scripts", directoryHint: .isDirectory)
         #expect(try SetupScriptCatalog.makeUserDirectory(at: folder) == folder)
         #expect(try FileManager.default.attributesOfItem(atPath: folder.path)[.posixPermissions] as? Int == 0o700)
         // A folder that is there is left as it is, with what is in it.
@@ -266,7 +266,7 @@ import VMCore
     }
 
     @Test func savesAScriptTheUserWrote() throws {
-        let parent = FileManager.default.temporaryDirectory.appending(path: "swiftvm-scripts-\(UUID().uuidString)", directoryHint: .isDirectory)
+        let parent = FileManager.default.temporaryDirectory.appending(path: "tctl-scripts-\(UUID().uuidString)", directoryHint: .isDirectory)
         defer { try? FileManager.default.removeItem(at: parent) }
         // The folder needn't be there yet.
         let folder = parent.appending(path: "setup-scripts", directoryHint: .isDirectory)
@@ -350,13 +350,13 @@ import VMCore
         let text = seed(with: [script]).userData
 
         // The script arrives byte for byte, next to its name, its runner, the runner's settings and the unit.
-        #expect(try contents(of: "/usr/local/lib/swiftvm/setup/scripts/1", in: text) == script.source)
-        #expect(try contents(of: "/usr/local/lib/swiftvm/setup/scripts/1.name", in: text) == "KDE Plasma\n")
-        #expect(try contents(of: "/usr/local/lib/swiftvm/setup/run.sh", in: text) == (try LinuxGuestAgent.resource("setup-run.sh")))
-        #expect(try contents(of: "/usr/local/lib/swiftvm/setup/settings", in: text) == "name=KDE Plasma\nrestart=yes\nuser=saeed\n")
-        #expect(try contents(of: "/etc/systemd/system/swiftvm-setup.service", in: text) == (try LinuxGuestAgent.resource("swiftvm-setup.service")))
+        #expect(try contents(of: "/usr/local/lib/tctl/setup/scripts/1", in: text) == script.source)
+        #expect(try contents(of: "/usr/local/lib/tctl/setup/scripts/1.name", in: text) == "KDE Plasma\n")
+        #expect(try contents(of: "/usr/local/lib/tctl/setup/run.sh", in: text) == (try LinuxGuestAgent.resource("setup-run.sh")))
+        #expect(try contents(of: "/usr/local/lib/tctl/setup/settings", in: text) == "name=KDE Plasma\nrestart=yes\nuser=saeed\n")
+        #expect(try contents(of: "/etc/systemd/system/tctl-setup.service", in: text) == (try LinuxGuestAgent.resource("tctl-setup.service")))
         let lines = text.components(separatedBy: "\n")
-        let entry = try #require(lines.firstIndex(of: "  - path: \"/usr/local/lib/swiftvm/setup/scripts/1\""))
+        let entry = try #require(lines.firstIndex(of: "  - path: \"/usr/local/lib/tctl/setup/scripts/1\""))
         // The script is the administrator's alone to read: it may hold what isn't everyone's.
         #expect(lines[entry + 3] == "    permissions: \"0700\"")
         // One list of files, one list of commands.
@@ -365,27 +365,27 @@ import VMCore
 
         // The setup is scheduled before the guest agent is installed, so that the agent's first word
         // about it is that it is to come. The agent's installer stays the last thing to run.
-        let schedule = try #require(lines.firstIndex(of: "  - \"sh /usr/local/lib/swiftvm/setup/run.sh --schedule || true\""))
-        let agent = try #require(lines.firstIndex(of: "  - \"sh /usr/local/lib/swiftvm/install.sh || true\""))
+        let schedule = try #require(lines.firstIndex(of: "  - \"sh /usr/local/lib/tctl/setup/run.sh --schedule || true\""))
+        let agent = try #require(lines.firstIndex(of: "  - \"sh /usr/local/lib/tctl/install.sh || true\""))
         #expect(schedule < agent)
-        #expect(text.hasSuffix("  - \"sh /usr/local/lib/swiftvm/install.sh || true\"\n"))
+        #expect(text.hasSuffix("  - \"sh /usr/local/lib/tctl/install.sh || true\"\n"))
     }
 
     @Test func carriesSeveralScriptsInTheirOrder() throws {
         let xfce = try #require(SetupScriptCatalog.builtIn.first { $0.id == "xfce" })
         let docker = try #require(SetupScriptCatalog.builtIn.first { $0.id == "docker" })
         let text = seed(with: [xfce, docker]).userData
-        #expect(try contents(of: "/usr/local/lib/swiftvm/setup/scripts/1", in: text) == xfce.source)
-        #expect(try contents(of: "/usr/local/lib/swiftvm/setup/scripts/2", in: text) == docker.source)
-        #expect(try contents(of: "/usr/local/lib/swiftvm/setup/scripts/2.name", in: text) == "Docker\n")
-        #expect(!text.contains("/usr/local/lib/swiftvm/setup/scripts/3"))
+        #expect(try contents(of: "/usr/local/lib/tctl/setup/scripts/1", in: text) == xfce.source)
+        #expect(try contents(of: "/usr/local/lib/tctl/setup/scripts/2", in: text) == docker.source)
+        #expect(try contents(of: "/usr/local/lib/tctl/setup/scripts/2.name", in: text) == "Docker\n")
+        #expect(!text.contains("/usr/local/lib/tctl/setup/scripts/3"))
         // What all of them set up, and a restart because one of them asks for it.
-        #expect(try contents(of: "/usr/local/lib/swiftvm/setup/settings", in: text) == "name=Xfce, Docker\nrestart=yes\nuser=saeed\n")
+        #expect(try contents(of: "/usr/local/lib/tctl/setup/settings", in: text) == "name=Xfce, Docker\nrestart=yes\nuser=saeed\n")
         // The runner, its settings and the unit travel once, and the setup is scheduled once.
-        #expect(text.components(separatedBy: "/usr/local/lib/swiftvm/setup/run.sh\"\n").count == 2)
+        #expect(text.components(separatedBy: "/usr/local/lib/tctl/setup/run.sh\"\n").count == 2)
         #expect(text.components(separatedBy: "--schedule").count == 2)
         // The other way round, they run the other way round.
-        #expect(try contents(of: "/usr/local/lib/swiftvm/setup/scripts/1", in: seed(with: [docker, xfce]).userData) == docker.source)
+        #expect(try contents(of: "/usr/local/lib/tctl/setup/scripts/1", in: seed(with: [docker, xfce]).userData) == docker.source)
     }
 
     @Test func aMachineWithoutAScriptIsAsItWas() {
@@ -405,14 +405,14 @@ import VMCore
     }
 
     @Test func aCopyOfTheMachineKeepsTheScriptAndDoesNotRunItAgain() throws {
-        let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-seed-\(UUID().uuidString).iso")
+        let url = FileManager.default.temporaryDirectory.appending(path: "tctl-seed-\(UUID().uuidString).iso")
         defer { try? FileManager.default.removeItem(at: url) }
         let script = try #require(SetupScriptCatalog.builtIn.first { $0.id == "xfce" })
         try seed(with: [script]).writeImage(to: url)
 
         try CloudInitSeed.reissue(at: url, hostName: "box-copy", macAddress: "02:AA:BB:CC:DD:EE", instanceID: "new")
         let userData = try ISOImageBuilder.text(of: "user-data", in: url)
-        #expect(try contents(of: "/usr/local/lib/swiftvm/setup/scripts/1", in: userData) == script.source)
-        #expect(userData.contains("  - \"sh /usr/local/lib/swiftvm/setup/run.sh --schedule || true\"\n"))
+        #expect(try contents(of: "/usr/local/lib/tctl/setup/scripts/1", in: userData) == script.source)
+        #expect(userData.contains("  - \"sh /usr/local/lib/tctl/setup/run.sh --schedule || true\"\n"))
     }
 }

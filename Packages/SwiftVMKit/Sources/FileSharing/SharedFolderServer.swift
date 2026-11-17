@@ -91,7 +91,7 @@ public final class SharedFolderServer: @unchecked Sendable {
             self.isAllowed = isAllowed
         }
         let thread = Thread { [self] in acceptLoop(descriptor) }
-        thread.name = "app.swiftvm.shared-folders"
+        thread.name = "app.tctl.shared-folders"
         thread.start()
     }
 
@@ -346,7 +346,7 @@ struct HTTPReader {
     }
 
     private static func temporaryFile() -> (URL, FileHandle)? {
-        let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-upload-\(UUID().uuidString)")
+        let url = FileManager.default.temporaryDirectory.appending(path: "tctl-upload-\(UUID().uuidString)")
         guard FileManager.default.createFile(atPath: url.path, contents: nil), let handle = try? FileHandle(forWritingTo: url) else { return nil }
         return (url, handle)
     }

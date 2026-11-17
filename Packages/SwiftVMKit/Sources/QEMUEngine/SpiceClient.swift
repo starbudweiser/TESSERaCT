@@ -35,7 +35,7 @@ final class SpiceClient: GuestScreenInput, @unchecked Sendable {
     @MainActor init(library: URL) throws {
         // Unix socket names are limited to 104 bytes. A private directory under /tmp leaves enough
         // room even when the user's system temporary directory has a long name.
-        var template = Array("/tmp/swiftvm-gpu-XXXXXX".utf8CString)
+        var template = Array("/tmp/tctl-gpu-XXXXXX".utf8CString)
         guard let path = mkdtemp(&template) else { throw QEMUError.didNotStart(String(cString: strerror(errno))) }
         directory = URL(fileURLWithPath: String(cString: path), isDirectory: true)
         do {

@@ -106,7 +106,7 @@ final class SeamlessSession: NSObject {
                 window = existing
             } else {
                 guard let regionView = machine.makeRegionView() else {
-                    onEnd?("This copy of SwiftVM's display can't show the guest's windows one by one.")
+                    onEnd?("This copy of TESSERaCT's display can't show the guest's windows one by one.")
                     return
                 }
                 window = makeWindow(for: guest.id, regionView: regionView)

@@ -1,16 +1,16 @@
-# Installs SwiftVM's guest tools in Windows, or replaces older ones: the drivers for the machine's
+# Installs TESSERaCT's guest tools in Windows, or replaces older ones: the drivers for the machine's
 # devices, and the guest agent. Run as an administrator. On the guest tools disc, install.cmd asks for
 # that; a new machine's setup runs this as SYSTEM.
 #
 # The agent is built here, from its source next to this script, by the C# compiler that comes with
-# Windows. The drivers are on the virtio-win disc, which SwiftVM plugs in next to this one.
+# Windows. The drivers are on the virtio-win disc, which TESSERaCT plugs in next to this one.
 #
 # A machine keeps the display driver it was made with. The 3D driver comes with a new machine's setup
 # only when it was made to draw with the Mac's GPU; later, the guest tools only bring it up to date.
 param([string]$Source = $PSScriptRoot, [switch]$NewMachine, [switch]$Locked)
 $ErrorActionPreference = 'Stop'
 
-$program = Join-Path $env:ProgramFiles 'SwiftVM'
+$program = Join-Path $env:ProgramFiles 'TESSERaCT'
 # Disc recovery must exclude a detached installer even when its host has stopped waiting.
 if (-not $Locked) {
     New-Item -ItemType Directory -Force -Path $program | Out-Null
@@ -22,7 +22,7 @@ if (-not $Locked) {
     }
     return
 }
-$executable = Join-Path $program 'swiftvm-agent.exe'
+$executable = Join-Path $program 'tctl-agent.exe'
 $compiler = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 $graphicsArchive = Join-Path $Source 'graphics-driver.zip'
 $hasAcceleratedDriver = Test-Path (Join-Path $env:WINDIR 'System32\DriverStore\FileRepository\viogpu3d.inf_*')
@@ -69,13 +69,13 @@ if (-not (Test-Path $compiler)) {
 }
 # Built in the program's own folder, so that it has that folder's permissions: everyone may run it,
 # which its half in each session needs. A file moved from SYSTEM's temporary folder keeps that one's.
-$built = Join-Path $program "swiftvm-agent-$PID.exe"
+$built = Join-Path $program "tctl-agent-$PID.exe"
 # Where .NET keeps what reads other programs' windows.
 $wpf = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\WPF'
 $output = & $compiler /nologo /target:winexe /optimize+ "/out:$built" `
     /r:System.ServiceProcess.dll /r:System.Web.Extensions.dll /r:System.Windows.Forms.dll /r:System.Core.dll `
     "/lib:$wpf" /r:UIAutomationClient.dll /r:UIAutomationTypes.dll /r:WindowsBase.dll `
-    (Join-Path $Source 'swiftvm-agent.cs') 2>&1
+    (Join-Path $Source 'tctl-agent.cs') 2>&1
 if ($LASTEXITCODE -ne 0) {
     throw "The guest agent couldn't be built: $output"
 }
@@ -86,23 +86,23 @@ foreach ($old in 'agent-desktop', 'agent-desktop-install.log') {
 }
 
 # An older agent goes first: its service, and its halves in the sessions of whoever is logged in.
-$service = Get-Service -Name SwiftVMAgent -ErrorAction SilentlyContinue
+$service = Get-Service -Name TESSERaCTAgent -ErrorAction SilentlyContinue
 if ($service) {
-    Stop-Service -Name SwiftVMAgent -Force -ErrorAction SilentlyContinue
+    Stop-Service -Name TESSERaCTAgent -Force -ErrorAction SilentlyContinue
 }
-Get-Process -Name swiftvm-agent -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-Process -Name tctl-agent -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 Start-Sleep -Milliseconds 500
 Move-Item -Force -Path $built -Destination $executable
 & icacls.exe $executable /reset | Out-Null
 
 if (-not $service) {
-    New-Service -Name SwiftVMAgent -BinaryPathName "`"$executable`"" -DisplayName 'SwiftVM Guest Agent' `
-        -Description 'Lets SwiftVM on the Mac set the clock, shut Windows down, share the clipboard and run commands.' `
+    New-Service -Name TESSERaCTAgent -BinaryPathName "`"$executable`"" -DisplayName 'TESSERaCT Guest Agent' `
+        -Description 'Lets TESSERaCT on the Mac set the clock, shut Windows down, share the clipboard and run commands.' `
         -StartupType Automatic | Out-Null
 }
 # A service that fails is started again, a little later each time.
-& sc.exe failure SwiftVMAgent reset= 60 actions= restart/2000/restart/5000/restart/10000 | Out-Null
-Start-Service -Name SwiftVMAgent
+& sc.exe failure TESSERaCTAgent reset= 60 actions= restart/2000/restart/5000/restart/10000 | Out-Null
+Start-Service -Name TESSERaCTAgent
 
 # The Mac's shared folders come over WebDAV, whose client takes files of 50 MB at most unless told
 # otherwise.
@@ -120,7 +120,7 @@ if ($hasGraphicsDriver -and -not $NewMachine -and (Test-Path $opengl)) {
     try {
         & $opengl -Register
         if ([Security.Principal.WindowsIdentity]::GetCurrent().IsSystem) {
-            Start-ScheduledTask -TaskName 'SwiftVM OpenGL'
+            Start-ScheduledTask -TaskName 'TESSERaCT OpenGL'
         } else {
             & $opengl
         }
@@ -131,4 +131,4 @@ if ($hasGraphicsDriver -and -not $NewMachine -and (Test-Path $opengl)) {
 
 # The service starts the agent's half in the session of whoever is logged in, and of whoever logs in
 # later.
-Write-Output 'The SwiftVM guest tools are installed.'
+Write-Output 'The TESSERaCT guest tools are installed.'

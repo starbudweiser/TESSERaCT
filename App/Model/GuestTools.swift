@@ -12,7 +12,7 @@ extension AppModel {
 
     /// The guest agent for macOS guests that ships inside the app, if this build has one.
     var macGuestAgentURL: URL? {
-        let url = Bundle.main.bundleURL.appending(path: "Contents/Helpers/swiftvm-agent")
+        let url = Bundle.main.bundleURL.appending(path: "Contents/Helpers/tctl-agent")
         return FileManager.default.isExecutableFile(atPath: url.path) ? url : nil
     }
 
@@ -89,12 +89,12 @@ extension AppModel {
         guard machine.configuration.os.family != .windows else {
             // Windows has no SSH until the guest tools have set it up. Its own setup installs them.
             throw VMError.invalidConfiguration(
-                "The guest tools are installed in Windows from inside it. Use `swiftvm install-tools \(machine.configuration.ssh.alias) --disc`, then \(WindowsGuestAgent.toolsInstallCommand.prefix(1).lowercased() + WindowsGuestAgent.toolsInstallCommand.dropFirst())"
+                "The guest tools are installed in Windows from inside it. Use `tctl install-tools \(machine.configuration.ssh.alias) --disc`, then \(WindowsGuestAgent.toolsInstallCommand.prefix(1).lowercased() + WindowsGuestAgent.toolsInstallCommand.dropFirst())"
             )
         }
         guard canSignIn(to: machine) else {
             throw VMError.invalidConfiguration(
-                "“\(machine.name)” has no SSH name or no address, so the guest tools can't be installed over SSH. To install from inside the guest, use `swiftvm install-tools <machine> --disc`."
+                "“\(machine.name)” has no SSH name or no address, so the guest tools can't be installed over SSH. To install from inside the guest, use `tctl install-tools <machine> --disc`."
             )
         }
         let alias = machine.configuration.ssh.alias
@@ -115,7 +115,7 @@ extension AppModel {
         let deadline = ContinuousClock.now + .seconds(15)
         while machine.agent.version != version {
             guard machine.state == .running, ContinuousClock.now < deadline else {
-                let whereToLook = isMac ? "`sudo launchctl print system/com.swiftvm.agent`" : "`systemctl status swiftvm-agent`"
+                let whereToLook = isMac ? "`sudo launchctl print system/fr.stephan.tesseract.agent`" : "`systemctl status tctl-agent`"
                 throw VMError.invalidConfiguration(
                     "The guest tools were installed in “\(machine.name)”, but the agent hasn't connected. In the guest, \(whereToLook) says why."
                 )
@@ -178,7 +178,7 @@ extension AppModel {
     private func requireRunningGuest(_ machine: VirtualMachine) throws {
         guard guestToolsVersion(for: machine) != nil else {
             throw VMError.invalidConfiguration(
-                "This copy of SwiftVM has no guest tools for \(machine.configuration.os.family.displayName) guests. “\(machine.name)” goes without."
+                "This copy of TESSERaCT has no guest tools for \(machine.configuration.os.family.displayName) guests. “\(machine.name)” goes without."
             )
         }
         guard machine.state == .running else { throw VMError.notRunning(name: machine.name) }
@@ -206,7 +206,7 @@ extension AppModel {
                                 title: "The guest tools are \(isReinstall ? "reinstalled" : "installed") in “\(machine.name)”",
                                 message: isWindows
                                     ? "The guest tools have connected again. Restart Windows to finish applying any driver changes."
-                                    : "SwiftVM now sees the system's version and addresses, keeps its clock right after a suspend, and shuts it down through the guest tools."
+                                    : "TESSERaCT now sees the system's version and addresses, keeps its clock right after a suspend, and shuts it down through the guest tools."
                             )
                             return
                         } catch let failure as ProcessRunner.Failure {

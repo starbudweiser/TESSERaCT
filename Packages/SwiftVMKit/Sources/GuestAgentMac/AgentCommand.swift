@@ -1,17 +1,17 @@
 import Foundation
 import GuestChannel
 
-/// The `swiftvm-agent` program: what it does for each way of calling it.
+/// The `tctl-agent` program: what it does for each way of calling it.
 public enum AgentCommand {
     static let usage = """
-        Usage: swiftvm-agent daemon      serve the SwiftVM app (as root, in a virtual machine; started by launchd)
-               swiftvm-agent session     share the clipboard of the user who is logged in, and tell the SwiftVM
+        Usage: tctl-agent daemon      serve the TESSERaCT app (as root, in a virtual machine; started by launchd)
+               tctl-agent session     share the clipboard of the user who is logged in, and tell the TESSERaCT
                                          app what is on their screen (started by launchd)
-               swiftvm-agent run-as <account> [--in-session] -- <command> [arguments]
+               tctl-agent run-as <account> [--in-session] -- <command> [arguments]
                                          run a command as an account of this system (started by the daemon)
-               swiftvm-agent dismiss-setup-notifications
+               tctl-agent dismiss-setup-notifications
                                          dismiss background-activity and extension notices after setup
-               swiftvm-agent --version
+               tctl-agent --version
         """
 
     /// Runs the program and returns its exit status. The two modes that serve never return.

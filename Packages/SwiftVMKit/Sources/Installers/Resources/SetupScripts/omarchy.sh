@@ -8,20 +8,20 @@
 # graphics: recommended
 # restart: yes
 #
-# A setup script for SwiftVM. It runs as root in a new virtual machine the first time the machine
+# A setup script for TESSERaCT. It runs as root in a new virtual machine the first time the machine
 # starts. The lines above say what it is; a line it prints that starts with "==> " is the step
-# SwiftVM shows. How these scripts are written: https://swiftvm.app/docs/features/setup-scripts/
+# TESSERaCT shows. How these scripts are written: https://swiftvm.app/docs/features/setup-scripts/
 #
 # The desktop and applications are installed when the image is built, not compiled in every new
 # machine. Omarchy owns its packages and updates; this finishes setup for the account from the seed.
 
 set -euo pipefail
-[[ $(uname -m) == aarch64 && -f /usr/local/share/swiftvm/omarchy-image ]] || {
-    echo "This script needs SwiftVM's ready-made Omarchy ARM image. Create an Arch machine with the built-in Omarchy setup." >&2
+[[ $(uname -m) == aarch64 && -f /usr/local/share/tctl/omarchy-image ]] || {
+    echo "This script needs TESSERaCT's ready-made Omarchy ARM image. Create an Arch machine with the built-in Omarchy setup." >&2
     exit 1
 }
-home=$(getent passwd "$SWIFTVM_USER" | cut -d: -f6)
-[[ -n $home && -d $home ]] || { echo "There is no home folder for $SWIFTVM_USER." >&2; exit 1; }
+home=$(getent passwd "$TESSERACT_USER" | cut -d: -f6)
+[[ -n $home && -d $home ]] || { echo "There is no home folder for $TESSERACT_USER." >&2; exit 1; }
 
 # The image defers hardware detection and its package-manager identity to each machine. This also
 # waits for the upstream first-boot service if it is already doing that work.
@@ -52,12 +52,12 @@ if [[ -f /var/lib/omarchy/provisioning/groups ]]; then
         getent group "$group" >/dev/null && groups+=("$group")
     done < /var/lib/omarchy/provisioning/groups
 fi
-usermod -aG "$(IFS=,; echo "${groups[*]}")" "$SWIFTVM_USER"
+usermod -aG "$(IFS=,; echo "${groups[*]}")" "$TESSERACT_USER"
 
-echo "==> Setting Omarchy up for $SWIFTVM_USER"
+echo "==> Setting Omarchy up for $TESSERACT_USER"
 # Node is bundled in the image. Resolving every optional tool's latest version here otherwise
 # waits on the network even though account provisioning needs none of those downloads.
-runuser -u "$SWIFTVM_USER" -- env HOME="$home" USER="$SWIFTVM_USER" LOGNAME="$SWIFTVM_USER" \
+runuser -u "$TESSERACT_USER" -- env HOME="$home" USER="$TESSERACT_USER" LOGNAME="$TESSERACT_USER" \
     SHELL=/bin/bash OMARCHY_SETUP_CONTEXT=provision-owner MISE_OFFLINE=true \
     omarchy-provision-user --first-install
 
@@ -71,7 +71,7 @@ fi
 # Offer the account and Omarchy session at the login screen, without an automatic login or a
 # password kept on disk beyond cloud-init's first-boot data.
 mkdir -p /var/lib/sddm
-printf '[Last]\nSession=/usr/share/wayland-sessions/omarchy.desktop\nUser=%s\n' "$SWIFTVM_USER" > /var/lib/sddm/state.conf
+printf '[Last]\nSession=/usr/share/wayland-sessions/omarchy.desktop\nUser=%s\n' "$TESSERACT_USER" > /var/lib/sddm/state.conf
 chown -R sddm:sddm /var/lib/sddm
 
 echo "==> Finishing"

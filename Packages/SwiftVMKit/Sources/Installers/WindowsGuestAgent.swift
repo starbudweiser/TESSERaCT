@@ -4,7 +4,7 @@ import VMCore
 /// The guest agent for Windows and the ways it gets into a guest.
 ///
 /// The agent is C# source (`Resources/GuestAgentWindows`) that the guest compiles itself, with the
-/// compiler that comes with Windows: the Mac that builds SwiftVM needs nothing to build it, as with the
+/// compiler that comes with Windows: the Mac that builds TESSERaCT needs nothing to build it, as with the
 /// Python agent for Linux. A new machine's setup installs it. A machine that was installed from a disc
 /// of its own gets it from the guest tools disc, together with the drivers on the virtio-win disc.
 public enum WindowsGuestAgent {
@@ -16,7 +16,7 @@ public enum WindowsGuestAgent {
 
     /// The files the agent is made of, by the names they have in a guest, and the resources they are.
     static let files: [(name: String, resource: String)] = [
-        ("swiftvm-agent.cs", "swiftvm-agent.cs"),
+        ("tctl-agent.cs", "tctl-agent.cs"),
         ("install.ps1", "windows-install.ps1"),
         ("opengl.ps1", "windows-opengl.ps1"),
     ]
@@ -30,7 +30,7 @@ public enum WindowsGuestAgent {
     }
 
     /// The version of the agent this build carries, as the agent reports it when it connects.
-    public static let version: String? = (try? resource("swiftvm-agent.cs")).flatMap(version(ofSource:))
+    public static let version: String? = (try? resource("tctl-agent.cs")).flatMap(version(ofSource:))
 
     static func version(ofSource source: String) -> String? {
         for line in source.split(separator: "\n") where line.contains("const string Version") {
@@ -40,7 +40,7 @@ public enum WindowsGuestAgent {
         return nil
     }
 
-    /// The files a new machine's setup disc carries in its `swiftvm` folder: the agent, its installer,
+    /// The files a new machine's setup disc carries in its `tctl` folder: the agent, its installer,
     /// and the runner that Windows Setup starts.
     ///
     /// - Parameter includesGraphicsDriver: Bring the 3D driver, with which the machine draws with this
@@ -85,7 +85,7 @@ public enum WindowsGuestAgent {
         try GuestToolsDisc.image(prefix: toolsImagePrefix, volumeName: toolsVolumeName, files: toolsFiles(), in: directory, inUse: inUse)
     }
 
-    static let toolsImagePrefix = "SwiftVM Windows Guest Tools "
+    static let toolsImagePrefix = "TESSERaCT Windows Guest Tools "
 
     /// Whether `path` is a guest tools disc made by ``toolsImage(in:inUse:)``.
     public static func isToolsImage(_ path: String) -> Bool {

@@ -40,7 +40,7 @@ public struct ChannelFrame: Sendable, Hashable {
 
     /// The frame the agent opens the line with. It carries words of its own, so that a reader that has
     /// lost its way in what an agent before it left half sent finds the start of what this one sends.
-    public static let hello = ChannelFrame(.hello, payload: Data("swiftvm-agent-channel".utf8))
+    public static let hello = ChannelFrame(.hello, payload: Data("tctl-agent-channel".utf8))
 
     /// The frame that opens `connection` to `port`.
     public static func open(_ connection: UInt32, port: UInt32) -> ChannelFrame {

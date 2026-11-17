@@ -3,11 +3,11 @@
 # scripts/run-dev.sh call this; there is rarely a reason to run it by hand.
 #   scripts/bundle-app.sh --products <folder> --helpers <folder> --output <app> [--development]
 #
-#   --products      where the build put the app's program, SwiftVM, with SwiftVMKit_Installers.bundle
+#   --products      where the build put the app's program, TESSERaCT, with SwiftVMKit_Installers.bundle
 #                   and Sparkle.framework
-#   --helpers       where the build of Packages/SwiftVMKit put swiftvm and swiftvm-agent
-#   --output        the app to make. A copy of SwiftVM that is there is replaced, unless it is running
-#   --development   make the development copy, "SwiftVM Dev": an app of its own to macOS, which keeps
+#   --helpers       where the build of Packages/SwiftVMKit put tctl and tctl-agent
+#   --output        the app to make. A copy of TESSERaCT that is there is replaced, unless it is running
+#   --development   make the development copy, "TESSERaCT Dev": an app of its own to macOS, which keeps
 #                   its machines apart from the app's (AppIdentity in Packages/SwiftVMKit)
 #   --qemu          the QEMU that scripts/build-qemu.sh made, which runs Windows guests and Linux guests
 #                   with graphics acceleration. Without it the app runs every other guest, and says so
@@ -24,12 +24,12 @@
 # before Apple Development, and the other way round for the development copy, which also keeps to the
 # certificate it was first signed with (.build/development-signing-identity) so that macOS doesn't ask
 # for the microphone again after every build. Without a certificate the app is signed to run on this
-# Mac, which is enough to run virtual machines. SWIFTVM_SIGN_IDENTITY picks a certificate by name or
+# Mac, which is enough to run virtual machines. TESSERACT_SIGN_IDENTITY picks a certificate by name or
 # SHA-1; "-" signs to run on this Mac.
 #
 # USB passthrough and bridged networking each require an entitlement granted by a provisioning profile
 # for this app and signing certificate. Only capabilities granted by the selected profile are signed
-# into the app. SWIFTVM_PROVISIONING_PROFILE names a profile instead of looking where Xcode keeps them;
+# into the app. TESSERACT_PROVISIONING_PROFILE names a profile instead of looking where Xcode keeps them;
 # "-" builds without. Shared networking needs no profile.
 set -euo pipefail
 root=${0:A:h:h}
@@ -56,23 +56,23 @@ done
     || fail "--sparkle-feed-url and --sparkle-public-key go together: an app that knows where its updates are has to be able to check them."
 [[ -n $products && -n $helpers && $output == *.app ]] \
     || fail "Usage: scripts/bundle-app.sh --products <folder> --helpers <folder> --output <app> [--development]"
-for built in "$products/SwiftVM" "$products/SwiftVMKit_Installers.bundle" "$products/Sparkle.framework" "$helpers/swiftvm" "$helpers/swiftvm-agent"; do
-    [[ -e $built ]] || fail "$built isn't there. Build first: scripts/build.sh, or swift run SwiftVM."
+for built in "$products/TESSERaCT" "$products/SwiftVMKit_Installers.bundle" "$products/Sparkle.framework" "$helpers/tctl" "$helpers/tctl-agent"; do
+    [[ -e $built ]] || fail "$built isn't there. Build first: scripts/build.sh, or swift run TESSERaCT."
 done
-[[ -z $qemu || ( -x $qemu/bin/qemu-system-aarch64 && -f $qemu/lib/libSwiftVMDisplay.dylib ) ]] \
+[[ -z $qemu || ( -x $qemu/bin/qemu-system-aarch64 && -f $qemu/lib/libTESSERaCTDisplay.dylib ) ]] \
     || fail "$qemu isn't a QEMU that scripts/build-qemu.sh made."
-# The disk takes swiftvm and SwiftVM for one name. The swiftvm tool, built at the repository's root, lands
+# The disk takes tctl and TESSERaCT for one name. The tctl tool, built at the repository's root, lands
 # in the folder of the app's program and replaces it, and the next build of the app doesn't notice.
 built=("$products"/*(N:t))
-(( ${built[(Ie)SwiftVM]} )) || fail "$products/SwiftVM isn't the app's program but the swiftvm tool, which was built at the repository's root. Delete that file and build again. The tool on its own is built with: swift build --package-path Packages/SwiftVMKit --product swiftvm"
+(( ${built[(Ie)TESSERaCT]} )) || fail "$products/TESSERaCT isn't the app's program but the tctl tool, which was built at the repository's root. Delete that file and build again. The tool on its own is built with: swift build --package-path Packages/SwiftVMKit --product tctl"
 
 if $development; then
-    identifier=com.swiftvm.app.dev
-    name="SwiftVM Dev"
+    identifier=fr.stephan.tesseract.dev
+    name="TESSERaCT Dev"
     certificates=("Apple Development" "Developer ID Application")
 else
-    identifier=com.swiftvm.app
-    name=SwiftVM
+    identifier=fr.stephan.tesseract
+    name=TESSERaCT
     certificates=("Developer ID Application" "Apple Development")
 fi
 
@@ -88,8 +88,8 @@ app=$stage/${output:t}
 contents=$app/Contents
 mkdir -p "$contents/MacOS" "$contents/Helpers" "$contents/Resources" "$contents/Frameworks"
 
-cp "$products/SwiftVM" "$contents/MacOS/SwiftVM"
-cp "$helpers/swiftvm" "$helpers/swiftvm-agent" "$contents/Helpers/"
+cp "$products/TESSERaCT" "$contents/MacOS/TESSERaCT"
+cp "$helpers/tctl" "$helpers/tctl-agent" "$contents/Helpers/"
 if [[ -n $qemu ]]; then
     # Code in Helpers, where only code may be; the firmware and the licences with the resources.
     mkdir -p "$contents/Helpers/QEMU" "$contents/Resources/QEMU"
@@ -107,7 +107,7 @@ rm -rf "$contents/Resources/SwiftVMKit_Installers.bundle/Contents/_CodeSignature
 # Sparkle, which updates the app. The build left it next to the program; in an app its place is
 # Contents/Frameworks, and the program has to be told to look there.
 cp -R "$products/Sparkle.framework" "$contents/Frameworks/"
-report=$(install_name_tool -add_rpath @executable_path/../Frameworks "$contents/MacOS/SwiftVM" 2>&1) \
+report=$(install_name_tool -add_rpath @executable_path/../Frameworks "$contents/MacOS/TESSERaCT" 2>&1) \
     || fail "The app's program couldn't be told where Sparkle is:"$'\n'"$report"
 
 # The icon and the asset catalog, compiled the way Xcode would. That takes a second or two, so the
@@ -128,7 +128,7 @@ fi
 cp "$assets/Assets.car" "$assets/AppIcon.icns" "$contents/Resources/"
 
 cp "$root/Config/Info.plist" "$contents/Info.plist"
-cp "$root/Config/SwiftVM.entitlements" "$stage/entitlements.plist"
+cp "$root/Config/TESSERaCT.entitlements" "$stage/entitlements.plist"
 if $development; then
     plutil -replace CFBundleIdentifier -string "$identifier" "$contents/Info.plist"
     plutil -replace CFBundleName -string "$name" "$contents/Info.plist"
@@ -152,7 +152,7 @@ fi
 print -n 'APPL????' > "$contents/PkgInfo"
 
 remembered=$root/.build/development-signing-identity
-identity=${SWIFTVM_SIGN_IDENTITY:-}
+identity=${TESSERACT_SIGN_IDENTITY:-}
 remember=false
 from_memory=false
 if [[ -z $identity ]]; then
@@ -190,15 +190,15 @@ fi
 
 # Restricted entitlements and the profile that grants them go in together or not at all: an app
 # with the entitlement and no profile to go with it is ended by macOS the moment it starts.
-profile=${SWIFTVM_PROVISIONING_PROFILE:-}
+profile=${TESSERACT_PROVISIONING_PROFILE:-}
 if [[ $profile == - ]]; then
     profile=""
 elif [[ -n $profile ]]; then
-    [[ -f $profile ]] || fail "SWIFTVM_PROVISIONING_PROFILE: $profile isn't there."
-    [[ -n $certificate ]] || fail "SWIFTVM_PROVISIONING_PROFILE: a provisioning profile goes with a signing certificate, and $name is being signed to run on this Mac."
-    decode_profile "$profile" "$stage/profile.plist" || fail "SWIFTVM_PROVISIONING_PROFILE: $profile isn't a provisioning profile."
+    [[ -f $profile ]] || fail "TESSERACT_PROVISIONING_PROFILE: $profile isn't there."
+    [[ -n $certificate ]] || fail "TESSERACT_PROVISIONING_PROFILE: a provisioning profile goes with a signing certificate, and $name is being signed to run on this Mac."
+    decode_profile "$profile" "$stage/profile.plist" || fail "TESSERACT_PROVISIONING_PROFILE: $profile isn't a provisioning profile."
     problem=$(profile_problem "$stage/profile.plist" "$identifier" "$certificate")
-    [[ -z $problem ]] || fail "SWIFTVM_PROVISIONING_PROFILE: the profile $problem."
+    [[ -z $problem ]] || fail "TESSERACT_PROVISIONING_PROFILE: the profile $problem."
 elif [[ -n $certificate ]]; then
     find_capability_profile "$identifier" "$certificate" $profile_folders
     profile=${reply[1]:-}
@@ -245,8 +245,8 @@ sign --preserve-metadata=entitlements "$sparkle/XPCServices/Downloader.xpc"
 sign "$sparkle/Autoupdate"
 sign "$sparkle/Updater.app"
 sign "$contents/Frameworks/Sparkle.framework"
-sign --identifier com.swiftvm.app.swiftvm "$contents/Helpers/swiftvm"
-sign --identifier com.swiftvm.app.swiftvm-agent "$contents/Helpers/swiftvm-agent"
+sign --identifier fr.stephan.tesseract.tctl "$contents/Helpers/tctl"
+sign --identifier fr.stephan.tesseract.tctl-agent "$contents/Helpers/tctl-agent"
 if [[ -n $qemu ]]; then
     for library in "$contents"/Helpers/QEMU/lib/*.dylib(N); do
         sign "$library"
@@ -257,7 +257,7 @@ if [[ -n $qemu ]]; then
     if [[ $identity == - ]]; then
         /usr/libexec/PlistBuddy -c "Add :com.apple.security.cs.disable-library-validation bool true" "$stage/qemu-entitlements.plist"
     fi
-    sign --identifier com.swiftvm.app.qemu --entitlements "$stage/qemu-entitlements.plist" "$contents/Helpers/QEMU/bin/qemu-system-aarch64"
+    sign --identifier fr.stephan.tesseract.qemu --entitlements "$stage/qemu-entitlements.plist" "$contents/Helpers/QEMU/bin/qemu-system-aarch64"
     # swtpm, the TPM of Windows guests, loads the same libraries and needs nothing else. A QEMU built
     # before it was there comes without.
     print '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict></dict></plist>' > "$stage/tpm-entitlements.plist"
@@ -265,13 +265,13 @@ if [[ -n $qemu ]]; then
         /usr/libexec/PlistBuddy -c "Add :com.apple.security.cs.disable-library-validation bool true" "$stage/tpm-entitlements.plist"
     fi
     if [[ -f $contents/Helpers/QEMU/bin/swtpm ]]; then
-        sign --identifier com.swiftvm.app.qemu.tpm --entitlements "$stage/tpm-entitlements.plist" "$contents/Helpers/QEMU/bin/swtpm"
+        sign --identifier fr.stephan.tesseract.qemu.tpm --entitlements "$stage/tpm-entitlements.plist" "$contents/Helpers/QEMU/bin/swtpm"
     fi
     # virglrenderer's render server, which QEMU starts for Windows' Direct3D. Its Intel half loads
     # D3DMetal, which the user installed from Apple's Game Porting Toolkit: Apple signed it, not the
     # app's team, so this one loads libraries whoever signed them.
     print '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>com.apple.security.cs.disable-library-validation</key><true/></dict></plist>' > "$stage/renderer-entitlements.plist"
-    sign --identifier com.swiftvm.app.qemu.renderer --entitlements "$stage/renderer-entitlements.plist" "$contents/Helpers/QEMU/bin/virgl_render_server"
+    sign --identifier fr.stephan.tesseract.qemu.renderer --entitlements "$stage/renderer-entitlements.plist" "$contents/Helpers/QEMU/bin/virgl_render_server"
 fi
 sign --entitlements "$stage/entitlements.plist" "$app"
 codesign --verify --deep --strict "$app" || fail "The signature of $app doesn't hold."

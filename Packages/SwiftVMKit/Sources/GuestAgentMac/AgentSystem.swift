@@ -100,7 +100,7 @@ struct MacSystem: AgentSystem {
     /// The guest tools may be installed while someone is still logging in, after launchd has looked
     /// for what to start in the new session and before the installer sees who it is for.
     func startSession(for user: uid_t) {
-        let job = "/Library/LaunchAgents/com.swiftvm.agent.session.plist"
+        let job = "/Library/LaunchAgents/fr.stephan.tesseract.agent.session.plist"
         guard FileManager.default.fileExists(atPath: job) else { return }
         // A session that has it already says so, and nothing changes.
         if (try? Self.run("/bin/launchctl", ["bootstrap", "gui/\(user)", job], timeout: 10)) != nil {

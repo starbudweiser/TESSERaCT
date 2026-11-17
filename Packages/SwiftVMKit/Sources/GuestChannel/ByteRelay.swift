@@ -1,6 +1,6 @@
 import Foundation
 
-/// Carries a conversation between two sockets, such as the `swiftvm` tool on one side and a port in a
+/// Carries a conversation between two sockets, such as the `tctl` tool on one side and a port in a
 /// guest on the other. It is here, with the protocol, because both ends of the socket device relay: the
 /// app on the Mac, and the agent in a macOS guest between its two halves.
 public enum ByteRelay {

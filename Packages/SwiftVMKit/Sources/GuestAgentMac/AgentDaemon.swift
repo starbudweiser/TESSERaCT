@@ -1,7 +1,7 @@
 import Foundation
 import GuestChannel
 
-/// The half of the agent that runs as root: it answers the SwiftVM app on the Mac.
+/// The half of the agent that runs as root: it answers the TESSERaCT app on the Mac.
 ///
 /// The app connects over the virtual machine's socket device, which needs no network. This half tells it
 /// which system this is and which addresses it holds, and on its request sets the clock, sets the time
@@ -35,7 +35,7 @@ final class AgentDaemon: @unchecked Sendable {
     /// A session has begun and has been given nothing from the Mac's clipboard yet.
     private var sessionWantsClipboard = false
     /// Where the system is asked for what it takes its time over, one thing after the other.
-    private let slowWork = DispatchQueue(label: "SwiftVM guest agent, slow work")
+    private let slowWork = DispatchQueue(label: "TESSERaCT guest agent, slow work")
     private var sources: [any DispatchSourceProtocol] = []
     private var addressWatcher: AddressWatcher?
     private var isLookDue = false
@@ -106,7 +106,7 @@ final class AgentDaemon: @unchecked Sendable {
                 guard let connection = AgentSockets.acceptFromHost(on: listener) else { return }
                 self?.serveApp(on: connection)
             }
-            AgentLog.note("SwiftVM guest agent \(version), listening on port \(port) of the socket device.")
+            AgentLog.note("TESSERaCT guest agent \(version), listening on port \(port) of the socket device.")
         } catch {
             let problem = "\(error)"
             if problem != lastProblem {

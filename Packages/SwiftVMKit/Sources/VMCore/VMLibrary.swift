@@ -115,7 +115,7 @@ public final class VMLibrary {
     ///
     /// It has a name that nothing else in a folder of the user's choosing goes by.
     public static func stagingDirectory(in folder: URL) -> URL {
-        folder.appending(path: ".swiftvm-staging", directoryHint: .isDirectory)
+        folder.appending(path: ".tctl-staging", directoryHint: .isDirectory)
     }
 
     private static func defaultMachinesDirectory(in rootDirectory: URL) -> URL {
@@ -613,7 +613,7 @@ public final class VMLibrary {
         }
         let reason = String(cString: strerror(code))
         if code == EPERM || code == EACCES {
-            return .inaccessible("This Mac doesn't let SwiftVM look at it (\(reason)). Allow it under Privacy & Security, Files and Folders, in System Settings.")
+            return .inaccessible("This Mac doesn't let TESSERaCT look at it (\(reason)). Allow it under Privacy & Security, Files and Folders, in System Settings.")
         }
         return .inaccessible(reason)
     }

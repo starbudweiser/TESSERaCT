@@ -17,7 +17,7 @@
 # longer. d3dmetal-native runs them on Apple's D3DMetal, from the Game Porting Toolkit, which has
 # Direct3D 12 besides. D3DMetal isn't built or brought here: the user installs it. Its code is for Intel
 # processors, so the render server has an Intel half for it, which Rosetta runs. Set
-# SWIFTVM_QEMU_DIRECT3D=0 to leave Direct3D out while keeping Linux graphics acceleration.
+# TESSERACT_QEMU_DIRECT3D=0 to leave Direct3D out while keeping Linux graphics acceleration.
 #
 # Every source is pinned in Native/QEMU/sources.tsv by its checksum. The libraries the build doesn't
 # make itself are Homebrew's, and so are the tools to build with:
@@ -35,7 +35,7 @@ source "$root/scripts/common.sh"
 qemu_version=11.1.2
 native=$root/Native/QEMU
 bridge=$root/Packages/SwiftVMKit/Sources/GuestDisplayBridge/include
-direct3d=$([[ ${SWIFTVM_QEMU_DIRECT3D:-1} == 1 ]] && print yes || print no)
+direct3d=$([[ ${TESSERACT_QEMU_DIRECT3D:-1} == 1 ]] && print yes || print no)
 # The app runs on macOS 27 and later, as its packages say, and so has what it brings.
 export MACOSX_DEPLOYMENT_TARGET=27.0
 # Everything that isn't asked for here is left out.
@@ -72,7 +72,7 @@ done
 key=$( { cat "$script" "$native"/* "$bridge"/*; print -r -- "$direct3d"; pkg-config --modversion glib-2.0 pixman-1 openssl; } | shasum -a 256 | cut -c1-12)
 cache=$root/.build/qemu
 result=$cache/$qemu_version-$key/QEMU
-if [[ -x $result/bin/qemu-system-aarch64 && -f $result/lib/libSwiftVMDisplay.dylib ]]; then
+if [[ -x $result/bin/qemu-system-aarch64 && -f $result/lib/libTESSERaCTDisplay.dylib ]]; then
     print -r -- "$result"
     exit 0
 fi
@@ -111,7 +111,7 @@ unpack() {
     local archive=$sources/$1 directory=$sources/$2 stamp
     shift 2
     stamp=$( { shasum -a 256 "$archive"; (( $# == 0 )) || cat "$@"; } | shasum -a 256 | cut -d' ' -f1)
-    [[ -f $directory/.swiftvm-stamp && $(<"$directory/.swiftvm-stamp") == $stamp ]] && return 0
+    [[ -f $directory/.tctl-stamp && $(<"$directory/.tctl-stamp") == $stamp ]] && return 0
     rm -rf "$directory" "$sources/.unpacking"
     mkdir "$sources/.unpacking"
     # Python's safe filter, except that links out of the tree are left out rather than failing the
@@ -134,7 +134,7 @@ PY
         patch --batch --forward -d "$directory" -p1 < "$patch_file" > /dev/null \
             || fail "${patch_file:t} doesn't apply to ${archive:t}."
     done
-    print -r -- "$stamp" > "$directory/.swiftvm-stamp"
+    print -r -- "$stamp" > "$directory/.tctl-stamp"
 }
 
 meson_build() {
@@ -238,10 +238,10 @@ build_libraries() {
         git -C "$sources/WebKit" sparse-checkout set Source/ThirdParty/ANGLE Configurations Tools/ccache
     fi
     local angle=$sources/WebKit/Source/ThirdParty/ANGLE angle_patch=$native/angle-dylibs.patch
-    if [[ $(git -C "$sources/WebKit" rev-parse HEAD 2> /dev/null) != ed78ab6e1a37f4f11583a0bd038f22ec91f3ff10 || ! -f $angle/.swiftvm-patched ]]; then
+    if [[ $(git -C "$sources/WebKit" rev-parse HEAD 2> /dev/null) != ed78ab6e1a37f4f11583a0bd038f22ec91f3ff10 || ! -f $angle/.tctl-patched ]]; then
         git -C "$sources/WebKit" checkout --quiet --force ed78ab6e1a37f4f11583a0bd038f22ec91f3ff10
         patch --batch -d "$angle" -p1 < "$angle_patch" > /dev/null || fail "${angle_patch:t} doesn't apply to ANGLE."
-        touch "$angle/.swiftvm-patched"
+        touch "$angle/.tctl-patched"
     fi
     local angle_build=(xcodebuild archive -archivePath "$prefix/ANGLE" -scheme ANGLE -sdk macosx -arch arm64 -configuration Release
         WEBCORE_LIBRARY_DIR=/usr/local/lib NORMAL_UMBRELLA_FRAMEWORKS_DIR= CODE_SIGNING_ALLOWED=NO GCC_TREAT_WARNINGS_AS_ERRORS=NO
@@ -249,9 +249,9 @@ build_libraries() {
     # Xcode keeps what it built outside the cache, so ANGLE is built again only when what goes into it
     # changes, rather than from the start whenever anything else does.
     local angle_stamp=$( { print -r -- "${angle_build[*]}"; git -C "$sources/WebKit" rev-parse HEAD; cat "$angle_patch"; xcodebuild -version; } | shasum -a 256 | cut -d' ' -f1)
-    if [[ ! -f $prefix/ANGLE.xcarchive/.swiftvm-stamp || $(<"$prefix/ANGLE.xcarchive/.swiftvm-stamp") != $angle_stamp ]]; then
+    if [[ ! -f $prefix/ANGLE.xcarchive/.tctl-stamp || $(<"$prefix/ANGLE.xcarchive/.tctl-stamp") != $angle_stamp ]]; then
         (cd "$angle" && $angle_build)
-        print -r -- "$angle_stamp" > "$prefix/ANGLE.xcarchive/.swiftvm-stamp"
+        print -r -- "$angle_stamp" > "$prefix/ANGLE.xcarchive/.tctl-stamp"
     fi
     cp -R "$prefix/ANGLE.xcarchive/Products/usr/local/lib/" "$prefix/lib/"
     cp -R "$angle/include/" "$prefix/include/"
@@ -338,9 +338,9 @@ build_display() {
         clang $flags -c "$file" -o "$objects/${file:t:r}.o"
         compiled+=("$objects/${file:t:r}.o")
     done
-    clang -dynamiclib -arch arm64 -mmacosx-version-min=$MACOSX_DEPLOYMENT_TARGET -install_name @rpath/libSwiftVMDisplay.dylib $compiled \
+    clang -dynamiclib -arch arm64 -mmacosx-version-min=$MACOSX_DEPLOYMENT_TARGET -install_name @rpath/libTESSERaCTDisplay.dylib $compiled \
         -framework AppKit -framework Metal -framework MetalKit -framework IOSurface -framework QuartzCore -framework CoreGraphics \
-        ${(z)$(pkg-config --libs spice-client-glib-2.0 gstreamer-1.0)} -o "$prefix/lib/libSwiftVMDisplay.dylib"
+        ${(z)$(pkg-config --libs spice-client-glib-2.0 gstreamer-1.0)} -o "$prefix/lib/libTESSERaCTDisplay.dylib"
     xcrun -sdk macosx metal -c "$renderer/CSShaders.metal" -I"$renderer/include" -o "$objects/CSShaders.air"
     xcrun -sdk macosx metallib "$objects/CSShaders.air" -o "$prefix/share/CocoaSpice_CocoaSpiceRenderer.bundle/default.metallib"
 }
@@ -400,7 +400,7 @@ package() {
     # What nothing links, as these are opened while QEMU runs: ANGLE by epoxy, and DXMT and
     # d3dmetal-native by virglrenderer.
     local name file search_path minimum
-    local opened=(libSwiftVMDisplay.dylib libEGL.dylib libGLESv2.dylib)
+    local opened=(libTESSERaCTDisplay.dylib libEGL.dylib libGLESv2.dylib)
     [[ $direct3d != yes ]] || opened+=(libdxmt-native.dylib libd3dmetal-native.dylib)
     for name in $opened; do
         if [[ $name == libd3dmetal-native.dylib ]]; then
@@ -496,14 +496,14 @@ PY
         cp "$brew_prefix/opt/$license" "$out/licenses/${license%%/*}-${license:t}"
     done
     cat > "$out/README.txt" <<EOF
-QEMU $qemu_version, built for SwiftVM to run Windows guests and Linux guests with graphics
+QEMU $qemu_version, built for TESSERaCT to run Windows guests and Linux guests with graphics
 acceleration.
 
 QEMU is free software under the GNU General Public License, version 2. Its source is at
 https://download.qemu.org/qemu-$qemu_version.tar.xz, with the patches in licenses/, and it was
 configured with:
   ${configure_options[*]}
-licenses/build-qemu.sh, which is scripts/build-qemu.sh in SwiftVM's repository, builds it and
+licenses/build-qemu.sh, which is scripts/build-qemu.sh in TESSERaCT's repository, builds it and
 everything else here. licenses/sources.tsv names every source that went in, with its checksum.
 
 qemu-graphics.patch and qemu-hvf-ipa-granule.patch carry graphics acceleration on macOS
@@ -516,8 +516,8 @@ bin/swtpm is swtpm (BSD 3-Clause), the TPM 2.0 of Windows guests, on libtpms (BS
 The libraries in lib/ are SPICE, GStreamer, json-glib, libjpeg-turbo, libepoxy,
 virglrenderer (with directx-native's headers, Apache 2.0), ANGLE, libtpms and swtpm's own, built from those sources, and Homebrew's builds of glib $(pkg-config --modversion glib-2.0),
 pixman $(pkg-config --modversion pixman-1), OpenSSL, PCRE2 and gettext's libintl. SPICE, GStreamer, glib and
-libintl are under the GNU Lesser General Public License 2.1 or later. libSwiftVMDisplay is
-CocoaSpice (Apache 2.0) with SwiftVM's display code. The firmware in share/ is EDK II, as it
+libintl are under the GNU Lesser General Public License 2.1 or later. libTESSERaCTDisplay is
+CocoaSpice (Apache 2.0) with TESSERaCT's display code. The firmware in share/ is EDK II, as it
 comes with QEMU's source. The licences are in licenses/.
 EOF
     [[ $direct3d != yes ]] || print -r -- "

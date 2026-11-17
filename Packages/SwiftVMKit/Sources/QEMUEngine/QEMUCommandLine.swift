@@ -72,7 +72,7 @@ public struct QEMUCommandLine: Sendable {
     public static func attachesTPM(configuration: VMConfiguration, supportsTPM: Bool, savedWithTPM: Bool?) throws -> Bool {
         if let savedWithTPM {
             guard !savedWithTPM || supportsTPM else {
-                throw QEMUError.didNotStart("“\(configuration.name)” was saved with a TPM, and this copy of SwiftVM was built without one. Discard its saved state to start it up fresh.")
+                throw QEMUError.didNotStart("“\(configuration.name)” was saved with a TPM, and this copy of TESSERaCT was built without one. Discard its saved state to start it up fresh.")
             }
             return savedWithTPM
         }
@@ -98,7 +98,7 @@ public struct QEMUCommandLine: Sendable {
     }
 
     /// The name the agent's serial port has in the guest, which is how the agent finds it.
-    public static let agentPortName = "org.swiftvm.agent"
+    public static let agentPortName = "org.tctl.agent"
 
     // MARK: Refresh rate
 
@@ -265,7 +265,7 @@ public struct QEMUCommandLine: Sendable {
         for (index, disk) in configuration.disks.enumerated() {
             guard let source = diskSources[disk.id] else { throw QEMUError.didNotStart("The disk “\(disk.fileName)” isn't there.") }
             arguments += ["-blockdev", Self.json(Self.diskNode(id: Self.diskNodeName(index), source: source, readOnly: disk.readOnly))]
-            devices.append(Self.diskDevice(node: Self.diskNodeName(index), bus: disk.bus, serial: "swiftvm\(index)", port: ports[disk.id]))
+            devices.append(Self.diskDevice(node: Self.diskNodeName(index), bus: disk.bus, serial: "tctl\(index)", port: ports[disk.id]))
         }
 
         for image in startingDrives {
@@ -276,7 +276,7 @@ public struct QEMUCommandLine: Sendable {
         // drives on USB. A virtio disk is there from the beginning.
         if configuration.os.family == .linux, let seed = seedImage {
             arguments += ["-blockdev", Self.json(Self.imageNode(for: seed))]
-            devices.append(["driver": "virtio-blk-pci", "drive": .string(Self.imageNodeName(for: seed.id)), "serial": "swiftvm-seed"])
+            devices.append(["driver": "virtio-blk-pci", "drive": .string(Self.imageNodeName(for: seed.id)), "serial": "tctl-seed"])
         }
 
         // A Linux guest's shared folders, a 9p device each, by the tags its agent mounts them by. They

@@ -109,8 +109,8 @@ import Testing
 }
 
 private final class ImageFeedFixture {
-    let cache = FileManager.default.temporaryDirectory.appending(path: "swiftvm-feed-\(UUID().uuidString)")
-    let repository = "swiftvm-tests/\(UUID().uuidString)"
+    let cache = FileManager.default.temporaryDirectory.appending(path: "tctl-feed-\(UUID().uuidString)")
+    let repository = "tctl-tests/\(UUID().uuidString)"
     let manifest = "omarchy-arm64-edge-v1.json"
     let session: URLSession
     var downloader: ImageDownloader

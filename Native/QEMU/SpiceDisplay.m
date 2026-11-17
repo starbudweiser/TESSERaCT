@@ -195,7 +195,7 @@ void gst_ios_init(void) { gst_init(NULL, NULL); }
 
 - (void)connect {
     if (![self.connection connect]) {
-        [self finishConnecting:[NSError errorWithDomain:@"SwiftVM.GuestDisplay" code:3 userInfo:@{
+        [self finishConnecting:[NSError errorWithDomain:@"TESSERaCT.GuestDisplay" code:3 userInfo:@{
             NSLocalizedDescriptionKey: @"The machine's display couldn't connect."
         }]];
     }
@@ -315,7 +315,7 @@ void gst_ios_init(void) { gst_init(NULL, NULL); }
         if (self.closed) return;
         NSString *reason = message ?: @"The connection to the machine's display failed.";
         if (!self.didConnect) {
-            [self finishConnecting:[NSError errorWithDomain:@"SwiftVM.GuestDisplay" code:code userInfo:@{NSLocalizedDescriptionKey: reason}]];
+            [self finishConnecting:[NSError errorWithDomain:@"TESSERaCT.GuestDisplay" code:code userInfo:@{NSLocalizedDescriptionKey: reason}]];
         } else if (self.disconnected) self.disconnected(reason);
     });
 }

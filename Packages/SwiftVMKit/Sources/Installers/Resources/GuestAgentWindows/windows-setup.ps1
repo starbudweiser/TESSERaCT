@@ -1,5 +1,5 @@
-# SwiftVM's setup of a new Windows machine. Windows Setup runs it twice, as the answer file that
-# SwiftVM wrote says: as SYSTEM before Windows first starts ("specialize"), and when the account first
+# TESSERaCT's setup of a new Windows machine. Windows Setup runs it twice, as the answer file that
+# TESSERaCT wrote says: as SYSTEM before Windows first starts ("specialize"), and when the account first
 # logs in. It writes down how far it has come, and the guest agent passes that on to the Mac.
 param(
     [Parameter(Mandatory = $true)]
@@ -8,7 +8,7 @@ param(
 )
 $ErrorActionPreference = 'Continue'
 
-$data = Join-Path $env:ProgramData 'SwiftVM\setup'
+$data = Join-Path $env:ProgramData 'TESSERaCT\setup'
 New-Item -ItemType Directory -Force -Path $data | Out-Null
 $log = Join-Path $data 'setup.log'
 
@@ -98,4 +98,4 @@ if (Test-Path (Join-Path $env:WINDIR 'System32\DriverStore\FileRepository\viogpu
 Set-Status 'finished'
 # Windows starts again, and the Mac with it: its display then follows the window, with the driver
 # that was installed before.
-& shutdown.exe /r /t 5 /c 'SwiftVM has finished setting up Windows.'
+& shutdown.exe /r /t 5 /c 'TESSERaCT has finished setting up Windows.'

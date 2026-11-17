@@ -66,7 +66,7 @@ private final class DriveProvider: VMBackendProvider {
 /// A machine in a scratch folder with one small "disk" whose contents the tests can change.
 @MainActor
 private struct Scratch {
-    let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+    let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
     let provider = DriveProvider()
 
     /// Machines made here believe the Mac is unlocked, whatever the Mac running the tests is doing.
@@ -77,7 +77,7 @@ private struct Scratch {
             networkInterfaces: [NetworkInterfaceConfiguration(macAddress: "02:00:00:00:00:01", ipv4Address: "192.168.230.10")],
             ssh: SSHConfiguration(alias: "box", user: "me")
         )
-        let bundle = try VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).swiftvm"), configuration: configuration)
+        let bundle = try VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).tctl"), configuration: configuration)
         try Data("first".utf8).write(to: bundle.diskURL(for: disk))
         try Data("nvram".utf8).write(to: bundle.efiVariableStoreURL)
         let machine = try VirtualMachine(bundle: bundle)
@@ -626,11 +626,11 @@ private struct Scratch {
     }
 
     @Test func copiesDisksAndFirmwareButNotIdentityOrHistory() throws {
-        let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+        let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: directory) }
         let disk = DiskConfiguration(fileName: "disk.img", capacity: 1 << 20, format: .raw)
         let configuration = VMConfiguration(name: "Mac", os: GuestOS(family: .macOS), cpuCount: 4, memorySize: 8 << 30, disks: [disk])
-        let original = try VMBundle.create(at: directory.appending(path: "Mac.swiftvm"), configuration: configuration)
+        let original = try VMBundle.create(at: directory.appending(path: "Mac.tctl"), configuration: configuration)
         for url in [
             original.diskURL(for: disk), original.auxiliaryStorageURL, original.hardwareModelURL,
             original.machineIdentifierURL, original.savedStateURL, original.consoleLogURL,
@@ -640,7 +640,7 @@ private struct Scratch {
         _ = try original.takeSnapshot(named: "Before", of: configuration)
 
         let copyConfiguration = configuration.duplicated(name: "Mac copy", sshAlias: "mac-copy")
-        let copy = try original.duplicate(to: directory.appending(path: "Mac copy.swiftvm"), configuration: copyConfiguration)
+        let copy = try original.duplicate(to: directory.appending(path: "Mac copy.tctl"), configuration: copyConfiguration)
         let names = try FileManager.default.contentsOfDirectory(atPath: copy.url.path).sorted()
         #expect(names == ["aux.img", "config.json", "disk.img", "hardware-model.bin", "logs"])
         #expect(try String(contentsOf: copy.diskURL(for: disk), encoding: .utf8) == "disk.img")

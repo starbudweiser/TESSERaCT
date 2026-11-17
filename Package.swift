@@ -1,17 +1,17 @@
 // swift-tools-version: 6.2
 import PackageDescription
 
-// The app. `swift run SwiftVM` builds it and opens a development copy; `scripts/build.sh` builds the app
+// The app. `swift run TESSERaCT` builds it and opens a development copy; `scripts/build.sh` builds the app
 // itself. Either way the product is only the app's program: `scripts/bundle-app.sh` makes an app of it.
 //
-// The `swiftvm` tool and the guest agent are built from `Packages/SwiftVMKit` in a build folder of their
+// The `tctl` tool and the guest agent are built from `Packages/SwiftVMKit` in a build folder of their
 // own. Products of one build share a folder, and on a disk that doesn't tell upper case from lower,
-// `swiftvm` and `SwiftVM` would be one file.
+// `tctl` and `TESSERaCT` would be one file.
 let package = Package(
-    name: "SwiftVM",
+    name: "TESSERaCT",
     platforms: [.macOS("27.0")],
     products: [
-        .executable(name: "SwiftVM", targets: ["SwiftVM"]),
+        .executable(name: "TESSERaCT", targets: ["TESSERaCT"]),
     ],
     dependencies: [
         .package(path: "Packages/SwiftVMKit"),
@@ -20,7 +20,7 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "SwiftVM",
+            name: "TESSERaCT",
             dependencies: [
                 .product(name: "VMCore", package: "SwiftVMKit"),
                 .product(name: "VZEngine", package: "SwiftVMKit"),
@@ -47,9 +47,9 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "SwiftVMTests",
+            name: "TESSERaCTTests",
             dependencies: [
-                "SwiftVM",
+                "TESSERaCT",
                 .product(name: "VMCore", package: "SwiftVMKit"),
                 .product(name: "VMControl", package: "SwiftVMKit"),
                 .product(name: "AgentControl", package: "SwiftVMKit"),

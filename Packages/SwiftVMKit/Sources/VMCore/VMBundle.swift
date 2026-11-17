@@ -2,7 +2,7 @@ import Foundation
 
 /// A virtual machine on disk: a package directory holding the configuration, disks and firmware state.
 public struct VMBundle: Sendable, Hashable {
-    public static let pathExtension = "swiftvm"
+    public static let pathExtension = "tctl"
 
     public let url: URL
 

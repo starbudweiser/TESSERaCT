@@ -504,7 +504,7 @@ public final class QEMUBackend: VMBackend {
     }
 
     /// Where the machine's memory goes, or comes from: a file, given by its name rather than in a URI,
-    /// which a comma in the path would cut short. It starts after the header that is SwiftVM's.
+    /// which a comma in the path would cut short. It starts after the header that is TESSERaCT's.
     private static func migrationChannels(to url: URL) -> QMPValue {
         [["channel-type": "main", "addr": [
             "transport": "file", "filename": .string(url.path), "offset": .number(Double(SavedStateHeader.size)),

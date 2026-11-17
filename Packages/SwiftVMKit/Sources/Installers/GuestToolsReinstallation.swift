@@ -37,10 +37,10 @@ public struct GuestToolsReinstallation: Sendable {
         switch family {
         case .linux:
             scriptName = "linux-reinstall.sh"
-            directory = "/run/swiftvm-reinstall-\(token)"
+            directory = "/run/tctl-reinstall-\(token)"
         case .macOS:
             scriptName = "macos-reinstall.sh"
-            directory = "/var/root/swiftvm-reinstall-\(token)"
+            directory = "/var/root/tctl-reinstall-\(token)"
         case .windows:
             scriptName = "windows-reinstall.ps1"
             directory = ""
@@ -56,14 +56,14 @@ public struct GuestToolsReinstallation: Sendable {
             input = nil
         }
         if family == .windows {
-            let place = "$d = Join-Path $env:ProgramFiles 'SwiftVM\\Reinstall-\(token)'; "
+            let place = "$d = Join-Path $env:ProgramFiles 'TESSERaCT\\Reinstall-\(token)'; "
             launch = Self.powershell(script)
             status = Self.powershell(place + "if (Test-Path -LiteralPath ($d + '\\status')) { Get-Content -Raw -LiteralPath ($d + '\\status') } else { 'pending' }")
-            cleanup = Self.powershell(place + "Unregister-ScheduledTask -TaskName 'SwiftVM-Reinstall-\(token)' -Confirm:$false -ErrorAction SilentlyContinue; Remove-Item -LiteralPath $d -Recurse -Force")
+            cleanup = Self.powershell(place + "Unregister-ScheduledTask -TaskName 'TESSERaCT-Reinstall-\(token)' -Confirm:$false -ErrorAction SilentlyContinue; Remove-Item -LiteralPath $d -Recurse -Force")
         } else {
             launch = Self.shell(script)
             status = Self.shell("if [ -f '\(directory)/status' ]; then cat '\(directory)/status'; else echo pending; fi")
-            let unload = family == .macOS ? "launchctl remove com.swiftvm.reinstall.\(token) >/dev/null 2>&1; " : ""
+            let unload = family == .macOS ? "launchctl remove fr.stephan.tesseract.reinstall.\(token) >/dev/null 2>&1; " : ""
             cleanup = Self.shell(unload + "rm -rf '\(directory)'")
         }
     }

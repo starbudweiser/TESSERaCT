@@ -21,12 +21,12 @@ public struct SharedFoldersPlace: Sendable, Hashable {
 /// Names shared between the host-side device configuration and guest-side setup.
 public enum GuestIntegration {
     /// virtio-fs tag of the device that carries the machine's shared folders (Linux guests).
-    public static let sharedFoldersTag = "swiftvm"
+    public static let sharedFoldersTag = "tctl"
     /// Where Linux guests mount the shared folders; each folder appears as a subdirectory.
     public static let sharedFoldersMountPoint = "/mnt/shared"
     /// The drive Windows guests map the shared folders to; each folder appears as a folder on it.
     public static let windowsSharedFoldersDrive = "Z:"
-    /// Mounts the shared folders in a Linux guest that SwiftVM didn't set up (an ISO install or live session).
+    /// Mounts the shared folders in a Linux guest that TESSERaCT didn't set up (an ISO install or live session).
     public static var linuxMountCommand: String {
         "sudo mkdir -p \(sharedFoldersMountPoint) && sudo mount -t virtiofs \(sharedFoldersTag) \(sharedFoldersMountPoint)"
     }
@@ -40,7 +40,7 @@ public enum GuestIntegration {
     /// folder. It comes from the folder's identifier, so that a folder keeps its tag whatever is shared
     /// besides it. QEMU takes 31 characters at most.
     public static func folderDeviceTag(for folder: SharedFolder) -> String {
-        "swiftvm-" + folder.id.uuidString.lowercased().prefix(8)
+        "tctl-" + folder.id.uuidString.lowercased().prefix(8)
     }
 
     /// The folders of a Linux guest on QEMU, each with its device and the name it has in the guest.
@@ -79,9 +79,9 @@ public enum GuestIntegration {
     }
 
     /// Where a Linux guest writes down everything its setup script prints.
-    public static let setupLogPath = "/var/log/swiftvm-setup.log"
+    public static let setupLogPath = "/var/log/tctl-setup.log"
     /// What a person runs in a Linux guest to have a setup script that failed run again.
-    public static let setupRetryCommand = "sudo systemctl start swiftvm-setup"
+    public static let setupRetryCommand = "sudo systemctl start tctl-setup"
 
     /// virtio-fs tag of the Rosetta share.
     public static let rosettaTag = "rosetta"

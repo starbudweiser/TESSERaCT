@@ -54,7 +54,7 @@ final class AgentChannel: @unchecked Sendable {
     /// resumed, believes its connections are still open: it hears the hello and says its own.
     func start() {
         let thread = Thread { [self] in readLoop() }
-        thread.name = "app.swiftvm.agent-channel"
+        thread.name = "app.tctl.agent-channel"
         thread.start()
         send(.hello)
     }
@@ -186,7 +186,7 @@ final class AgentChannel: @unchecked Sendable {
         init(id: UInt32, local: Int32) {
             self.id = id
             self.local = local
-            output = DispatchQueue(label: "app.swiftvm.agent-channel.\(id)")
+            output = DispatchQueue(label: "app.tctl.agent-channel.\(id)")
         }
 
         func letGo() {
@@ -232,7 +232,7 @@ final class AgentChannel: @unchecked Sendable {
                 return
             }
         }
-        thread.name = "app.swiftvm.agent-channel.pump"
+        thread.name = "app.tctl.agent-channel.pump"
         thread.start()
     }
 

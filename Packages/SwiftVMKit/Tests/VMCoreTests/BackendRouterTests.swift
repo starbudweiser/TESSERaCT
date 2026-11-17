@@ -40,11 +40,11 @@ private final class CountingProvider: VMBackendProvider {
 
 @MainActor
 @Suite struct BackendRouterTests {
-    private let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+    private let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
 
     private func machine(_ family: GuestFamily) throws -> VirtualMachine {
         let configuration = VMConfiguration(name: family.displayName, os: GuestOS(family: family), cpuCount: 2, memorySize: 4 << 30, disks: [])
-        return try VirtualMachine(bundle: VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).swiftvm"), configuration: configuration))
+        return try VirtualMachine(bundle: VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).tctl"), configuration: configuration))
     }
 
     @Test func handsEachMachineToItsEngine() async throws {

@@ -12,7 +12,7 @@ umask 022
 source=$(cd "$(dirname "$0")/../.." && pwd)
 mkdir -p "${1:?output directory required}"
 output=$(cd "$1" && pwd)
-work=$(mktemp -d /var/tmp/swiftvm-omarchy.XXXXXX)
+work=$(mktemp -d /var/tmp/tctl-omarchy.XXXXXX)
 root=$work/root
 mkdir "$root"
 
@@ -56,9 +56,9 @@ mount --rbind --make-rslave /dev "$root/dev"
 mount -t tmpfs tmpfs "$root/run"
 rm -f "$root/etc/resolv.conf"
 cp /etc/resolv.conf "$root/etc/resolv.conf"
-mkdir -p "$root/opt/swiftvm/scripts" "$root/output" "$root/work"
-cp "$source/scripts/build-omarchy-image.sh" "$root/opt/swiftvm/scripts/"
-cp -R "$source/scripts/omarchy-image" "$root/opt/swiftvm/scripts/"
+mkdir -p "$root/opt/tctl/scripts" "$root/output" "$root/work"
+cp "$source/scripts/build-omarchy-image.sh" "$root/opt/tctl/scripts/"
+cp -R "$source/scripts/omarchy-image" "$root/opt/tctl/scripts/"
 mount --bind "$output" "$root/output"
 
 # No Actions credentials or runner environment enter the builder. Package scripts run as root;
@@ -70,5 +70,5 @@ chroot "$root" /usr/bin/env -i HOME=/root PATH=/usr/bin:/usr/sbin \
     pacman -Sy --noconfirm archlinuxarm-keyring
     pacman -Syu --noconfirm --needed arch-install-scripts btrfs-progs dosfstools \
       e2fsprogs jq python qemu-img zstd curl
-    bash /opt/swiftvm/scripts/build-omarchy-image.sh --output /output --work /work
+    bash /opt/tctl/scripts/build-omarchy-image.sh --output /output --work /work
   '

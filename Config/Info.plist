@@ -5,13 +5,13 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
-	<string>SwiftVM</string>
+	<string>TESSERaCT</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.swiftvm.app</string>
+	<string>fr.stephan.tesseract</string>
 	<key>CFBundleName</key>
-	<string>SwiftVM</string>
+	<string>TESSERaCT</string>
 	<key>CFBundleDisplayName</key>
-	<string>SwiftVM</string>
+	<string>TESSERaCT</string>
 	<key>CFBundleShortVersionString</key>
 	<string>0.1.0</string>
 	<key>CFBundleVersion</key>
@@ -39,20 +39,20 @@
 	<key>SUAutomaticallyUpdate</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2026 SwiftVM contributors. Licensed under Apache-2.0.</string>
+	<string>Copyright © 2026 TESSERaCT contributors. Licensed under Apache-2.0.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>SwiftVM passes microphone audio to virtual machines that have the microphone turned on.</string>
+	<string>TESSERaCT passes microphone audio to virtual machines that have the microphone turned on.</string>
 	<key>NSRemovableVolumesUsageDescription</key>
-	<string>SwiftVM keeps virtual machines, templates and downloaded images on the disks you choose for them.</string>
+	<string>TESSERaCT keeps virtual machines, templates and downloaded images on the disks you choose for them.</string>
 	<key>NSNetworkVolumesUsageDescription</key>
-	<string>SwiftVM keeps virtual machines, templates and downloaded images on the disks you choose for them.</string>
+	<string>TESSERaCT keeps virtual machines, templates and downloaded images on the disks you choose for them.</string>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
 			<key>UTTypeIdentifier</key>
-			<string>com.swiftvm.machine</string>
+			<string>fr.stephan.tesseract.machine</string>
 			<key>UTTypeDescription</key>
-			<string>SwiftVM Virtual Machine</string>
+			<string>TESSERaCT Virtual Machine</string>
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>com.apple.package</string>
@@ -62,15 +62,15 @@
 			<dict>
 				<key>public.filename-extension</key>
 				<array>
-					<string>swiftvm</string>
+					<string>tctl</string>
 				</array>
 			</dict>
 		</dict>
 		<dict>
 			<key>UTTypeIdentifier</key>
-			<string>com.swiftvm.template</string>
+			<string>fr.stephan.tesseract.template</string>
 			<key>UTTypeDescription</key>
-			<string>SwiftVM Template</string>
+			<string>TESSERaCT Template</string>
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>com.apple.package</string>
@@ -80,7 +80,7 @@
 			<dict>
 				<key>public.filename-extension</key>
 				<array>
-					<string>swiftvmtemplate</string>
+					<string>tctltemplate</string>
 				</array>
 			</dict>
 		</dict>
@@ -89,7 +89,7 @@
 	<array>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>SwiftVM Virtual Machine</string>
+			<string>TESSERaCT Virtual Machine</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
@@ -98,7 +98,7 @@
 			<true/>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>com.swiftvm.machine</string>
+				<string>fr.stephan.tesseract.machine</string>
 			</array>
 		</dict>
 	</array>

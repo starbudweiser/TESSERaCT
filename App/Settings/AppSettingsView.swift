@@ -126,7 +126,7 @@ struct AppSettingsView: View {
         } header: {
             Text("Deleting")
         } footer: {
-            Text("A virtual machine that is deleted, here or with “swiftvm delete”, is removed with its disks and snapshots at once instead of moved to the Trash. Their space is free right away, and they can't be brought back.")
+            Text("A virtual machine that is deleted, here or with “tctl delete”, is removed with its disks and snapshots at once instead of moved to the Trash. Their space is free right away, and they can't be brought back.")
         }
     }
 
@@ -191,9 +191,9 @@ struct AppSettingsView: View {
             if let graphicsProblem {
                 Text(graphicsProblem).foregroundStyle(.red)
             } else if !canUseD3DMetal {
-                Text("This copy of SwiftVM was built without what runs D3DMetal, so Windows machines have Direct3D 11 only.")
+                Text("This copy of TESSERaCT was built without what runs D3DMetal, so Windows machines have Direct3D 11 only.")
             } else {
-                Text("Windows machines get Direct3D 12, and OpenGL on top of it, from Apple's D3DMetal, which comes with the Game Porting Toolkit. Download the toolkit from developer.apple.com, open its disk image and the “Evaluation environment for Windows games” image inside it, and choose that one here: SwiftVM keeps a copy. D3DMetal runs under Rosetta. Machines use D3DMetal the next time they start; shut them down before you remove or replace it.")
+                Text("Windows machines get Direct3D 12, and OpenGL on top of it, from Apple's D3DMetal, which comes with the Game Porting Toolkit. Download the toolkit from developer.apple.com, open its disk image and the “Evaluation environment for Windows games” image inside it, and choose that one here: TESSERaCT keeps a copy. D3DMetal runs under Rosetta. Machines use D3DMetal the next time they start; shut them down before you remove or replace it.")
             }
         }
     }
@@ -370,7 +370,7 @@ struct AppSettingsView: View {
                 }
                 .disabled(isChangingTool)
             } label: {
-                Text("swiftvm")
+                Text("tctl")
                 Text(toolStatusText(for: link))
             }
         } header: {
@@ -379,7 +379,7 @@ struct AppSettingsView: View {
             if let toolProblem {
                 Text(toolProblem).foregroundStyle(.red)
             } else {
-                Text("The swiftvm tool creates, starts and connects to virtual machines from Terminal. Installing it puts a link in \(link.linkURL.deletingLastPathComponent().path), for which macOS may ask for an administrator's password. Then try “swiftvm help”.")
+                Text("The tctl tool creates, starts and connects to virtual machines from Terminal. Installing it puts a link in \(link.linkURL.deletingLastPathComponent().path), for which macOS may ask for an administrator's password. Then try “tctl help”.")
             }
         }
     }
@@ -392,7 +392,7 @@ struct AppSettingsView: View {
             "Not installed"
         case .occupied(let target?):
             // Another copy of the app, or one that has been moved or deleted since.
-            "\(link.linkURL.path) leads to \((target as NSString).abbreviatingWithTildeInPath). Installing points it at this copy of SwiftVM."
+            "\(link.linkURL.path) leads to \((target as NSString).abbreviatingWithTildeInPath). Installing points it at this copy of TESSERaCT."
         case .occupied(nil):
             "Something else is at \(link.linkURL.path). Installing replaces it, unless it is a folder."
         }

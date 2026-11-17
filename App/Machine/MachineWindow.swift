@@ -101,7 +101,7 @@ struct MachineView: View {
             // its own, and take the guest's windows away from where they are.
             placeholder(
                 title: "\(machine.name) is in Seamless Mode",
-                detail: "Its windows are on your desktop. Click SwiftVM in the Dock for the Start menu.",
+                detail: "Its windows are on your desktop. Click TESSERaCT in the Dock for the Start menu.",
                 actionTitle: "Exit Seamless Mode",
                 actionImage: "macwindow",
                 action: { model.exitSeamlessMode(machine, reopeningWindow: false) }

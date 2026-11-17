@@ -1,6 +1,6 @@
 import Foundation
 
-/// The link that puts the `swiftvm` tool on the `PATH`: a symbolic link in `/usr/local/bin` that leads to
+/// The link that puts the `tctl` tool on the `PATH`: a symbolic link in `/usr/local/bin` that leads to
 /// the tool inside the app.
 public struct CommandLineToolLink: Sendable, Equatable {
     public enum Status: Sendable, Equatable {
@@ -25,7 +25,7 @@ public struct CommandLineToolLink: Sendable, Equatable {
 
     /// `/usr/local/bin` is on the `PATH` of every shell on macOS, and is where tools that don't come with
     /// the system belong.
-    public static let defaultLinkURL = URL(fileURLWithPath: "/usr/local/bin/swiftvm")
+    public static let defaultLinkURL = URL(fileURLWithPath: "/usr/local/bin/tctl")
 
     /// The tool inside the app.
     public var toolURL: URL

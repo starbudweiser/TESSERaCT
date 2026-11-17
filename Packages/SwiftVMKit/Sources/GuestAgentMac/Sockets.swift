@@ -4,9 +4,9 @@ import GuestChannel
 /// The sockets the agent listens on and connects to.
 enum AgentSockets {
     /// Where the agent's half in a user's session finds the half that runs as root.
-    static let sessionSocketPath = "/var/run/swiftvm-agent.sock"
+    static let sessionSocketPath = "/var/run/tctl-agent.sock"
     /// Where it connects once more for every job it does: one with the screen, the mouse or the keyboard.
-    static let sessionJobSocketPath = "/var/run/swiftvm-agent-jobs.sock"
+    static let sessionJobSocketPath = "/var/run/tctl-agent-jobs.sock"
 
     struct SocketError: Error, CustomStringConvertible {
         var description: String

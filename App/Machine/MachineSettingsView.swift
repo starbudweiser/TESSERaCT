@@ -77,10 +77,10 @@ nonisolated enum MachineSettingsPane: String, SettingsPane {
         case .storage: "The disk, and disc and disk images plugged in as drives."
         case .sharing: "Folders and the clipboard shared with this Mac."
         case .network: "The network connection, and ports forwarded from this Mac."
-        case .ssh: "How ssh and swiftvm reach the virtual machine."
+        case .ssh: "How ssh and tctl reach the virtual machine."
         case .usb: "USB devices of this Mac that the virtual machine uses."
         case .keyboard: "Where system shortcuts go while the virtual machine has focus."
-        case .automation: "What the swiftvm command may do in the virtual machine."
+        case .automation: "What the tctl command may do in the virtual machine."
         case .startup: "How the virtual machine starts its system."
         }
     }
@@ -469,7 +469,7 @@ struct MachineSettingsView: View {
             Text("Connection")
         } footer: {
             if !BridgedNetworking.isEntitled {
-                Text("Bridged networking isn't available in this copy of SwiftVM.")
+                Text("Bridged networking isn't available in this copy of TESSERaCT.")
             }
             if let macAddressProblem {
                 Text(macAddressProblem).foregroundStyle(.red)
@@ -508,7 +508,7 @@ struct MachineSettingsView: View {
         Section {
             TextField("Name", text: $sshAlias)
                 .onSubmit { commitTextFields() }
-                .help("The name that ssh and swiftvm reach this virtual machine by")
+                .help("The name that ssh and tctl reach this virtual machine by")
             TextField("User", text: $sshUser, prompt: Text(NSUserName()))
                 .onSubmit { commitTextFields() }
             TextField("Port", text: $sshPort, prompt: Text("22"))
@@ -551,7 +551,7 @@ struct MachineSettingsView: View {
         Section {
             Toggle("Allow Automation", isOn: binding(\.automation.isAllowed))
         } footer: {
-            Text("AI agents and scripts see and work the virtual machine's desktop with swiftvm control <machine>, at a login screen too, and run commands in it with swiftvm exec. For agents: swiftvm skill and swiftvm mcp.")
+            Text("AI agents and scripts see and work the virtual machine's desktop with tctl control <machine>, at a login screen too, and run commands in it with tctl exec. For agents: tctl skill and tctl mcp.")
         }
     }
 

@@ -51,7 +51,7 @@ struct ControlFailure: Error {
     }
 }
 
-/// Does what `swiftvm control` and `swiftvm mcp` ask of one machine's desktop.
+/// Does what `tctl control` and `tctl mcp` ask of one machine's desktop.
 ///
 /// It reads the screen itself and uses the machine's own mouse and keyboard, so all of it works on any
 /// guest and at a login screen. It asks the guest tools what the screen's parts are where they can tell,
@@ -744,12 +744,12 @@ enum GuestCommands {
         case .macOS:
             if what.hasPrefix("~/") {
                 // No shell reads a command, so nothing else says what `~` is.
-                return ["/bin/sh", "-c", "exec /usr/bin/open \"$HOME/$1\"", "swiftvm-open", String(what.dropFirst(2))]
+                return ["/bin/sh", "-c", "exec /usr/bin/open \"$HOME/$1\"", "tctl-open", String(what.dropFirst(2))]
             }
             let isPlace = what.contains("://") || what.hasPrefix("/")
             return ["/usr/bin/open"] + (isPlace ? [] : ["-a"]) + [what]
         case .linux:
-            return ["/bin/sh", "-c", linuxOpen, "swiftvm-open", what]
+            return ["/bin/sh", "-c", linuxOpen, "tctl-open", what]
         case .windows:
             // `start` takes its first quoted word as a window's title.
             return ["cmd.exe", "/c", "start", "", windowsWord(what)]

@@ -25,7 +25,7 @@ public final class NBDServer: @unchecked Sendable {
     private let listener: Int32
     /// A pipe that is written to when it is over, for the thread that waits for the machine to connect.
     private let wake: (read: Int32, write: Int32)
-    private let work = DispatchQueue(label: "app.swiftvm.nbd", attributes: .concurrent)
+    private let work = DispatchQueue(label: "app.tctl.nbd", attributes: .concurrent)
     private let lock = NSLock()
     private var connections: Set<Int32> = []
     private var isStopped = false
@@ -65,7 +65,7 @@ public final class NBDServer: @unchecked Sendable {
         self.disk = disk
         // A socket's path has room for 103 bytes. The folder for temporary files is the user's own,
         // and its path is short enough.
-        let path = FileManager.default.temporaryDirectory.appending(path: "swiftvm-\(UUID().uuidString.prefix(8)).sock").path
+        let path = FileManager.default.temporaryDirectory.appending(path: "tctl-\(UUID().uuidString.prefix(8)).sock").path
         var address = sockaddr_un()
         address.sun_family = sa_family_t(AF_UNIX)
         let capacity = MemoryLayout.size(ofValue: address.sun_path)

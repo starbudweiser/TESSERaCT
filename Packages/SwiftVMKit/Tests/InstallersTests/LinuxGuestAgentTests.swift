@@ -18,7 +18,7 @@ import VMCore
         #expect(arguments.contains("ServerAliveInterval=5"))
         #expect(arguments.suffix(2) == [
             "web",
-            "sudo -n sh -c 'umask 077; d=$(mktemp -d /tmp/swiftvm-tools.XXXXXXXX) || exit 1; "
+            "sudo -n sh -c 'umask 077; d=$(mktemp -d /tmp/tctl-tools.XXXXXXXX) || exit 1; "
                 + "cat > \"$d/install.sh\" && sh \"$d/install.sh\"; code=$?; rm -rf \"$d\"; exit $code'",
         ])
     }
@@ -34,19 +34,19 @@ import VMCore
             }
         }
         // The installer ran and refused: its reason is the answer, and a disc wouldn't change it.
-        let noPython = try #require(failure(printing: "swiftvm: the guest agent needs Python 3 at /usr/bin/python3. Install it and run this again\n"))
+        let noPython = try #require(failure(printing: "tctl: the guest agent needs Python 3 at /usr/bin/python3. Install it and run this again\n"))
         #expect(LinuxGuestAgent.installerComplaint(in: noPython) == "the guest agent needs Python 3 at /usr/bin/python3. Install it and run this again")
-        let noisy = try #require(failure(printing: "Warning: Permanently added 'web' (ED25519) to the list of known hosts.\nswiftvm: this system doesn't use systemd, which the guest agent needs\n"))
+        let noisy = try #require(failure(printing: "Warning: Permanently added 'web' (ED25519) to the list of known hosts.\ntctl: this system doesn't use systemd, which the guest agent needs\n"))
         #expect(LinuxGuestAgent.installerComplaint(in: noisy) == "this system doesn't use systemd, which the guest agent needs")
         // It never ran: there was no way in, and the disc is one.
-        for text in ["sudo: a password is required\n", "web: Permission denied (publickey).\n", "", "swiftvm:\n"] {
+        for text in ["sudo: a password is required\n", "web: Permission denied (publickey).\n", "", "tctl:\n"] {
             let noWayIn = try #require(failure(printing: text))
             #expect(LinuxGuestAgent.installerComplaint(in: noWayIn) == nil)
         }
     }
 
     @Test func makesTheGuestToolsDiscOnce() throws {
-        let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tools-\(UUID().uuidString)")
+        let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tools-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: directory) }
 
         let disc = try LinuxGuestAgent.toolsImage(in: directory)
@@ -63,8 +63,8 @@ import VMCore
         #expect(try FileManager.default.attributesOfItem(atPath: disc.path)[.modificationDate] as? Date == created)
 
         // Discs of other builds go, unless a machine still has one attached.
-        let stale = directory.appending(path: "SwiftVM Guest Tools 000000000000.iso")
-        let attached = directory.appending(path: "SwiftVM Guest Tools 111111111111.iso")
+        let stale = directory.appending(path: "TESSERaCT Guest Tools 000000000000.iso")
+        let attached = directory.appending(path: "TESSERaCT Guest Tools 111111111111.iso")
         let unrelated = directory.appending(path: "notes.txt")
         for url in [stale, attached, unrelated] {
             try Data("x".utf8).write(to: url)

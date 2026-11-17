@@ -35,7 +35,7 @@ import Testing
     }
 
     @Test func anAcceleratedLinuxGuestOnlySharesWhileEnabled() async throws {
-        let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-clipboard-\(UUID())")
+        let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-clipboard-\(UUID())")
         defer { try? FileManager.default.removeItem(at: directory) }
         let configuration = VMConfiguration(
             name: "Clipboard", os: GuestOS(family: .linux), engine: .qemu,

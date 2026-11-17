@@ -2,7 +2,7 @@ import Foundation
 import VMControl
 import VMCore
 
-/// Putting the `swiftvm` tool on the `PATH`, for the button in Settings.
+/// Putting the `tctl` tool on the `PATH`, for the button in Settings.
 extension AppModel {
     /// The link in `/usr/local/bin` that leads to this app's tool, if this build has the tool inside.
     var commandLineToolLink: CommandLineToolLink? {
@@ -28,8 +28,8 @@ extension AppModel {
         let script = CommandLineToolLink.administratorScript(
             running: installed ? link.installCommand : link.removeCommand,
             prompt: installed
-                ? "\(AppIdentity.current.name) wants to add the swiftvm command to \(folder)."
-                : "\(AppIdentity.current.name) wants to remove the swiftvm command from \(folder)."
+                ? "\(AppIdentity.current.name) wants to add the tctl command to \(folder)."
+                : "\(AppIdentity.current.name) wants to remove the tctl command from \(folder)."
         )
         do {
             // The dialog stays up for as long as the user takes; keep the app responsive meanwhile.

@@ -161,7 +161,7 @@ public final class RFBClient: @unchecked Sendable {
     private let descriptor: Int32
     private let lock = NSLock()
     /// Writes go out one at a time, and never on the thread that reads.
-    private let writer = DispatchQueue(label: "app.swiftvm.rfb.write", qos: .userInteractive)
+    private let writer = DispatchQueue(label: "app.tctl.rfb.write", qos: .userInteractive)
     private var updateHandler: (@Sendable (CGRect) -> Void)?
     private var resizeHandler: (@Sendable (Picture) -> Void)?
     private var cursorHandler: (@Sendable (Cursor?) -> Void)?
@@ -204,7 +204,7 @@ public final class RFBClient: @unchecked Sendable {
         try makePicture(width: width, height: height)
         lock.withLock { isReading = true }
         let thread = Thread { [self] in readLoop(reader) }
-        thread.name = "app.swiftvm.rfb"
+        thread.name = "app.tctl.rfb"
         thread.qualityOfService = .userInteractive
         thread.start()
         requestUpdate(incremental: false)

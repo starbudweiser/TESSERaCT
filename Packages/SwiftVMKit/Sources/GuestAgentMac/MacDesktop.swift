@@ -36,7 +36,7 @@ struct MacDesktop: AgentDesktop {
     private static func requireAccess() throws {
         // Only asked for by `allow`: a question on the screen for every look would be in everyone's way.
         guard AXIsProcessTrusted() else {
-            throw AgentFailure("macOS hasn't let the guest tools read what is on this Mac's screen yet, or act on it. `swiftvm control <machine> allow --password <password>`, on the Mac that runs this virtual machine, has it allowed. Or turn on swiftvm-agent in the guest, under System Settings › Privacy & Security › Device Control and Data Access, which earlier versions of macOS call Accessibility.")
+            throw AgentFailure("macOS hasn't let the guest tools read what is on this Mac's screen yet, or act on it. `tctl control <machine> allow --password <password>`, on the Mac that runs this virtual machine, has it allowed. Or turn on tctl-agent in the guest, under System Settings › Privacy & Security › Device Control and Data Access, which earlier versions of macOS call Accessibility.")
         }
     }
 
@@ -489,7 +489,7 @@ struct ScreenReader {
             guard let text = request.text else { throw AgentFailure("The request has no text.") }
             var isSettable = DarwinBoolean(false)
             guard AXUIElementIsAttributeSettable(element, "AXValue" as CFString, &isSettable) == .success, isSettable.boolValue else {
-                throw AgentFailure("\(what) doesn't take text this way. If it is a text field, give it the keyboard with `swiftvm control <machine> focus`, and type.")
+                throw AgentFailure("\(what) doesn't take text this way. If it is a text field, give it the keyboard with `tctl control <machine> focus`, and type.")
             }
             guard AXUIElementSetAttributeValue(element, "AXValue" as CFString, text as CFString) == .success else {
                 throw AgentFailure("\(what) didn't take the text.")

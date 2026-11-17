@@ -2,7 +2,7 @@
 # The system manager, not the agent being replaced, owns the installer.
 set -eu
 umask 077
-d=/run/swiftvm-reinstall-@@token@@
+d=/run/tctl-reinstall-@@token@@
 mkdir "$d"
 mkdir "$d/disc"
 # udev may still be naming the newly attached device.
@@ -16,9 +16,9 @@ trap 'umount "$d/disc" 2>/dev/null || true' EXIT
 cp "$d/disc/install.sh" "$d/install.sh"
 umount "$d/disc"
 trap - EXIT
-cat > "$d/run.sh" <<'SWIFTVM_RUNNER'
+cat > "$d/run.sh" <<'TESSERACT_RUNNER'
 #!/bin/sh
-cd /run/swiftvm-reinstall-@@token@@ || exit 1
+cd /run/tctl-reinstall-@@token@@ || exit 1
 if /bin/sh ./install.sh > install.log 2>&1; then
     echo ok > status.new
 else
@@ -26,5 +26,5 @@ else
     tail -c 2000 install.log >> status.new
 fi
 mv status.new status
-SWIFTVM_RUNNER
-systemd-run --quiet --collect --unit=swiftvm-reinstall-@@token@@ --property=RuntimeMaxSec=150 /bin/sh "$d/run.sh"
+TESSERACT_RUNNER
+systemd-run --quiet --collect --unit=tctl-reinstall-@@token@@ --property=RuntimeMaxSec=150 /bin/sh "$d/run.sh"

@@ -93,7 +93,7 @@ struct AgentEnd: @unchecked Sendable {
         let connection = GuestAgentConnection(handle: handle)
 
         async let clock = connection.request { .setClock(id: $0, nanoseconds: 42) }
-        async let mount = connection.request { .mountSharedFolders(id: $0, tag: "swiftvm", mountPoint: "/mnt/shared") }
+        async let mount = connection.request { .mountSharedFolders(id: $0, tag: "tctl", mountPoint: "/mnt/shared") }
         var requests: [HostMessage] = []
         for _ in 0..<2 {
             if let request = await agent.receive() { requests.append(request) }
@@ -232,7 +232,7 @@ struct AgentEnd: @unchecked Sendable {
         let connection = GuestAgentConnection(handle: handle)
         // Nobody reads at the other end: sooner or later a message doesn't fit any more.
         var sent = 0
-        while connection.send(.mountSharedFolders(id: sent, tag: "swiftvm", mountPoint: String(repeating: "/x", count: 2000))) {
+        while connection.send(.mountSharedFolders(id: sent, tag: "tctl", mountPoint: String(repeating: "/x", count: 2000))) {
             sent += 1
             guard sent < 100_000 else {
                 Issue.record("the line never filled up")

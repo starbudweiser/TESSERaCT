@@ -3,7 +3,7 @@ import Testing
 @testable import QEMUEngine
 
 @Suite struct DirectXTests {
-    private let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+    private let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
 
     /// The QEMU of a build with DXMT and d3dmetal-native.
     private func installation() throws -> QEMUInstallation {

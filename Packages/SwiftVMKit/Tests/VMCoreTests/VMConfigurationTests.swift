@@ -46,10 +46,10 @@ private final class StubProvider: VMBackendProvider {
     }
 
     @Test func roundTripsThroughBundle() throws {
-        let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+        let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: directory) }
         let configuration = sample()
-        let bundle = try VMBundle.create(at: directory.appending(path: "Test.swiftvm"), configuration: configuration)
+        let bundle = try VMBundle.create(at: directory.appending(path: "Test.tctl"), configuration: configuration)
         let loaded = try bundle.loadConfiguration()
         // Dates are stored with second precision.
         #expect(loaded.id == configuration.id)
@@ -144,8 +144,8 @@ private final class StubProvider: VMBackendProvider {
         var mac = sample()
         mac.os = GuestOS(family: .macOS)
         #expect(mac.mountsSharedFoldersAutomatically)
-        #expect(GuestIntegration.linuxMountCommand == "sudo mkdir -p /mnt/shared && sudo mount -t virtiofs swiftvm /mnt/shared")
-        #expect(GuestIntegration.linuxPersistentMountCommand == "echo 'swiftvm /mnt/shared virtiofs rw,nofail 0 0' | sudo tee -a /etc/fstab")
+        #expect(GuestIntegration.linuxMountCommand == "sudo mkdir -p /mnt/shared && sudo mount -t virtiofs tctl /mnt/shared")
+        #expect(GuestIntegration.linuxPersistentMountCommand == "echo 'tctl /mnt/shared virtiofs rw,nofail 0 0' | sudo tee -a /etc/fstab")
     }
 
     @Test func eachFolderOnQEMUHasADeviceAndANameOfItsOwn() {
@@ -194,7 +194,7 @@ private final class StubProvider: VMBackendProvider {
 
 @MainActor @Suite struct VMLibraryTests {
     @Test func createsListsAndRemovesMachines() throws {
-        let root = FileManager.default.temporaryDirectory.appending(path: "swiftvm-library-\(UUID().uuidString)")
+        let root = FileManager.default.temporaryDirectory.appending(path: "tctl-library-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: root) }
         let library = VMLibrary(rootDirectory: root)
         library.load()
@@ -202,10 +202,10 @@ private final class StubProvider: VMBackendProvider {
 
         let configuration = VMConfiguration(name: "Web Server", os: GuestOS(family: .linux), cpuCount: 2, memorySize: 4 << 30, disks: [])
         let url = library.availableBundleURL(forName: configuration.name)
-        #expect(url.lastPathComponent == "Web Server.swiftvm")
+        #expect(url.lastPathComponent == "Web Server.tctl")
         let machine = try library.add(VMBundle.create(at: url, configuration: configuration))
         #expect(machine.state == .stopped)
-        #expect(library.availableBundleURL(forName: "Web Server").lastPathComponent == "Web Server 2.swiftvm")
+        #expect(library.availableBundleURL(forName: "Web Server").lastPathComponent == "Web Server 2.tctl")
 
         // A fresh library instance finds the machine again through the index.
         let reloaded = VMLibrary(rootDirectory: root)
@@ -222,7 +222,7 @@ private final class StubProvider: VMBackendProvider {
     }
 
     @Test func runningMachinesAreNotRemovable() async throws {
-        let root = FileManager.default.temporaryDirectory.appending(path: "swiftvm-library-\(UUID().uuidString)")
+        let root = FileManager.default.temporaryDirectory.appending(path: "tctl-library-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: root) }
         let provider = StubProvider()
         let library = VMLibrary(rootDirectory: root)
@@ -250,10 +250,10 @@ private final class StubProvider: VMBackendProvider {
     }
 
     @Test func suspendedStateIsDetectedFromBundle() throws {
-        let root = FileManager.default.temporaryDirectory.appending(path: "swiftvm-library-\(UUID().uuidString)")
+        let root = FileManager.default.temporaryDirectory.appending(path: "tctl-library-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: root) }
         let configuration = VMConfiguration(name: "Saved", os: GuestOS(family: .linux), cpuCount: 2, memorySize: 4 << 30, disks: [])
-        let bundle = try VMBundle.create(at: root.appending(path: "Saved.swiftvm"), configuration: configuration)
+        let bundle = try VMBundle.create(at: root.appending(path: "Saved.tctl"), configuration: configuration)
         try Data([1, 2, 3]).write(to: bundle.savedStateURL)
         let machine = try VirtualMachine(bundle: bundle)
         #expect(machine.state == .suspended)

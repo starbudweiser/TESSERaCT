@@ -3,7 +3,7 @@ import Testing
 @testable import FileSharing
 
 @Suite struct WebDAVHandlerTests {
-    private let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-webdav-\(UUID().uuidString)")
+    private let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-webdav-\(UUID().uuidString)")
 
     private func handler() throws -> WebDAVHandler {
         let projects = directory.appending(path: "Projects")

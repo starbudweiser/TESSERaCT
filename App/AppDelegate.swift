@@ -206,7 +206,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// Opening a `.swiftvm` bundle from Finder adds it to the library, and shows its window: the panel in
+    /// Opening a `.tctl` bundle from Finder adds it to the library, and shows its window: the panel in
     /// the menu bar, where it is listed from now on, isn't open to show that anything happened.
     func application(_ application: NSApplication, open urls: [URL]) {
         let model = AppModel.shared

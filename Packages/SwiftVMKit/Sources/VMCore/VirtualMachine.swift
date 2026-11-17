@@ -960,7 +960,7 @@ public final class VirtualMachine: Identifiable {
     private func performSuspend() async throws {
         guard state == .running || state == .paused, let backend else { return }
         guard backend.canSaveState else {
-            throw VMError.invalidConfiguration("“\(name)” uses GPU acceleration, which can't save running graphics state. Shut it down before taking a snapshot or quitting SwiftVM.")
+            throw VMError.invalidConfiguration("“\(name)” uses GPU acceleration, which can't save running graphics state. Shut it down before taking a snapshot or quitting TESSERaCT.")
         }
         let wasRunning = state == .running
         state = .suspending

@@ -6,7 +6,7 @@ import Testing
 /// machines in.
 @MainActor
 private struct Scratch {
-    let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)").standardizedFileURL
+    let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)").standardizedFileURL
 
     var root: URL { directory.appending(path: "library") }
     var elsewhere: URL { directory.appending(path: "elsewhere", directoryHint: .isDirectory) }
@@ -50,7 +50,7 @@ private func exists(_ url: URL) -> Bool {
         let library = scratch.makeLibrary()
 
         let machine = try scratch.addMachine(to: library, in: scratch.elsewhere)
-        #expect(machine.bundle.url.path == scratch.elsewhere.appending(path: "Web.swiftvm").path)
+        #expect(machine.bundle.url.path == scratch.elsewhere.appending(path: "Web.tctl").path)
         // Nothing of the making is left in a folder of the user's.
         #expect(!exists(VMLibrary.stagingDirectory(in: scratch.elsewhere)))
 
@@ -119,7 +119,7 @@ private func exists(_ url: URL) -> Bool {
 
         try await library.move(machine, to: scratch.elsewhere)
         // Under the name it has now, with everything that was in it.
-        #expect(machine.bundle.url.path == scratch.elsewhere.appending(path: "Web Server.swiftvm").path)
+        #expect(machine.bundle.url.path == scratch.elsewhere.appending(path: "Web Server.tctl").path)
         #expect(!exists(original))
         #expect(try Data(contentsOf: machine.bundle.url.appending(path: "disk.img")) == Data("disk".utf8))
         #expect(machine.activity == nil)
@@ -145,7 +145,7 @@ private func exists(_ url: URL) -> Bool {
         await #expect(throws: (any Error).self) { try await library.move(machine, to: scratch.elsewhere) }
         #expect(machine.bundle.url.path == original.path)
         #expect(exists(original))
-        #expect(!exists(scratch.elsewhere.appending(path: "Web.swiftvm")))
+        #expect(!exists(scratch.elsewhere.appending(path: "Web.tctl")))
         try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: scratch.root.path)
         #expect(scratch.makeLibrary().machines.map(\.bundle.url.path) == [original.path])
     }
@@ -325,7 +325,7 @@ private func exists(_ url: URL) -> Bool {
 
         // Both are gone from where they were, on a disk that is connected.
         try FileManager.default.removeItem(at: deleted.bundle.url)
-        let destination = scratch.directory.appending(path: "Renamed.swiftvm")
+        let destination = scratch.directory.appending(path: "Renamed.tctl")
         try FileManager.default.moveItem(at: moved.bundle.url, to: destination)
 
         for _ in 0..<300 where moved.bundle.url.path != destination.path || library.machine(id: deleted.id) != nil {
@@ -347,13 +347,13 @@ private func exists(_ url: URL) -> Bool {
 }
 
 @Suite struct BundleCopyTests {
-    private let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+    private let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
 
     /// A bundle with a disk that is almost all empty space, and a snapshot of it.
     private func makeBundle() throws -> (bundle: VMBundle, disk: DiskConfiguration) {
         let disk = DiskConfiguration(fileName: "disk.img", capacity: 256 << 20, format: .raw)
         let configuration = VMConfiguration(name: "Box", os: GuestOS(family: .linux), cpuCount: 2, memorySize: 4 << 30, disks: [disk])
-        let bundle = try VMBundle.create(at: directory.appending(path: "Box.swiftvm"), configuration: configuration)
+        let bundle = try VMBundle.create(at: directory.appending(path: "Box.tctl"), configuration: configuration)
         FileManager.default.createFile(atPath: bundle.diskURL(for: disk).path, contents: nil)
         let handle = try FileHandle(forWritingTo: bundle.diskURL(for: disk))
         try handle.truncate(atOffset: disk.capacity)
@@ -369,7 +369,7 @@ private func exists(_ url: URL) -> Bool {
         let (bundle, disk) = try makeBundle()
 
         // Not cloned, as on a disk that can't share blocks with the original.
-        let copy = try bundle.copy(to: directory.appending(path: "Copy.swiftvm"), cloning: false)
+        let copy = try bundle.copy(to: directory.appending(path: "Copy.tctl"), cloning: false)
         #expect(FileManager.default.contentsEqual(atPath: bundle.diskURL(for: disk).path, andPath: copy.diskURL(for: disk).path))
         #expect(copy.loadSnapshots().map(\.name) == ["Before"])
         #expect(try copy.loadConfiguration().name == "Box")
@@ -380,7 +380,7 @@ private func exists(_ url: URL) -> Bool {
     @Test func aCopyThatIsCalledOffLeavesNothingBehind() throws {
         defer { try? FileManager.default.removeItem(at: directory) }
         let (bundle, _) = try makeBundle()
-        let destination = directory.appending(path: "Copy.swiftvm")
+        let destination = directory.appending(path: "Copy.tctl")
 
         #expect(throws: CancellationError.self) {
             try bundle.copy(to: destination, cloning: false, isCancelled: { true })

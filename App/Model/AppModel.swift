@@ -56,11 +56,11 @@ final class AppModel {
     /// uses the guest's mouse and keyboard for that, which two askers would do across each other.
     @ObservationIgnored var machinesBeingAllowed: Set<UUID> = []
     /// macOS machines whose first setup, from the SSH key to letting automation work the desktop, the
-    /// app is still carrying out. `swiftvm wait` waits for it, so nothing else works the guest meanwhile.
+    /// app is still carrying out. `tctl wait` waits for it, so nothing else works the guest meanwhile.
     @ObservationIgnored var machinesBeingSetUp: Set<UUID> = []
-    /// Why a new macOS machine's setup didn't let automation work its desktop, for `swiftvm wait` to say.
+    /// Why a new macOS machine's setup didn't let automation work its desktop, for `tctl wait` to say.
     @ObservationIgnored var automationSetupProblems: [UUID: String] = [:]
-    /// What remembers each machine's desktop between one `swiftvm control` and the next.
+    /// What remembers each machine's desktop between one `tctl control` and the next.
     @ObservationIgnored var machineControllers: [UUID: (run: Int, controller: MachineController)] = [:]
     /// Whether the app's item is in the menu bar. It always is: with no window open the item is all there
     /// is of the app. macOS lets an item be dragged out of the menu bar all the same, so one that is
@@ -78,7 +78,7 @@ final class AppModel {
     /// Whether the Templates window is open, or was just asked for. What goes wrong with saving a
     /// template is said there then, and otherwise wherever the machine's errors are.
     @ObservationIgnored var isShowingTemplates = false
-    /// Whether `~/.ssh/config` includes SwiftVM's generated hosts.
+    /// Whether `~/.ssh/config` includes TESSERaCT's generated hosts.
     private(set) var isSSHIncludeInstalled = false
     /// Addresses that running machines actually hold, by machine ID.
     private var observedAddresses: [UUID: String] = [:]
@@ -263,7 +263,7 @@ final class AppModel {
         }
     }
 
-    /// Lets the `swiftvm` command-line tool drive the app.
+    /// Lets the `tctl` command-line tool drive the app.
     private func startControlServer() {
         do {
             controlServer = try ControlServer(
@@ -276,7 +276,7 @@ final class AppModel {
             )
         } catch {
             // The app works without the command-line tool; don't interrupt launch for this.
-            NSLog("SwiftVM: control socket unavailable: \(error.localizedDescription)")
+            NSLog("TESSERaCT: control socket unavailable: \(error.localizedDescription)")
         }
     }
 
@@ -460,7 +460,7 @@ final class AppModel {
             guard let interface = machine.configuration.networkInterfaces.first,
                   let macAddress = MACAddress(interface.macAddress)
             else { continue }
-            // The LAN's DHCP server owns bridged addresses; the host's lease file and SwiftVM's
+            // The LAN's DHCP server owns bridged addresses; the host's lease file and TESSERaCT's
             // reservations say nothing about them. Without guest tools the address stays unknown.
             if !interface.usesSharedNetwork {
                 if interface.isConnected, machine.agent.isConnected,
@@ -619,12 +619,12 @@ final class AppModel {
             NSWorkspace.shared.open(url)
             return
         }
-        runInTerminal(["exec \(command)"], scriptName: "swiftvm-ssh-\(alias)")
+        runInTerminal(["exec \(command)"], scriptName: "tctl-ssh-\(alias)")
     }
 
-    /// The `swiftvm` tool that ships inside the app, if this build has one.
+    /// The `tctl` tool that ships inside the app, if this build has one.
     var commandLineToolURL: URL? {
-        let url = Bundle.main.bundleURL.appending(path: "Contents/Helpers/swiftvm")
+        let url = Bundle.main.bundleURL.appending(path: "Contents/Helpers/tctl")
         return FileManager.default.isExecutableFile(atPath: url.path) ? url : nil
     }
 
@@ -641,7 +641,7 @@ final class AppModel {
             lines.append("unset \(ControlPaths.homeEnvironmentKey)")
         }
         lines.append("exec \(Self.shellQuoted(tool.path)) console \(machine.id.uuidString)")
-        runInTerminal(lines, scriptName: "swiftvm-console-\(machine.id.uuidString.prefix(8))")
+        runInTerminal(lines, scriptName: "tctl-console-\(machine.id.uuidString.prefix(8))")
     }
 
     /// Runs shell commands in a new window of the user's terminal app.
@@ -704,7 +704,7 @@ final class AppModel {
         return alias
     }
 
-    /// Gives a machine another SSH name: what `ssh` and `swiftvm` reach it by. Whatever is typed is made
+    /// Gives a machine another SSH name: what `ssh` and `tctl` reach it by. Whatever is typed is made
     /// into a name that SSH takes, as a machine's name is when it is created.
     ///
     /// - Returns: The name the machine has now.

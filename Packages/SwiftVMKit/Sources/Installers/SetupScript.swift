@@ -42,7 +42,7 @@ public struct SetupScript: Sendable, Hashable, Identifiable {
             case .nameTaken(let name):
                 "Your folder has a script called “\(name)” already."
             case .nameOfTemplate(let name):
-                "SwiftVM brings a script called “\(name)”. Give yours another name."
+                "TESSERaCT brings a script called “\(name)”. Give yours another name."
             case .unknown(let name, let system, let available):
                 "No setup script is called “\(name)”. Available for \(system): \(available.joined(separator: ", ")). For a file, give its path, as in ./\(name)."
             case .notAFile(let file):
@@ -362,10 +362,10 @@ public enum SetupScriptCatalog {
         return script
     }
 
-    /// The folder a user keeps scripts of their own in: `~/.config/swiftvm/setup-scripts`. The app and
+    /// The folder a user keeps scripts of their own in: `~/.config/tctl/setup-scripts`. The app and
     /// its development copy read the same one, as a script is the user's and not a machine's.
     public static var userDirectory: URL {
-        FileManager.default.homeDirectoryForCurrentUser.appending(path: ".config/swiftvm/setup-scripts", directoryHint: .isDirectory)
+        FileManager.default.homeDirectoryForCurrentUser.appending(path: ".config/tctl/setup-scripts", directoryHint: .isDirectory)
     }
 
     /// No more files than this are read from a folder, which is read whenever scripts are listed.

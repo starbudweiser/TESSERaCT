@@ -33,7 +33,7 @@ public final class CompressedDisk: @unchecked Sendable {
         public var errorDescription: String? {
             switch self {
             case .notACompressedDisk: "The file isn't a compressed disk."
-            case .unsupportedVersion(let version): "The compressed disk was made by a newer SwiftVM (format \(version))."
+            case .unsupportedVersion(let version): "The compressed disk was made by a newer TESSERaCT (format \(version))."
             case .corrupted(let what): "The compressed disk is damaged: \(what)."
             case .outOfRange: "A request went past the end of the disk."
             case .readOnly: "The compressed disk is open for reading only."
@@ -44,7 +44,7 @@ public final class CompressedDisk: @unchecked Sendable {
         }
     }
 
-    public static let fileExtension = "swiftvmdisk"
+    public static let fileExtension = "tctldisk"
 
     static let blockSize = 4096
     static let clusterSize = 65536
@@ -185,7 +185,7 @@ public final class CompressedDisk: @unchecked Sendable {
     private let scratchPool = OSAllocatedUnfairLock<[Scratch]>(uncheckedState: [])
 
     // Only touched on the commit queue.
-    private let commitQueue = DispatchQueue(label: "app.swiftvm.compressed-disk.commit")
+    private let commitQueue = DispatchQueue(label: "app.tctl.compressed-disk.commit")
     private var timer: (any DispatchSourceTimer)?
     private var generation: UInt64
     private var table: [TableEntry]

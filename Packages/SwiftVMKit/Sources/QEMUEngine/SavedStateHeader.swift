@@ -8,7 +8,7 @@ import Foundation
 struct SavedStateHeader: Equatable {
     /// Where QEMU's part of the file starts.
     static let size = 4096
-    private static let signature = Data("SwiftVM QEMU machine state 1\n".utf8)
+    private static let signature = Data("TESSERaCT QEMU machine state 1\n".utf8)
 
     /// The USB port of each drive and disk on USB, by its identifier.
     var usbPorts: [UUID: Int]
@@ -39,7 +39,7 @@ struct SavedStateHeader: Equatable {
         guard data.starts(with: signature),
               let contents = try? JSONDecoder().decode(Contents.self, from: data.dropFirst(signature.count).prefix { $0 != 0 })
         else {
-            throw QEMUError.didNotStart("Its saved state isn't one that SwiftVM can resume.")
+            throw QEMUError.didNotStart("Its saved state isn't one that TESSERaCT can resume.")
         }
         var ports: [UUID: Int] = [:]
         for (key, port) in contents.usbPorts {

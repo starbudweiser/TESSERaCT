@@ -10,11 +10,11 @@ fail() {
 # Call it as it is, not inside $( ): when there is no telling, it stops the script. Taking "can't tell"
 # for "none" would have an app replaced under a copy that runs.
 running_from() {
-    local program=${1:A}/Contents/MacOS/SwiftVM listing pid command files
+    local program=${1:A}/Contents/MacOS/TESSERaCT listing pid command files
     reply=()
     listing=$(ps -axww -o pid=,comm=) || fail "Couldn't list the running programs, so there is no telling whether ${1:t:r} is running."
     while read -r pid command; do
-        [[ ${command:t} == SwiftVM ]] || continue
+        [[ ${command:t} == TESSERaCT ]] || continue
         # ps names a program the way it was started: by a relative path, or through a link. lsof names
         # the file itself.
         if files=$(lsof -a -p $pid -d txt -Fn 2> /dev/null); then
@@ -36,14 +36,14 @@ refuse_if_running() {
     (( ${#reply} == 0 )) || fail "${1:t:r} is running from $1 (process ${(j:, :)reply}). Quit it first, then try again."
 }
 
-# Stops the script unless the app at $1 may be replaced: there is nothing there, or a copy of SwiftVM
+# Stops the script unless the app at $1 may be replaced: there is nothing there, or a copy of TESSERaCT
 # that these scripts made and that isn't running.
 check_replaceable() {
     [[ $1 == *.app ]] || fail "$1 has to be an app: a folder whose name ends in .app."
     [[ -e $1 || -L $1 ]] || return 0
     local existing
     existing=$(plutil -extract CFBundleIdentifier raw "$1/Contents/Info.plist" 2> /dev/null || true)
-    [[ $existing == com.swiftvm.app(|.dev) ]] || fail "$1 isn't a copy of SwiftVM that these scripts made. Move it away first."
+    [[ $existing == fr.stephan.tesseract(|.dev) ]] || fail "$1 isn't a copy of TESSERaCT that these scripts made. Move it away first."
     refuse_if_running "$1"
 }
 

@@ -5,6 +5,6 @@ import SwiftUI
 enum EntryPoint {
     static func main() {
         DevelopmentLauncher.handOverUnlessInAnApp()
-        SwiftVMApp.main()
+        TESSERaCTApp.main()
     }
 }

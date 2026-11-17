@@ -3,7 +3,7 @@ import Foundation
 import VMCore
 
 /// What Windows Setup is told so that nobody has to sit through it: an answer file that installs
-/// Windows Pro on the machine's disk, creates the account and skips every question, and SwiftVM's own
+/// Windows Pro on the machine's disk, creates the account and skips every question, and TESSERaCT's own
 /// setup, which installs the drivers and the guest agent. Both go on the machine's setup disc.
 ///
 /// The edition is Pro because it can be reached by Remote Desktop, which a Windows app shown in a window
@@ -43,14 +43,14 @@ public struct WindowsSetup: Sendable, Hashable {
     static let proInstallationKey = "VK7JG-NPHTM-C97JM-9MPGT-3V66T"
 
     /// Writes the setup disc: the answer file at its root, where Windows Setup looks for one, and
-    /// SwiftVM's setup in a folder of its own.
+    /// TESSERaCT's setup in a folder of its own.
     public func writeDisc(to url: URL) throws {
         var files: [String: Data] = ["autounattend.xml": Data(answerFile.utf8)]
         for (name, contents) in try WindowsGuestAgent.setupFiles(includesGraphicsDriver: acceleratesGraphics) {
-            files["swiftvm/" + name] = contents
+            files["tctl/" + name] = contents
         }
         if !authorizedKeys.isEmpty {
-            files["swiftvm/authorized_keys"] = Data(authorizedKeys.map { $0 + "\r\n" }.joined().utf8)
+            files["tctl/authorized_keys"] = Data(authorizedKeys.map { $0 + "\r\n" }.joined().utf8)
         }
         try ISOImageBuilder.makeISO(volumeName: Self.volumeName, files: files, at: url)
     }
@@ -73,12 +73,12 @@ public struct WindowsSetup: Sendable, Hashable {
             """
         }.joined(separator: "\n")
         // The setup disc's letter isn't known ahead: whichever drive has the runner on it.
-        let specialize = "cmd.exe /c \"for %d in (D E F G H I J K L M N O P Q R S T U V W X Y Z) do if exist %d:\\swiftvm\\setup.ps1 powershell.exe -NoProfile -ExecutionPolicy Bypass -File %d:\\swiftvm\\setup.ps1 -Phase specialize\""
+        let specialize = "cmd.exe /c \"for %d in (D E F G H I J K L M N O P Q R S T U V W X Y Z) do if exist %d:\\tctl\\setup.ps1 powershell.exe -NoProfile -ExecutionPolicy Bypass -File %d:\\tctl\\setup.ps1 -Phase specialize\""
         // With a TPM there, Windows encrypts its disk with BitLocker by itself where it can. The disk
         // would then only open with that TPM's state, or a recovery key that nobody was shown. Turning
         // it on stays the user's to do.
         let preventEncryption = "reg.exe add HKLM\\SYSTEM\\CurrentControlSet\\Control\\BitLocker /v PreventDeviceEncryption /t REG_DWORD /d 1 /f"
-        let firstLogon = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\\ProgramData\\SwiftVM\\setup\\setup.ps1 -Phase firstlogon"
+        let firstLogon = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\\ProgramData\\TESSERaCT\\setup\\setup.ps1 -Phase firstlogon"
         let displayName = Self.xml((fullName?.isEmpty == false ? fullName : nil) ?? userName)
         return """
         <?xml version="1.0" encoding="utf-8"?>
@@ -261,7 +261,7 @@ public enum WindowsInstaller {
     /// read-only and out of sight, for a moment.
     public static func inspect(_ url: URL) throws -> String {
         let name = url.lastPathComponent
-        let mountPoint = FileManager.default.temporaryDirectory.appending(path: "swiftvm-windows-\(UUID().uuidString)", directoryHint: .isDirectory)
+        let mountPoint = FileManager.default.temporaryDirectory.appending(path: "tctl-windows-\(UUID().uuidString)", directoryHint: .isDirectory)
         try FileManager.default.createDirectory(at: mountPoint, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: mountPoint) }
         do {

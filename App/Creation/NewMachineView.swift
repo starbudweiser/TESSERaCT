@@ -1045,7 +1045,7 @@ private struct SetupScriptChooser: View {
                     .foregroundStyle(.red)
                     .fixedSize(horizontal: false, vertical: true)
             } else {
-                Text("Runs as root. A line it prints that starts with “==> ” is the step SwiftVM shows. It is saved under this name in your scripts folder, where you can change it later.")
+                Text("Runs as root. A line it prints that starts with “==> ” is the step TESSERaCT shows. It is saved under this name in your scripts folder, where you can change it later.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)

@@ -20,7 +20,7 @@ import VMCore
 
 @Suite struct SSHConfigWriterTests {
     private func makeWriter() -> (SSHConfigWriter, URL) {
-        let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm ssh \(UUID().uuidString)")
+        let directory = FileManager.default.temporaryDirectory.appending(path: "tctl ssh \(UUID().uuidString)")
         let writer = SSHConfigWriter(
             generatedConfigURL: directory.appending(path: "app/ssh_config"),
             userConfigURL: directory.appending(path: "home/.ssh/config")
@@ -91,7 +91,7 @@ import VMCore
 
 @Suite struct SSHKeyManagerTests {
     @Test func generatesKeyWhenNoneExists() throws {
-        let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-keys-\(UUID().uuidString)")
+        let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-keys-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: directory) }
         let manager = SSHKeyManager(sshDirectory: directory)
         #expect(manager.existingKeyPair() == nil)
@@ -116,7 +116,7 @@ import VMCore
     /// Runs the command the guest would run, with a scratch directory standing in for the account's home.
     @Test(arguments: ["/bin/sh", "/bin/zsh"])
     func remoteCommandAddsTheKeyOnce(shell: String) throws {
-        let home = FileManager.default.temporaryDirectory.appending(path: "swiftvm-home-\(UUID().uuidString)")
+        let home = FileManager.default.temporaryDirectory.appending(path: "tctl-home-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: home) }
         let key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFakeKeyForTests me@host"
@@ -140,8 +140,8 @@ import VMCore
 @Suite struct ProcessRunnerTests {
     @Test func passesEnvironmentAndInput() throws {
         let output = try ProcessRunner.run(
-            "/bin/sh", ["-c", "printf '%s:' \"$SWIFTVM_TEST_VALUE\"; cat"],
-            environment: ["SWIFTVM_TEST_VALUE": "from the caller"], input: Data("typed in".utf8)
+            "/bin/sh", ["-c", "printf '%s:' \"$TESSERACT_TEST_VALUE\"; cat"],
+            environment: ["TESSERACT_TEST_VALUE": "from the caller"], input: Data("typed in".utf8)
         )
         #expect(output.standardOutput == "from the caller:typed in")
         // Without input the tool reads end-of-file straight away, and keeps the caller's own environment.

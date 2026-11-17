@@ -304,7 +304,7 @@ extension AppModel {
     /// Stops a machine that is to draw with the Mac's GPU from being made where it can't start.
     private func requireGraphicsAcceleration(_ wanted: Bool) throws {
         guard wanted, qemuProvider?.canAccelerateGraphics != true else { return }
-        throw VMError.invalidConfiguration("Graphics acceleration needs QEMU with OpenGL, which this copy of SwiftVM was built without.")
+        throw VMError.invalidConfiguration("Graphics acceleration needs QEMU with OpenGL, which this copy of TESSERaCT was built without.")
     }
 
     private func performInstallerCreate(_ request: LinuxInstallerRequest, os: GuestOS, creation: MachineCreation) async throws -> VirtualMachine {
@@ -577,7 +577,7 @@ extension AppModel {
             try await installGuestTools(on: machine, password: password)
             // From here on the machine sees to the rest by itself, through the agent.
         } catch {
-            automationSetupProblems[machine.id] = "The guest tools couldn't be installed: \(error.localizedDescription) `swiftvm install-tools \(machine.configuration.ssh.alias) --password <password>` tries again."
+            automationSetupProblems[machine.id] = "The guest tools couldn't be installed: \(error.localizedDescription) `tctl install-tools \(machine.configuration.ssh.alias) --password <password>` tries again."
             await setTimeZoneWithoutGuestTools(of: machine, password: password, after: error)
             return
         }
@@ -587,10 +587,10 @@ extension AppModel {
             try await allowAutomation(on: machine, password: password, sessionPatience: .seconds(120))
         } catch {
             guard machine.state.isActive else { return }
-            automationSetupProblems[machine.id] = "\(error.localizedDescription) `swiftvm control \(machine.configuration.ssh.alias) allow --password <password>` tries again."
+            automationSetupProblems[machine.id] = "\(error.localizedDescription) `tctl control \(machine.configuration.ssh.alias) allow --password <password>` tries again."
             machine.notice = VMErrorInfo(
                 title: "“\(machine.name)” doesn't let the guest tools read its desktop yet",
-                message: "\(error.localizedDescription)\n\n`swiftvm control \(machine.configuration.ssh.alias) allow --password <password>` tries again."
+                message: "\(error.localizedDescription)\n\n`tctl control \(machine.configuration.ssh.alias) allow --password <password>` tries again."
             )
         }
         // Installing the tools and discovering bundled extensions can leave persistent banners over

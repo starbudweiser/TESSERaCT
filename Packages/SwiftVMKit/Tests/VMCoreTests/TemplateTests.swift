@@ -34,7 +34,7 @@ private final class StubProvider: VMBackendProvider {
 /// A scratch folder with a library of templates in it, and machines to save as templates.
 @MainActor
 private struct Scratch {
-    let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)").standardizedFileURL
+    let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)").standardizedFileURL
     let provider = StubProvider()
 
     var root: URL { directory.appending(path: "library") }
@@ -53,7 +53,7 @@ private struct Scratch {
             networkInterfaces: [NetworkInterfaceConfiguration(macAddress: "02:00:00:00:00:01", ipv4Address: "192.168.230.10")],
             ssh: SSHConfiguration(alias: "box", user: "me")
         )
-        let bundle = try VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).swiftvm"), configuration: configuration)
+        let bundle = try VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).tctl"), configuration: configuration)
         try Data("first".utf8).write(to: bundle.diskURL(for: disk))
         for url in [bundle.auxiliaryStorageURL, bundle.hardwareModelURL, bundle.machineIdentifierURL, bundle.consoleLogURL] {
             try Data(url.lastPathComponent.utf8).write(to: url)
@@ -93,7 +93,7 @@ private struct Scratch {
 
         let template = try await library.save(machine, named: "Golden")
         let package = try #require(library.bundle(of: template))
-        #expect(package.url.lastPathComponent == "Golden.swiftvmtemplate")
+        #expect(package.url.lastPathComponent == "Golden.tctltemplate")
         let names = try FileManager.default.contentsOfDirectory(atPath: package.url.path).sorted()
         #expect(names == ["aux.img", "disk.img", "hardware-model.bin", "template.json", "tpm-state.bin"])
         #expect(library.templates == [template])
@@ -161,7 +161,7 @@ private struct Scratch {
         #expect(plain.disks[0].capacity == 1 << 20)
 
         let source = try #require(library.bundle(of: template))
-        let copy = try source.duplicate(to: scratch.directory.appending(path: "Box 2.swiftvm"), configuration: configuration)
+        let copy = try source.duplicate(to: scratch.directory.appending(path: "Box 2.tctl"), configuration: configuration)
         let names = try FileManager.default.contentsOfDirectory(atPath: copy.url.path).sorted()
         #expect(names == ["aux.img", "config.json", "disk.img", "hardware-model.bin", "logs"])
         #expect(try String(contentsOf: copy.diskURL(for: configuration.disks[0]), encoding: .utf8) == "first")
@@ -228,6 +228,6 @@ private struct Scratch {
         // Back in the default folder, what is kept elsewhere stays there and isn't listed.
         try reloaded.setDirectory(nil)
         #expect(reloaded.templates.isEmpty)
-        #expect(FileManager.default.fileExists(atPath: elsewhere.appending(path: "Box.swiftvmtemplate").path))
+        #expect(FileManager.default.fileExists(atPath: elsewhere.appending(path: "Box.tctltemplate").path))
     }
 }

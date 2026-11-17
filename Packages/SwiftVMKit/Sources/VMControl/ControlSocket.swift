@@ -211,7 +211,7 @@ public final class ControlServer: @unchecked Sendable {
                 }
             }
         }
-        thread.name = "SwiftVM control server"
+        thread.name = "TESSERaCT control server"
         thread.start()
     }
 

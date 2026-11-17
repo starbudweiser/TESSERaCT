@@ -17,7 +17,7 @@ public enum BridgedNetworking {
         public var errorDescription: String? {
             switch self {
             case .notEntitled:
-                "This copy of SwiftVM doesn't support bridged networking. It needs to be signed with a provisioning profile that grants com.apple.vm.networking."
+                "This copy of TESSERaCT doesn't support bridged networking. It needs to be signed with a provisioning profile that grants com.apple.vm.networking."
             case .interfaceUnavailable(let identifier):
                 "The host network interface “\(identifier)” isn't available for bridging. Connect the adapter or choose another interface in the virtual machine's Network settings."
             }

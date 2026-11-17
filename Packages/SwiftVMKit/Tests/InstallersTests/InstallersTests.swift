@@ -29,7 +29,7 @@ import VMCore
         #expect(text.contains("lock_passwd: false"))
         #expect(text.contains("ssh_pwauth: true"))
         #expect(text.contains("      password: \"p@ss: word\""))
-        #expect(text.contains("  - [\"swiftvm\", \"/mnt/shared\", virtiofs, \"rw,nofail\", \"0\", \"0\"]"))
+        #expect(text.contains("  - [\"tctl\", \"/mnt/shared\", virtiofs, \"rw,nofail\", \"0\", \"0\"]"))
         #expect(!text.contains("rosetta"))
     }
 
@@ -43,7 +43,7 @@ import VMCore
         #expect(text.contains("  - name: \"saeed\"\n    uid: 501\n"))
         // Below 1000, login screens would take it for a service's account.
         #expect(text.contains("  - path: \"/var/lib/AccountsService/users/saeed\"\n    content: \"[User]\\nSystemAccount=false\\n\""))
-        #expect(text.contains("  - path: \"/etc/sddm.conf.d/90-swiftvm-users.conf\"\n    content: \"[Users]\\nMinimumUid=501\\nHideShells="))
+        #expect(text.contains("  - path: \"/etc/sddm.conf.d/90-tctl-users.conf\"\n    content: \"[Users]\\nMinimumUid=501\\nHideShells="))
         shared.userID = 1001
         #expect(shared.userData.contains("    uid: 1001\n"))
         #expect(!shared.userData.contains("MinimumUid"))
@@ -76,7 +76,7 @@ import VMCore
 
     @Test func sendsKernelMessagesToTheSerialConsole() {
         let text = seed.userData
-        #expect(text.contains("write_files:\n  - path: \"/etc/default/grub.d/99-swiftvm-console.cfg\"\n    content: \""))
+        #expect(text.contains("write_files:\n  - path: \"/etc/default/grub.d/99-tctl-console.cfg\"\n    content: \""))
         // One line of YAML, with the display named after the serial console so that it stays the system console.
         #expect(text.contains(#"GRUB_CMDLINE_LINUX_DEFAULT=\"$GRUB_CMDLINE_LINUX_DEFAULT console=hvc0 console=tty1\"\n""#))
         #expect(text.contains("runcmd:\n  - \"if command -v update-grub >/dev/null; then update-grub; elif command -v grubby"))
@@ -103,10 +103,10 @@ import VMCore
         // Both files are in the one list of files to write, and the installer runs last.
         #expect(text.components(separatedBy: "write_files:").count == 2)
         #expect(text.components(separatedBy: "runcmd:").count == 2)
-        #expect(text.hasSuffix("  - \"sh /usr/local/lib/swiftvm/install.sh || true\"\n"))
+        #expect(text.hasSuffix("  - \"sh /usr/local/lib/tctl/install.sh || true\"\n"))
 
         let lines = text.components(separatedBy: "\n")
-        let path = try #require(lines.firstIndex(of: "  - path: \"/usr/local/lib/swiftvm/install.sh\""))
+        let path = try #require(lines.firstIndex(of: "  - path: \"/usr/local/lib/tctl/install.sh\""))
         #expect(lines[path + 1] == "    encoding: b64")
         #expect(lines[path + 3] == "    permissions: \"0755\"")
         // What arrives in the guest is the installer, byte for byte.
@@ -131,7 +131,7 @@ import VMCore
     }
 
     @Test func writesSeedImage() throws {
-        let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-seed-\(UUID().uuidString).iso")
+        let url = FileManager.default.temporaryDirectory.appending(path: "tctl-seed-\(UUID().uuidString).iso")
         defer { try? FileManager.default.removeItem(at: url) }
         try seed.writeImage(to: url)
         let size = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
@@ -139,7 +139,7 @@ import VMCore
     }
 
     @Test func changingTheNetworkCardPreservesFirstBootSetupAndInstanceIdentity() throws {
-        let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-seed-\(UUID().uuidString).iso")
+        let url = FileManager.default.temporaryDirectory.appending(path: "tctl-seed-\(UUID().uuidString).iso")
         defer { try? FileManager.default.removeItem(at: url) }
         let original = CloudInitSeed(
             hostName: "custom-mac", userName: "username", password: "password",
@@ -163,7 +163,7 @@ import VMCore
     }
 
     @Test func aCopyOfTheMachineGetsASeedOfItsOwn() throws {
-        let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-seed-\(UUID().uuidString).iso")
+        let url = FileManager.default.temporaryDirectory.appending(path: "tctl-seed-\(UUID().uuidString).iso")
         defer { try? FileManager.default.removeItem(at: url) }
         try seed.writeImage(to: url)
         #expect(try ISOImageBuilder.text(of: "user-data", in: url) == seed.userData)
@@ -187,17 +187,17 @@ import VMCore
         // Everything else is as it was.
         #expect(userData.contains("timezone: \"Europe/Berlin\""))
         #expect(userData.contains("growpart:\n  mode: auto\n  devices: [\"/\"]"))
-        #expect(userData.contains("  - [\"swiftvm\", \"/mnt/shared\", virtiofs, \"rw,nofail\", \"0\", \"0\"]"))
-        #expect(userData.contains("write_files:\n  - path: \"/etc/default/grub.d/99-swiftvm-console.cfg\""))
+        #expect(userData.contains("  - [\"tctl\", \"/mnt/shared\", virtiofs, \"rw,nofail\", \"0\", \"0\"]"))
+        #expect(userData.contains("write_files:\n  - path: \"/etc/default/grub.d/99-tctl-console.cfg\""))
         #expect(userData.contains("update-grub"))
         // The copy installs the agent anew, which does no harm to the one on the copied disk.
-        #expect(userData.contains("  - path: \"/usr/local/lib/swiftvm/install.sh\"\n    encoding: b64\n"))
-        #expect(userData.hasSuffix("  - \"sh /usr/local/lib/swiftvm/install.sh || true\"\n"))
+        #expect(userData.contains("  - path: \"/usr/local/lib/tctl/install.sh\"\n    encoding: b64\n"))
+        #expect(userData.hasSuffix("  - \"sh /usr/local/lib/tctl/install.sh || true\"\n"))
         #expect(userData.hasPrefix("#cloud-config\n"))
     }
 
     @Test func aCopyGetsThisBuildsGuestAgent() throws {
-        let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-seed-\(UUID().uuidString).iso")
+        let url = FileManager.default.temporaryDirectory.appending(path: "tctl-seed-\(UUID().uuidString).iso")
         defer { try? FileManager.default.removeItem(at: url) }
         // The original was made by a build with an older agent, and has since been given a newer one.
         var old = seed
@@ -211,8 +211,8 @@ import VMCore
         let userData = try ISOImageBuilder.text(of: "user-data", in: url)
         #expect(!userData.contains(longAgo))
         let current = Data(try LinuxGuestAgent.installer().utf8).base64EncodedString()
-        #expect(userData.contains("  - path: \"/usr/local/lib/swiftvm/install.sh\"\n    encoding: b64\n    content: \"\(current)\"\n    permissions: \"0755\"\n"))
-        #expect(userData.hasSuffix("  - \"sh /usr/local/lib/swiftvm/install.sh || true\"\n"))
+        #expect(userData.contains("  - path: \"/usr/local/lib/tctl/install.sh\"\n    encoding: b64\n    content: \"\(current)\"\n    permissions: \"0755\"\n"))
+        #expect(userData.hasSuffix("  - \"sh /usr/local/lib/tctl/install.sh || true\"\n"))
 
         // A machine that was made without the agent doesn't get one by being copied.
         var without = seed
@@ -292,7 +292,7 @@ import VMCore
     }
 
     @Test func computesDigests() throws {
-        let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-digest-\(UUID().uuidString)")
+        let url = FileManager.default.temporaryDirectory.appending(path: "tctl-digest-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: url) }
         try Data("abc".utf8).write(to: url)
         #expect(try ImageDownloader.digest(of: url, algorithm: .sha256) == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
@@ -419,7 +419,7 @@ private func blockPatternedPayload() -> Data {
         let payload = blockPatternedPayload()
         let server = try FlakyFileServer(payload: payload, droppingFirstResponseAfter: 2 << 20)
         defer { server.stop() }
-        let cache = FileManager.default.temporaryDirectory.appending(path: "swiftvm-downloads-\(UUID().uuidString)")
+        let cache = FileManager.default.temporaryDirectory.appending(path: "tctl-downloads-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: cache) }
 
         var downloader = ImageDownloader(cacheDirectory: cache)
@@ -442,7 +442,7 @@ private func blockPatternedPayload() -> Data {
         let payload = blockPatternedPayload()
         let server = try FlakyFileServer(payload: payload, droppingFirstResponseAfter: payload.count)
         defer { server.stop() }
-        let cache = FileManager.default.temporaryDirectory.appending(path: "swiftvm-downloads-\(UUID().uuidString)")
+        let cache = FileManager.default.temporaryDirectory.appending(path: "tctl-downloads-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: cache) }
         let image = RemoteImage(url: URL(string: "http://127.0.0.1:\(server.port)/image.img")!)
         let downloader = ImageDownloader(cacheDirectory: cache)
@@ -478,7 +478,7 @@ private func blockPatternedPayload() -> Data {
         let payload = blockPatternedPayload()
         let server = try FlakyFileServer(payload: payload, droppingFirstResponseAfter: payload.count)
         defer { server.stop() }
-        let cache = FileManager.default.temporaryDirectory.appending(path: "swiftvm-downloads-\(UUID().uuidString)")
+        let cache = FileManager.default.temporaryDirectory.appending(path: "tctl-downloads-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: cache, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: cache) }
         let image = RemoteImage(url: URL(string: "http://127.0.0.1:\(server.port)/image.img")!)
@@ -496,7 +496,7 @@ private func blockPatternedPayload() -> Data {
     @Test func keepsWhatWasLeftWhenTheServerCanNotBeReached() async throws {
         let payload = blockPatternedPayload()
         let server = try FlakyFileServer(payload: payload, droppingFirstResponseAfter: 2 << 20, waitsForClient: true)
-        let cache = FileManager.default.temporaryDirectory.appending(path: "swiftvm-downloads-\(UUID().uuidString)")
+        let cache = FileManager.default.temporaryDirectory.appending(path: "tctl-downloads-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: cache) }
         let image = RemoteImage(url: URL(string: "http://127.0.0.1:\(server.port)/image.img")!)
 
@@ -527,7 +527,7 @@ private func blockPatternedPayload() -> Data {
         // Nobody listens at this address, so starting over fails as well.
         let server = try FlakyFileServer(payload: Data(), droppingFirstResponseAfter: 0)
         server.stop()
-        let cache = FileManager.default.temporaryDirectory.appending(path: "swiftvm-downloads-\(UUID().uuidString)")
+        let cache = FileManager.default.temporaryDirectory.appending(path: "tctl-downloads-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: cache, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: cache) }
         let image = RemoteImage(url: URL(string: "http://127.0.0.1:\(server.port)/image.img")!)
@@ -541,7 +541,7 @@ private func blockPatternedPayload() -> Data {
     }
 
     @Test func whatWasLeftOfAnotherDownloadIsNotUsed() throws {
-        let file = FileManager.default.temporaryDirectory.appending(path: "swiftvm-unfinished-\(UUID().uuidString).resume")
+        let file = FileManager.default.temporaryDirectory.appending(path: "tctl-unfinished-\(UUID().uuidString).resume")
         defer { try? FileManager.default.removeItem(at: file) }
         let url = URL(string: "https://example.com/a/image.img")!
         let data = Data("resume data".utf8)
@@ -569,7 +569,7 @@ private func blockPatternedPayload() -> Data {
         let firstServer = try FlakyFileServer(payload: first, droppingFirstResponseAfter: first.count)
         let secondServer = try FlakyFileServer(payload: second, droppingFirstResponseAfter: 2 << 20, waitsForClient: true)
         defer { firstServer.stop(); secondServer.stop() }
-        let cache = FileManager.default.temporaryDirectory.appending(path: "swiftvm-parts-\(UUID().uuidString)")
+        let cache = FileManager.default.temporaryDirectory.appending(path: "tctl-parts-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: cache) }
         let image = RemoteImage(url: URL(string: "https://example.org/desktop.qcow2")!, sha256: digest(first + second), parts: [
             .init(url: URL(string: "http://127.0.0.1:\(firstServer.port)/part0")!, sha256: digest(first), bytes: Int64(first.count)),
@@ -608,7 +608,7 @@ private func blockPatternedPayload() -> Data {
         let payload = Data("image contents".utf8)
         let server = try FlakyFileServer(payload: payload, droppingFirstResponseAfter: payload.count)
         defer { server.stop() }
-        let cache = FileManager.default.temporaryDirectory.appending(path: "swiftvm-parts-\(UUID().uuidString)")
+        let cache = FileManager.default.temporaryDirectory.appending(path: "tctl-parts-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: cache) }
         let incorrect = String(repeating: "0", count: 64)
         let image = RemoteImage(
@@ -664,7 +664,7 @@ private func blockPatternedPayload() -> Data {
 
 @Suite struct LinuxImageInstallerTests {
     @Test func installsRawImageAndGrowsIt() throws {
-        let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-install-\(UUID().uuidString)")
+        let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-install-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: directory) }
         let image = directory.appending(path: "cloud.raw")

@@ -2,7 +2,7 @@
 
 The built-in Omarchy setup starts from an image built with
 `../build-omarchy-image.sh`. It uses Omarchy's signed ARM edge packages and
-first-boot hardware provisioning, not a SwiftVM fork of the desktop. The
+first-boot hardware provisioning, not a TESSERaCT fork of the desktop. The
 builder is adapted from Try Omarchy; see `LICENSE.try-omarchy` and the source
 revision at the top of the builder.
 
@@ -16,10 +16,10 @@ SSH keys or release credentials are needed in the guest.
 ```sh
 pacman -Syu --noconfirm --needed archlinuxarm-keyring arch-install-scripts \
   btrfs-progs dosfstools e2fsprogs jq python qemu-img zstd curl
-mkdir -p /var/lib/swiftvm-image/{output,work}
+mkdir -p /var/lib/tctl-image/{output,work}
 bash scripts/build-omarchy-image.sh \
-  --output /var/lib/swiftvm-image/output \
-  --work /var/lib/swiftvm-image/work
+  --output /var/lib/tctl-image/output \
+  --work /var/lib/tctl-image/work
 ```
 
 Transfer the builder and this directory together. Use absolute output and work
@@ -30,7 +30,7 @@ the package download cache. Use a new output directory for each candidate.
 The output contains a compressed QCOW2 for local verification, 1 GiB download
 pieces, `image.json`, package inventories, repository/version provenance, and
 `SHA256SUMS`. Accounts, passwords, host keys, machine ID, random seed and the
-pacman master key are not shared by machines. SwiftVM's seed supplies the user
+pacman master key are not shared by machines. TESSERaCT's seed supplies the user
 and guest tools; the first boot creates each machine's identities.
 
 ## Refresh and publication
@@ -60,8 +60,8 @@ never overwrites a published image's assets.
 
 CI verifies package signatures, QCOW2 integrity, and download checksums. It
 **does not boot a guest**. Validate the first Actions-built image manually in
-SwiftVM, and repeat that check when changing the builder or first-boot contract:
-use a separate `SWIFTVM_HOME`, then check first-boot completion, login, graphics,
+TESSERaCT, and repeat that check when changing the builder or first-boot contract:
+use a separate `TESSERACT_HOME`, then check first-boot completion, login, graphics,
 disk growth, package trust, and a reboot. Automatic monthly publication does
 not guarantee that future upstream edge packages are free of regressions.
 
@@ -89,4 +89,4 @@ to silently select an older image. Existing machines keep updating upstream.
 For a manual image publication, use the tag from `provenance.json`, include the
 versioned manifest with the pieces and metadata, and use a draft until uploads
 are complete and verified. Never make an image the latest app release.
-Publishing an image does not publish a new SwiftVM app.
+Publishing an image does not publish a new TESSERaCT app.

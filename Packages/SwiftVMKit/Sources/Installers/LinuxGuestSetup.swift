@@ -16,7 +16,7 @@ public enum LinuxGuestSetup {
     static let runnerPath = "\(directory)/run.sh"
     static let settingsPath = "\(directory)/settings"
     static let unitPath = "/etc/systemd/system/\(unitName)"
-    static let unitName = "swiftvm-setup.service"
+    static let unitName = "tctl-setup.service"
 
     /// What the first-boot setup runs once the files are written. The runner does nothing on a disk where
     /// a setup has been scheduled before, which is what a copy of a machine starts from.

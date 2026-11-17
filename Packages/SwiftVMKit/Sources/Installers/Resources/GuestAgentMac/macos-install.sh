@@ -1,30 +1,30 @@
 #!/bin/sh
-# Installs the SwiftVM guest tools in macOS, or replaces an older copy of them.
+# Installs the TESSERaCT guest tools in macOS, or replaces an older copy of them.
 #
-# They are one small program, the guest agent, that lets the SwiftVM app on the Mac that runs this
+# They are one small program, the guest agent, that lets the TESSERaCT app on the Mac that runs this
 # virtual machine see this system's version and addresses, share the clipboard with it, set its
-# clock and time zone, and shut it down without a question on its screen. For the swiftvm command
+# clock and time zone, and shut it down without a question on its screen. For the tctl command
 # on that Mac it runs commands here and tells what is on the screen, once
 # macOS has been told to let it. It talks to the app over the virtual machine's socket device, so
 # none of that needs a network.
 #
 # Run it as root:    sudo sh install.sh
-# To remove it all:  sudo sh /usr/local/lib/swiftvm/install.sh --remove
+# To remove it all:  sudo sh /usr/local/lib/tctl/install.sh --remove
 #
 # Everything it installs is in this file: two launchd jobs in plain text, and the program itself,
-# which is built from the SwiftVM sources (Sources/GuestAgentMac) and written down here in Base64.
+# which is built from the TESSERaCT sources (Sources/GuestAgentMac) and written down here in Base64.
 set -eu
 # Whoever logs in has to be able to run the program, whatever the account that installs it likes
 # its own files to be.
 umask 022
 
-directory=/usr/local/lib/swiftvm
-program="$directory/swiftvm-agent"
-daemon=/Library/LaunchDaemons/com.swiftvm.agent.plist
-session=/Library/LaunchAgents/com.swiftvm.agent.session.plist
+directory=/usr/local/lib/tctl
+program="$directory/tctl-agent"
+daemon=/Library/LaunchDaemons/fr.stephan.tesseract.agent.plist
+session=/Library/LaunchAgents/fr.stephan.tesseract.agent.session.plist
 
 fail() {
-    echo "swiftvm: $*" >&2
+    echo "tctl: $*" >&2
     exit 1
 }
 
@@ -32,7 +32,7 @@ fail() {
 [ "$(id -u)" -eq 0 ] || fail "this has to run as root, for example: sudo sh $0"
 
 # Every transport takes the same lock. Keep its file so another attempt cannot lock a different inode.
-exec 9>/var/root/swiftvm-reinstall.lock
+exec 9>/var/root/tctl-reinstall.lock
 lockf -t 0 9 || fail "the guest tools are already being installed; wait for that installation to finish"
 
 # The user at the screen, in whose session the agent's other half runs. Root while nobody is logged in.
@@ -58,26 +58,26 @@ stop() {
 }
 
 stop_agents() {
-    stop system/com.swiftvm.agent
+    stop system/fr.stephan.tesseract.agent
     for user in $(session_users); do
-        stop "gui/$user/com.swiftvm.agent.session"
+        stop "gui/$user/fr.stephan.tesseract.agent.session"
     done
 }
 
 if [ "${1:-}" = "--remove" ]; then
     stop_agents
-    rm -f "$daemon" "$session" /var/run/swiftvm-agent.sock /var/run/swiftvm-agent-jobs.sock
+    rm -f "$daemon" "$session" /var/run/tctl-agent.sock /var/run/tctl-agent-jobs.sock
     rm -rf "$directory"
-    echo "The SwiftVM guest tools are removed."
+    echo "The TESSERaCT guest tools are removed."
     exit 0
 fi
 
 mkdir -p "$directory"
 chmod 755 "$directory"
 
-base64 -D > "$program.new" <<'SWIFTVM_END_OF_FILE'
-@@swiftvm-agent@@
-SWIFTVM_END_OF_FILE
+base64 -D > "$program.new" <<'TESSERACT_END_OF_FILE'
+@@tctl-agent@@
+TESSERACT_END_OF_FILE
 chmod 755 "$program.new"
 if ! "$program.new" --version >/dev/null 2>&1; then
     rm -f "$program.new"
@@ -101,16 +101,16 @@ stop_agents
 mv -f "$program.new" "$program"
 
 # The half that runs as root and answers the app.
-cat > "$daemon" <<'SWIFTVM_END_OF_FILE'
+cat > "$daemon" <<'TESSERACT_END_OF_FILE'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>com.swiftvm.agent</string>
+	<string>fr.stephan.tesseract.agent</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/usr/local/lib/swiftvm/swiftvm-agent</string>
+		<string>/usr/local/lib/tctl/tctl-agent</string>
 		<string>daemon</string>
 	</array>
 	<key>RunAtLoad</key>
@@ -119,20 +119,20 @@ cat > "$daemon" <<'SWIFTVM_END_OF_FILE'
 	<true/>
 </dict>
 </plist>
-SWIFTVM_END_OF_FILE
+TESSERACT_END_OF_FILE
 
 # The half that runs in the session of whoever logs in at the screen: for the clipboard, and for
 # what is on the screen.
-cat > "$session" <<'SWIFTVM_END_OF_FILE'
+cat > "$session" <<'TESSERACT_END_OF_FILE'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>com.swiftvm.agent.session</string>
+	<string>fr.stephan.tesseract.agent.session</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/usr/local/lib/swiftvm/swiftvm-agent</string>
+		<string>/usr/local/lib/tctl/tctl-agent</string>
 		<string>session</string>
 	</array>
 	<key>LimitLoadToSessionType</key>
@@ -143,7 +143,7 @@ cat > "$session" <<'SWIFTVM_END_OF_FILE'
 	<true/>
 </dict>
 </plist>
-SWIFTVM_END_OF_FILE
+TESSERACT_END_OF_FILE
 chmod 644 "$daemon" "$session"
 
 launchctl bootstrap system "$daemon" || fail "launchd didn't take the guest agent"
@@ -152,4 +152,4 @@ for user in $users; do
     launchctl bootstrap "gui/$user" "$session" >/dev/null 2>&1 || true
 done
 
-echo "The SwiftVM guest tools are installed."
+echo "The TESSERaCT guest tools are installed."

@@ -129,7 +129,7 @@ private final class AgentProvider: VMBackendProvider {
 /// Who gets to give a guest's agent a job, and what the agent is asked for.
 @MainActor
 @Suite struct GuestJobGateTests {
-    private let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+    private let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
     private let provider = AgentProvider()
 
     /// A running machine whose agent has said hello.
@@ -138,7 +138,7 @@ private final class AgentProvider: VMBackendProvider {
             name: "Web", os: GuestOS(family: family), cpuCount: 2, memorySize: 2 << 30, disks: [],
             automation: AutomationConfiguration(isAllowed: automation)
         )
-        let bundle = try VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).swiftvm"), configuration: configuration)
+        let bundle = try VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).tctl"), configuration: configuration)
         let machine = try VirtualMachine(bundle: bundle)
         machine.backendProvider = provider
         // What the app asks of this agent by itself goes unanswered, and isn't worth waiting for.

@@ -83,13 +83,13 @@ private final class FakeProvider: VMBackendProvider {
 
 @MainActor
 @Suite struct VirtualMachineStartTests {
-    private let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+    private let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
     private let provider = FakeProvider()
     private let account = GuestProvisioning(fullName: "Test User", userName: "tester", password: "secret")
 
     private func makeMachine(family: GuestFamily = .macOS) throws -> VirtualMachine {
         let configuration = VMConfiguration(name: "Mac", os: GuestOS(family: family), cpuCount: 4, memorySize: 8 << 30, disks: [])
-        let bundle = try VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).swiftvm"), configuration: configuration)
+        let bundle = try VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).tctl"), configuration: configuration)
         let machine = try VirtualMachine(bundle: bundle)
         machine.backendProvider = provider
         machine.isHostLocked = { false }
@@ -301,7 +301,7 @@ private final class FakeProvider: VMBackendProvider {
 
 @MainActor
 @Suite struct WindowsDisplayTests {
-    private let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-display-\(UUID())")
+    private let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-display-\(UUID())")
     private let provider = FakeProvider()
     private let retina = DisplayPixels(width: 5120, height: 2880, scale: 2)
 
@@ -408,12 +408,12 @@ private final class FakeProvider: VMBackendProvider {
 
 @MainActor
 @Suite struct VirtualMachineShutdownTests {
-    private let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+    private let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
     private let provider = FakeProvider()
 
     private func makeRunningMachine(family: GuestFamily = .macOS) async throws -> VirtualMachine {
         let configuration = VMConfiguration(name: "Mac", os: GuestOS(family: family), cpuCount: 4, memorySize: 8 << 30, disks: [])
-        let bundle = try VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).swiftvm"), configuration: configuration)
+        let bundle = try VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).tctl"), configuration: configuration)
         let machine = try VirtualMachine(bundle: bundle)
         machine.backendProvider = provider
         machine.isHostLocked = { false }
@@ -604,7 +604,7 @@ private final class FakeProvider: VMBackendProvider {
     }
 
     @Test func stagedBundlesJoinTheLibraryUnderTheMachineName() throws {
-        let root = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+        let root = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: root) }
         let library = VMLibrary(rootDirectory: root)
         library.load()
@@ -615,18 +615,18 @@ private final class FakeProvider: VMBackendProvider {
         #expect(library.machines.isEmpty)
 
         let machine = try library.add(staged: staged)
-        #expect(machine.bundle.url.lastPathComponent == "Web Server.swiftvm")
+        #expect(machine.bundle.url.lastPathComponent == "Web Server.tctl")
         #expect(machine.bundle.url.deletingLastPathComponent().path == library.machinesDirectory.standardizedFileURL.path)
         #expect(!FileManager.default.fileExists(atPath: staged.url.path))
         #expect(library.machines.map(\.name) == ["Web Server"])
 
         // A second machine with the same name gets its own bundle.
         let twin = try VMBundle.create(at: library.makeStagingBundleURL(), configuration: configuration(named: "Web Server"))
-        #expect(try library.add(staged: twin).bundle.url.lastPathComponent == "Web Server 2.swiftvm")
+        #expect(try library.add(staged: twin).bundle.url.lastPathComponent == "Web Server 2.tctl")
     }
 
     @Test func leftoversOfUnfinishedCreationsAreRemoved() throws {
-        let root = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+        let root = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: root) }
         let library = VMLibrary(rootDirectory: root)
         library.load()

@@ -12,10 +12,10 @@
 #
 # A release is signed with a Developer ID Application certificate and carries the provisioning profile
 # that goes with it, for USB devices: scripts/bundle-app.sh finds both, or is told with
-# SWIFTVM_SIGN_IDENTITY and SWIFTVM_PROVISIONING_PROFILE. Notarizing is the workflow's part.
+# TESSERACT_SIGN_IDENTITY and TESSERACT_PROVISIONING_PROFILE. Notarizing is the workflow's part.
 #
 # A release always carries the QEMU that runs Windows guests and Linux guests with graphics
-# acceleration: scripts/build-qemu.sh says what building it takes. SWIFTVM_QEMU names one it made
+# acceleration: scripts/build-qemu.sh says what building it takes. TESSERACT_QEMU names one it made
 # earlier, which the release workflows take from the Build QEMU workflow, to use as it is.
 set -euo pipefail
 root=${0:A:h:h}
@@ -34,8 +34,8 @@ while (( $# )); do
     esac
 done
 is_release_version "$version" || fail "$usage"
-if [[ ${SWIFTVM_PROVISIONING_PROFILE:--} != - ]]; then
-    export SWIFTVM_PROVISIONING_PROFILE=${SWIFTVM_PROVISIONING_PROFILE:a}
+if [[ ${TESSERACT_PROVISIONING_PROFILE:--} != - ]]; then
+    export TESSERACT_PROVISIONING_PROFILE=${TESSERACT_PROVISIONING_PROFILE:a}
 fi
 cd "$root"
 if [[ -z $build_number ]]; then
@@ -43,15 +43,15 @@ if [[ -z $build_number ]]; then
 fi
 [[ $build_number == <1-> ]] || fail "--build-number has to be a number above zero, and “$build_number” isn't."
 
-app=$output/SwiftVM.app
-image=$output/SwiftVM-$version.dmg
+app=$output/TESSERaCT.app
+image=$output/TESSERaCT-$version.dmg
 check_replaceable "$app"
 
-swift build -c release --product SwiftVM
-swift build -c release --package-path Packages/SwiftVMKit --product swiftvm
-swift build -c release --package-path Packages/SwiftVMKit --product swiftvm-agent
-if [[ -n ${SWIFTVM_QEMU:-} ]]; then
-    qemu=${SWIFTVM_QEMU:a}
+swift build -c release --product TESSERaCT
+swift build -c release --package-path Packages/SwiftVMKit --product tctl
+swift build -c release --package-path Packages/SwiftVMKit --product tctl-agent
+if [[ -n ${TESSERACT_QEMU:-} ]]; then
+    qemu=${TESSERACT_QEMU:a}
 else
     qemu=$("$root/scripts/build-qemu.sh")
 fi
@@ -78,10 +78,10 @@ if (( $+commands[create-dmg] )); then
     (( ${#made} == 1 )) || fail "create-dmg made no disk image of $app."
     mv "$made[1]" "$image"
 else
-    mkdir "$stage/SwiftVM"
-    cp -R "$app" "$stage/SwiftVM/"
-    ln -s /Applications "$stage/SwiftVM/Applications"
-    hdiutil create -quiet -volname SwiftVM -srcfolder "$stage/SwiftVM" -format UDZO -ov "$image" \
+    mkdir "$stage/TESSERaCT"
+    cp -R "$app" "$stage/TESSERaCT/"
+    ln -s /Applications "$stage/TESSERaCT/Applications"
+    hdiutil create -quiet -volname TESSERaCT -srcfolder "$stage/TESSERaCT" -format UDZO -ov "$image" \
         || fail "The disk image couldn't be made."
 fi
 
@@ -92,7 +92,7 @@ identity=$(codesign --display --verbose=2 "$app" 2>&1 | awk -F= '$1 == "Authorit
 if [[ -n $identity ]]; then
     codesign --force --sign "$identity" --timestamp "$image" || fail "The disk image couldn't be signed."
 else
-    print -u2 "SwiftVM is signed to run on this Mac, so the disk image isn't signed: it is no release."
+    print -u2 "TESSERaCT is signed to run on this Mac, so the disk image isn't signed: it is no release."
 fi
 
 print "App: $app"

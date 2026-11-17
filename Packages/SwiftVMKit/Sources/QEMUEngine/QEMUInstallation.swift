@@ -48,7 +48,7 @@ public struct QEMUInstallation: Sendable, Hashable {
     }
 
     var libraryDirectory: URL { program.deletingLastPathComponent().deletingLastPathComponent().appending(path: "lib") }
-    var displayLibrary: URL { libraryDirectory.appending(path: "libSwiftVMDisplay.dylib") }
+    var displayLibrary: URL { libraryDirectory.appending(path: "libTESSERaCTDisplay.dylib") }
     var dxmtLibrary: URL { libraryDirectory.appending(path: "libdxmt-native.dylib") }
     var d3dMetalLibrary: URL { libraryDirectory.appending(path: "libd3dmetal-native.dylib") }
 
@@ -131,7 +131,7 @@ public enum QEMUError: Error, LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .notInstalled:
-            "This copy of SwiftVM was built without QEMU, which runs Windows guests and Linux guests with graphics acceleration."
+            "This copy of TESSERaCT was built without QEMU, which runs Windows guests and Linux guests with graphics acceleration."
         case .didNotStart(let reason):
             "QEMU couldn't start the virtual machine. \(reason)"
         case .refused(let reason):

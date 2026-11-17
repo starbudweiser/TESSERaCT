@@ -4,7 +4,7 @@ import Testing
 
 @Suite struct WindowsSetupTests {
     private let setup = WindowsSetup(
-        computerName: "WIN-TEST", userName: "saeed", fullName: "Saeed & Co", password: "swiftvm", language: "de-DE",
+        computerName: "WIN-TEST", userName: "saeed", fullName: "Saeed & Co", password: "tctl", language: "de-DE",
         authorizedKeys: ["ssh-ed25519 AAAA test"]
     )
 
@@ -21,24 +21,24 @@ import Testing
         for check in ["BypassTPMCheck", "BypassSecureBootCheck", "BypassRAMCheck", "BypassCPUCheck"] {
             #expect(answers.contains(check))
         }
-        // Windows doesn't encrypt its disk by itself with the TPM, before SwiftVM's setup or anything else.
+        // Windows doesn't encrypt its disk by itself with the TPM, before TESSERaCT's setup or anything else.
         let specialize = try text("//*[local-name()='settings'][@pass='specialize']//*[local-name()='RunSynchronousCommand']/*[local-name()='Path']")
         #expect(specialize.first?.contains("BitLocker /v PreventDeviceEncryption /t REG_DWORD /d 1") == true)
-        // The account, which logs in by itself and then finishes SwiftVM's setup.
+        // The account, which logs in by itself and then finishes TESSERaCT's setup.
         #expect(try text("//*[local-name()='LocalAccount']/*[local-name()='Name']") == ["saeed"])
         #expect(try text("//*[local-name()='LocalAccount']/*[local-name()='DisplayName']") == ["Saeed & Co"])
         #expect(try text("//*[local-name()='AutoLogon']/*[local-name()='Enabled']") == ["true"])
         #expect(try text("//*[local-name()='ComputerName']") == ["WIN-TEST"])
         #expect(try text("//*[local-name()='SynchronousCommand']/*[local-name()='CommandLine']").first?.contains("-Phase firstlogon") == true)
         // The password is never written out.
-        #expect(!answers.contains(">swiftvm<"))
+        #expect(!answers.contains(">tctl<"))
     }
 
     @Test func encodesThePasswordAsWindowsReadsIt() {
-        // What Windows' own tools write for the password "swiftvm".
-        let expected = Data("swiftvmPassword".utf16.flatMap { [UInt8($0 & 0xFF), UInt8($0 >> 8)] }).base64EncodedString()
-        #expect(WindowsSetup.encodedPassword("swiftvm") == expected)
-        #expect(WindowsSetup.encodedPassword("swiftvm") == "cwB3AGkAZgB0AHYAbQBQAGEAcwBzAHcAbwByAGQA")
+        // What Windows' own tools write for the password "tctl".
+        let expected = Data("tctlPassword".utf16.flatMap { [UInt8($0 & 0xFF), UInt8($0 >> 8)] }).base64EncodedString()
+        #expect(WindowsSetup.encodedPassword("tctl") == expected)
+        #expect(WindowsSetup.encodedPassword("tctl") == "cwB3AGkAZgB0AHYAbQBQAGEAcwBzAHcAbwByAGQA")
     }
 
     @Test func takesOnlyNamesWindowsTakesForAccounts() {
@@ -60,7 +60,7 @@ import Testing
 
     @Test func putsTheSetupNextToTheAnswerFileOnItsDisc() throws {
         let files = try WindowsGuestAgent.setupFiles()
-        #expect(Set(files.keys) == ["setup.ps1", "install.ps1", "opengl.ps1", "swiftvm-agent.cs"])
+        #expect(Set(files.keys) == ["setup.ps1", "install.ps1", "opengl.ps1", "tctl-agent.cs"])
         // Windows' own tools read what is written for them with Windows' line breaks.
         let runner = String(decoding: try #require(files["setup.ps1"]), as: UTF8.self)
         #expect(runner.contains("\r\n"))

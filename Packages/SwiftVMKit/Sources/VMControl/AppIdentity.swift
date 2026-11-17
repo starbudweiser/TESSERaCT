@@ -1,7 +1,7 @@
 import Foundation
 
-/// Which copy of SwiftVM a program is part of: the app people use, or the development copy that
-/// `swift run SwiftVM` makes. The two are different apps to macOS and keep their data apart, so that a
+/// Which copy of TESSERaCT a program is part of: the app people use, or the development copy that
+/// `swift run TESSERaCT` makes. The two are different apps to macOS and keep their data apart, so that a
 /// development copy can run next to the app without ever seeing its machines.
 public enum AppIdentity: String, Sendable, CaseIterable {
     case release = "com.swiftvm.app"
@@ -12,8 +12,8 @@ public enum AppIdentity: String, Sendable, CaseIterable {
     /// What the copy is called in the menu bar and in the Dock, and what it calls itself.
     public var name: String {
         switch self {
-        case .release: "SwiftVM"
-        case .development: "SwiftVM Dev"
+        case .release: "TESSERaCT"
+        case .development: "TESSERaCT Dev"
         }
     }
 
@@ -21,8 +21,8 @@ public enum AppIdentity: String, Sendable, CaseIterable {
     /// its control socket.
     public var dataDirectoryName: String {
         switch self {
-        case .release: "SwiftVM"
-        case .development: "SwiftVM-Dev"
+        case .release: "TESSERaCT"
+        case .development: "TESSERaCT-Dev"
         }
     }
 
@@ -31,14 +31,14 @@ public enum AppIdentity: String, Sendable, CaseIterable {
         let program = Bundle.main.executableURL
         guard let identity = AppIdentity(ofProgramAt: program) else {
             let app = program.flatMap(appBundle(containing:))?.path ?? "the app it is in"
-            FileHandle.standardError.write(Data("SwiftVM can't tell which copy of it this is: the Info.plist of \(app) can't be read.\n".utf8))
+            FileHandle.standardError.write(Data("TESSERaCT can't tell which copy of it this is: the Info.plist of \(app) can't be read.\n".utf8))
             exit(1)
         }
         return identity
     }()
 
     /// The copy the program at `program` is part of: the one whose app it is inside of. A program
-    /// outside an app, such as the `swiftvm` tool built on its own, goes with the app people use, and so
+    /// outside an app, such as the `tctl` tool built on its own, goes with the app people use, and so
     /// does one inside an app that goes by another name.
     ///
     /// `nil` for a program inside an app that doesn't say what it is. Taking it for the app would hand

@@ -4,7 +4,7 @@ import Testing
 import VMCore
 
 @Suite struct QEMUCommandLineTests {
-    private let bundle = VMBundle(url: URL(fileURLWithPath: "/Machines/Windows.swiftvm"))
+    private let bundle = VMBundle(url: URL(fileURLWithPath: "/Machines/Windows.tctl"))
     private let installation = QEMUInstallation(
         program: URL(fileURLWithPath: "/App/Contents/Helpers/QEMU/bin/qemu-system-aarch64"),
         dataDirectory: URL(fileURLWithPath: "/App/Contents/Resources/QEMU/share")
@@ -43,7 +43,7 @@ import VMCore
 
     /// A Linux machine that draws with the Mac's GPU, set up by its first-boot disc, with two folders.
     @Test func aLinuxMachineHasItsOwnClockConsoleGPUSetupDiscAndFolders() throws {
-        let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+        let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: directory) }
         let disk = DiskConfiguration(fileName: "disk.img", capacity: 16 << 30, bus: .virtio, format: .raw)
         let projects = directory.appending(path: "Projects, old").path
@@ -62,7 +62,7 @@ import VMCore
             display: DisplayConfiguration(acceleratesGraphics: true), sharedFolders: folders,
             installation: InstallationConfiguration(attachesSeedImage: true)
         )
-        let bundle = try VMBundle.create(at: directory.appending(path: "Arch.swiftvm"), configuration: configuration)
+        let bundle = try VMBundle.create(at: directory.appending(path: "Arch.tctl"), configuration: configuration)
         FileManager.default.createFile(atPath: bundle.seedImageURL.path, contents: Data(count: 4096))
         var accelerated = installation
         accelerated.acceleratesGraphics = true
@@ -83,7 +83,7 @@ import VMCore
         // OpenGL, which virglrenderer passes on to the Mac's GPU.
         #expect(devices.first { $0["id"] as? String == "gpu" }?["driver"] as? String == "virtio-gpu-gl-pci")
         // The setup disc is a virtio disk, there before cloud-init looks for it, and on no USB port.
-        let seed = try #require(devices.first { $0["serial"] as? String == "swiftvm-seed" })
+        let seed = try #require(devices.first { $0["serial"] as? String == "tctl-seed" })
         #expect(seed["driver"] as? String == "virtio-blk-pci")
         #expect(!devices.contains { $0["driver"] as? String == "usb-storage" || $0["driver"] as? String == "scsi-cd" })
         // A 9p device for each folder, by the tag its agent mounts it by.
@@ -260,10 +260,10 @@ import VMCore
         var configuration = commandLine().configuration
         configuration.name = "One, Two=2"
         let arguments = try QEMUCommandLine(
-            configuration: configuration, bundle: VMBundle(url: URL(fileURLWithPath: "/Machines/One, Two.swiftvm")),
+            configuration: configuration, bundle: VMBundle(url: URL(fileURLWithPath: "/Machines/One, Two.tctl")),
             installation: installation, diskSources: [disk.id: .file(URL(fileURLWithPath: "/a.img"))], display: .framebuffer
         ).arguments()
-        #expect(values(of: "-drive", in: arguments) == ["if=pflash,unit=1,format=raw,file=/Machines/One,, Two.swiftvm/efi-vars.fd"])
+        #expect(values(of: "-drive", in: arguments) == ["if=pflash,unit=1,format=raw,file=/Machines/One,, Two.tctl/efi-vars.fd"])
         #expect(values(of: "-name", in: arguments) == ["guest=One,, Two=2"])
     }
 }
@@ -283,7 +283,7 @@ import VMCore
 @MainActor
 @Suite struct WindowsDisplayAdapterTests {
     @Test func aWindowsMachineCanBootAfterItsDirect3DRuntimeIsRemoved() throws {
-        let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+        let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: directory) }
         var installation = QEMUInstallation(
             program: directory.appending(path: "bin/qemu-system-aarch64"),
@@ -320,12 +320,12 @@ import VMCore
 
 @MainActor
 @Suite struct InstallerBootTests {
-    private let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+    private let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
 
     private func bundle(writing bytes: Int, discs: [RemovableImage]) throws -> (VMConfiguration, VMBundle) {
         let disk = DiskConfiguration(fileName: "disk.img", capacity: 1 << 30, bus: .nvme, format: .raw)
         let configuration = VMConfiguration(name: "Windows", os: GuestOS(family: .windows), cpuCount: 2, memorySize: 4 << 30, disks: [disk], removableImages: discs)
-        let bundle = try VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).swiftvm"), configuration: configuration)
+        let bundle = try VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).tctl"), configuration: configuration)
         FileManager.default.createFile(atPath: bundle.diskURL(for: disk).path, contents: Data(count: bytes))
         return (configuration, bundle)
     }
@@ -349,7 +349,7 @@ import VMCore
 
 @Suite struct SavedStateHeaderTests {
     @Test func theDrivesPortsComeBackFromTheSavedStateQEMUWroteAfterThem() throws {
-        let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-state-\(UUID().uuidString)")
+        let url = FileManager.default.temporaryDirectory.appending(path: "tctl-state-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: url) }
         // QEMU writes its part from the header's size on, and leaves what is before it empty.
         let stream = Data("QEVM".utf8) + Data(repeating: 7, count: 100)
@@ -365,21 +365,21 @@ import VMCore
     }
 
     @Test func remembersWhetherTheMachineHadATPM() throws {
-        let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-state-\(UUID().uuidString)")
+        let url = FileManager.default.temporaryDirectory.appending(path: "tctl-state-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: url) }
         try Data(count: SavedStateHeader.size + 16).write(to: url)
         try SavedStateHeader(usbPorts: [:], hasTPM: true).write(into: url)
         #expect(try SavedStateHeader.read(from: url).hasTPM)
 
         // What was saved before machines had a TPM says nothing of one.
-        var old = Data("SwiftVM QEMU machine state 1\n".utf8) + Data(#"{"usbPorts":{}}"#.utf8)
+        var old = Data("TESSERaCT QEMU machine state 1\n".utf8) + Data(#"{"usbPorts":{}}"#.utf8)
         old.append(Data(count: SavedStateHeader.size + 16 - old.count))
         try old.write(to: url)
         #expect(try !SavedStateHeader.read(from: url).hasTPM)
     }
 
     @Test func aFileWithoutTheHeaderIsNoStateToResume() throws {
-        let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-state-\(UUID().uuidString)")
+        let url = FileManager.default.temporaryDirectory.appending(path: "tctl-state-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: url) }
         try Data(count: SavedStateHeader.size + 16).write(to: url)
         #expect(throws: QEMUError.self) { try SavedStateHeader.read(from: url) }

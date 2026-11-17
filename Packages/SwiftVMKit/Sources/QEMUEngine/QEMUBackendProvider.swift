@@ -58,11 +58,11 @@ public final class QEMUBackendProvider: VMBackendProvider {
                 throw QEMUError.didNotStart("A machine with graphics acceleration can't resume saved memory.")
             }
             guard installation.acceleratesGraphics else {
-                throw QEMUError.didNotStart("This copy of SwiftVM's QEMU was built without graphics acceleration.")
+                throw QEMUError.didNotStart("This copy of TESSERaCT's QEMU was built without graphics acceleration.")
             }
             // Custom builds can leave out Direct3D, which Windows' 3D driver needs.
             guard current.os.family != .windows || installation.supportsDirect3D else {
-                throw QEMUError.didNotStart("This copy of SwiftVM's QEMU was built without Direct3D, which Windows' 3D driver needs.")
+                throw QEMUError.didNotStart("This copy of TESSERaCT's QEMU was built without Direct3D, which Windows' 3D driver needs.")
             }
         }
         if machine.configuration.display.adapter != adapter {

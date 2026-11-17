@@ -1,9 +1,9 @@
 #!/bin/bash
 #
-# Builds SwiftVM's Omarchy ARM edge image from Omarchy's signed package repositories.
+# Builds TESSERaCT's Omarchy ARM edge image from Omarchy's signed package repositories.
 # Based on Try Omarchy's factory builder at 4ec7f964985800b58293c814ff4f1f190a047679
 # (https://github.com/omacom/try-omarchy); its MIT license is in
-# omarchy-image/LICENSE.try-omarchy. SwiftVM uses cloud-init for the account and
+# omarchy-image/LICENSE.try-omarchy. TESSERaCT uses cloud-init for the account and
 # guest tools, and packages the disk as QCOW2 for its existing image installer.
 #
 #   GPT  p1  2 GiB  vfat  OMARCHY_EFI   /boot  Limine + UKIs
@@ -338,7 +338,7 @@ log "Running omarchy-apply-system --defer-provisioning --first-install"
 install -d -m 0755 "$target/var/lib/omarchy" "$target/var/lib/omarchy/image"
 omarchy_db_sha256=$(sha256sum "$omarchy_db" | cut -d' ' -f1)
 built=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-printf 'format=1\nplatform=aarch64\nbuilder=swiftvm\nchannel=%s\nchannel_db_sha256=%s\nbuilt=%s\n' \
+printf 'format=1\nplatform=aarch64\nbuilder=tctl\nchannel=%s\nchannel_db_sha256=%s\nbuilt=%s\n' \
   "$channel" "$omarchy_db_sha256" "$built" >"$target/var/lib/omarchy/image/target"
 chmod 0644 "$target/var/lib/omarchy/image/target"
 
@@ -373,13 +373,13 @@ node_version=${node_version%-linux-arm64.tar.gz}
 curl -fsSL "https://nodejs.org/dist/$node_version/$node_file" -o "$provisioning/packages/$node_file"
 echo "$node_sha  $provisioning/packages/$node_file" | sha256sum -c --quiet -
 
-# SwiftVM's seed supplies the account, guest tools and per-user setup. Install their dependencies
+# TESSERaCT's seed supplies the account, guest tools and per-user setup. Install their dependencies
 # here rather than making every new machine download them before it can answer the app.
-log "Preparing SwiftVM provisioning"
+log "Preparing TESSERaCT provisioning"
 target_install cloud-init cloud-guest-utils openssh python sudo inetutils spice-vdagent at-spi2-core python-gobject wl-clipboard
-install -m 0644 "$(dirname "$0")/omarchy-image/prepare.sh" "$target/var/tmp/swiftvm-image-prepare.sh"
-arch-chroot "$target" bash /var/tmp/swiftvm-image-prepare.sh
-rm "$target/var/tmp/swiftvm-image-prepare.sh"
+install -m 0644 "$(dirname "$0")/omarchy-image/prepare.sh" "$target/var/tmp/tctl-image-prepare.sh"
+arch-chroot "$target" bash /var/tmp/tctl-image-prepare.sh
+rm "$target/var/tmp/tctl-image-prepare.sh"
 
 # --- login and name resolution (orchestrator configure_login/dns) --------------
 install -d "$target/etc/sddm.conf.d"
@@ -416,7 +416,7 @@ done
 masked_hooks=()
 arch-chroot "$target" limine-update
 grep -q Omarchy "$target/boot/limine.conf" || fail "limine.conf has no Omarchy entry"
-grep -rqa 'console=hvc0' "$target/boot" || fail "the kernel image lacks SwiftVM's virtio console"
+grep -rqa 'console=hvc0' "$target/boot" || fail "the kernel image lacks TESSERaCT's virtio console"
 btrfs quota disable "$target" 2>/dev/null || true
 
 # --- installed configuration -----------------------------------------------------
@@ -471,7 +471,7 @@ esp_loop=""
 root_loop=""
 
 log "Packing the image"
-# SwiftVM already reads zlib-compressed QCOW2. Split the download below GitHub's per-asset limit;
+# TESSERaCT already reads zlib-compressed QCOW2. Split the download below GitHub's per-asset limit;
 # both each part and the assembled image have immutable digests in the release manifest.
 qemu-img convert -c -f raw -O qcow2 -o compression_type=zlib "$disk" "$state/image.qcow2"
 qemu-img check "$state/image.qcow2"

@@ -1,28 +1,28 @@
 #!/bin/sh
-# Runs the setup scripts of a virtual machine that SwiftVM made: the ones that were picked when the
-# machine was created, a desktop for example. SwiftVM puts this file and the scripts into a new
-# machine, and swiftvm-setup.service runs it once the system is up for the first time.
+# Runs the setup scripts of a virtual machine that TESSERaCT made: the ones that were picked when the
+# machine was created, a desktop for example. TESSERaCT puts this file and the scripts into a new
+# machine, and tctl-setup.service runs it once the system is up for the first time.
 #
-#   The scripts       /usr/local/lib/swiftvm/setup/scripts, by their number: 1, 2, ...
-#   What they print   /var/log/swiftvm-setup.log
-#   How it went       /var/lib/swiftvm/setup/status
+#   The scripts       /usr/local/lib/tctl/setup/scripts, by their number: 1, 2, ...
+#   What they print   /var/log/tctl-setup.log
+#   How it went       /var/lib/tctl/setup/status
 #
 # They run one after the other. When one fails, those after it aren't run.
-# To carry on after a failure:  sudo systemctl start swiftvm-setup
+# To carry on after a failure:  sudo systemctl start tctl-setup
 #
 # A setup that is cut short, by the machine being turned off, carries on the next time the system
 # starts: the scripts that came to their end stay done, and the one that was cut short is run again
 # from its beginning. One that keeps being cut short is given up on.
 set -u
 
-home=${SWIFTVM_SETUP_HOME:-/usr/local/lib/swiftvm/setup}
-state=${SWIFTVM_SETUP_STATE:-/var/lib/swiftvm/setup}
-log=${SWIFTVM_SETUP_LOG:-/var/log/swiftvm-setup.log}
-unit=swiftvm-setup.service
+home=${TESSERACT_SETUP_HOME:-/usr/local/lib/tctl/setup}
+state=${TESSERACT_SETUP_STATE:-/var/lib/tctl/setup}
+log=${TESSERACT_SETUP_LOG:-/var/log/tctl-setup.log}
+unit=tctl-setup.service
 # How often a script is started without ever coming to an end, before that is taken for an answer.
 attempts_allowed=3
 
-# What SwiftVM knows about the scripts and the machine, one "key=value" to a line: what all of the
+# What TESSERaCT knows about the scripts and the machine, one "key=value" to a line: what all of the
 # scripts set up, whether any of them wants a restart, and the account. The lines are taken as they
 # are and never run, whatever is in them.
 name='' restart=no user=''
@@ -82,7 +82,7 @@ finish() {
 systemctl enable "$unit" > /dev/null 2>&1 || true
 
 # What a script may count on.
-export SWIFTVM_USER="$user"
+export TESSERACT_USER="$user"
 # Nobody is there to answer a question.
 export DEBIAN_FRONTEND=noninteractive
 export APT_LISTCHANGES_FRONTEND=none
@@ -193,7 +193,7 @@ while [ "$number" -lt "$total" ]; do
     run_script "$script"
     status=$?
     if [ "$status" -ne 0 ]; then
-        say "==== $title stopped with an error (exit status $status). To run it again: sudo systemctl start swiftvm-setup ===="
+        say "==== $title stopped with an error (exit status $status). To run it again: sudo systemctl start tctl-setup ===="
         finish failed "$title"
         exit "$status"
     fi
@@ -210,7 +210,7 @@ if [ ! -d "/usr/lib/modules/$(uname -r)" ]; then
     restart=yes
 fi
 # Started by hand when everything was done already, there is nothing to restart for. Until the
-# system is back up the setup isn't finished: whoever waits for it (swiftvm wait) would otherwise
+# system is back up the setup isn't finished: whoever waits for it (tctl wait) would otherwise
 # start on a machine that is about to go down. The unit, still enabled, says so after the restart,
 # when every script is done already.
 if [ "$restart" = yes ] && [ "$ran" = yes ]; then

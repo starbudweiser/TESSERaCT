@@ -26,5 +26,5 @@ else
     apt-get install -y docker.io
 fi
 
-echo "==> Letting $SWIFTVM_USER use it"
-usermod -aG docker "$SWIFTVM_USER"
+echo "==> Letting $TESSERACT_USER use it"
+usermod -aG docker "$TESSERACT_USER"

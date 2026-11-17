@@ -7,9 +7,9 @@
 # disk: 24
 # restart: yes
 #
-# A setup script for SwiftVM. It runs as root in a new virtual machine the first time the machine
+# A setup script for TESSERaCT. It runs as root in a new virtual machine the first time the machine
 # starts. The lines above say what it is; a line it prints that starts with "==> " is the step
-# SwiftVM shows. How these scripts are written: https://swiftvm.app/docs/features/setup-scripts/
+# TESSERaCT shows. How these scripts are written: https://swiftvm.app/docs/features/setup-scripts/
 
 set -eu
 . /etc/os-release
@@ -32,7 +32,7 @@ case $ID in
     *) echo "This script is written for Ubuntu, Debian, Fedora and Arch Linux, not for $ID." >&2; exit 1 ;;
 esac
 # What the guest tools read the screen with, part by part, for whoever drives this machine from
-# the Mac (swiftvm control): the desktop's own accessibility, and what Python takes to ask it.
+# the Mac (tctl control): the desktop's own accessibility, and what Python takes to ask it.
 case $ID in
     arch | archarm) packages="$packages at-spi2-core python-gobject wl-clipboard xclip" ;;
     fedora) packages="$packages at-spi2-core python3-gobject wl-clipboard xclip" ;;
@@ -108,18 +108,18 @@ fi
 echo "==> Finishing"
 if [ "$ID" != debian ] && [ "$ID" != fedora ]; then
     mkdir -p /etc/sddm.conf.d
-    printf '[Theme]\nCurrent=breeze\n' > /etc/sddm.conf.d/90-swiftvm.conf
+    printf '[Theme]\nCurrent=breeze\n' > /etc/sddm.conf.d/90-tctl.conf
 fi
-# The account logs in by itself, as it does in a macOS or Windows machine that SwiftVM sets up, and
-# its screen doesn't lock while nobody types: whoever drives the desktop from the Mac (swiftvm
+# The account logs in by itself, as it does in a macOS or Windows machine that TESSERaCT sets up, and
+# its screen doesn't lock while nobody types: whoever drives the desktop from the Mac (tctl
 # desktop) finds it there after every start. The password still unlocks a locked screen, sudo and SSH.
 # Plasma's own session, which is Wayland from Plasma 6 and X11 before.
 # Fedora's Plasma Login reads the same settings from a folder of its own.
-if [ -n "${SWIFTVM_USER:-}" ]; then
+if [ -n "${TESSERACT_USER:-}" ]; then
     settings=/etc/sddm.conf.d
     [ "$ID" != fedora ] || settings=/etc/plasmalogin.conf.d
     mkdir -p "$settings"
-    printf '[Autologin]\nUser=%s\nSession=plasma.desktop\n' "$SWIFTVM_USER" > "$settings/80-swiftvm-autologin.conf"
+    printf '[Autologin]\nUser=%s\nSession=plasma.desktop\n' "$TESSERACT_USER" > "$settings/80-tctl-autologin.conf"
 fi
 mkdir -p /etc/xdg
 printf '[Daemon]\nAutolock=false\nLockOnResume=false\n' > /etc/xdg/kscreenlockerrc
@@ -128,14 +128,14 @@ printf '[Daemon]\nAutolock=false\nLockOnResume=false\n' > /etc/xdg/kscreenlocker
 # watches the card, so that the desktop knows it is online. Two services that both configure
 # one card would take turns at undoing each other's work.
 mkdir -p /etc/NetworkManager/conf.d
-cat > /etc/NetworkManager/conf.d/zz-swiftvm.conf << 'END'
+cat > /etc/NetworkManager/conf.d/zz-tctl.conf << 'END'
 [main]
 no-auto-default=*
 
 [keyfile]
 unmanaged-devices=
 
-[device-swiftvm]
+[device-tctl]
 match-device=type:ethernet
 managed=1
 END

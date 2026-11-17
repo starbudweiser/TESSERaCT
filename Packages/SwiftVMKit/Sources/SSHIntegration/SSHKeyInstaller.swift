@@ -7,7 +7,7 @@ import VMCore
 public enum SSHKeyInstaller {
     /// Environment variable that carries the password to the helper `ssh` asks for it. The password never
     /// touches the disk or a command line.
-    static let passwordVariable = "SWIFTVM_SSH_PASSWORD"
+    static let passwordVariable = "TESSERACT_SSH_PASSWORD"
 
     /// Appends the key it reads from standard input unless the file already lists it. Runs in the guest
     /// account's login shell.
@@ -39,7 +39,7 @@ public enum SSHKeyInstaller {
     /// or the password, which is expected while the guest is still setting itself up.
     public static func install(publicKey: String, on alias: String, configURL: URL, password: String) throws {
         let fileManager = FileManager.default
-        let helper = fileManager.temporaryDirectory.appending(path: "swiftvm-askpass-\(UUID().uuidString).sh")
+        let helper = fileManager.temporaryDirectory.appending(path: "tctl-askpass-\(UUID().uuidString).sh")
         try "#!/bin/sh\nprintf '%s\\n' \"$\(passwordVariable)\"\n".write(to: helper, atomically: true, encoding: .utf8)
         defer { try? fileManager.removeItem(at: helper) }
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: helper.path)

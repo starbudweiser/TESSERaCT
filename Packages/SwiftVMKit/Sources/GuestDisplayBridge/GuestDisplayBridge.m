@@ -7,7 +7,7 @@ id<SVMGuestDisplay> SVMGuestDisplayLoad(NSURL *library, NSURL *socket, NSError *
     if (!create) {
         const char *detail = dlerror();
         if (error) {
-            *error = [NSError errorWithDomain:@"SwiftVM.GuestDisplay" code:1 userInfo:@{
+            *error = [NSError errorWithDomain:@"TESSERaCT.GuestDisplay" code:1 userInfo:@{
                 NSLocalizedDescriptionKey: detail ? @(detail) : @"The display library that comes with QEMU is incomplete."
             }];
         }
@@ -16,7 +16,7 @@ id<SVMGuestDisplay> SVMGuestDisplayLoad(NSURL *library, NSURL *socket, NSError *
     }
     id<SVMGuestDisplay> display = create(socket);
     if (!display && error) {
-        *error = [NSError errorWithDomain:@"SwiftVM.GuestDisplay" code:2 userInfo:@{
+        *error = [NSError errorWithDomain:@"TESSERaCT.GuestDisplay" code:2 userInfo:@{
             NSLocalizedDescriptionKey: @"Metal couldn't create the machine's display."
         }];
     }

@@ -13,11 +13,11 @@ public enum ISOImageBuilder {
     ///
     /// - Parameters:
     ///   - volumeName: The volume label, e.g. `cidata` for cloud-init.
-    ///   - files: File name → contents. A name with slashes in it is in folders: `swiftvm/setup.ps1`.
+    ///   - files: File name → contents. A name with slashes in it is in folders: `tctl/setup.ps1`.
     ///   - url: Destination; replaced if it exists.
     public static func makeISO(volumeName: String, files: [String: Data], at url: URL) throws {
         let fileManager = FileManager.default
-        let staging = fileManager.temporaryDirectory.appending(path: "swiftvm-iso-\(UUID().uuidString)", directoryHint: .isDirectory)
+        let staging = fileManager.temporaryDirectory.appending(path: "tctl-iso-\(UUID().uuidString)", directoryHint: .isDirectory)
         try fileManager.createDirectory(at: staging, withIntermediateDirectories: true)
         defer { try? fileManager.removeItem(at: staging) }
 

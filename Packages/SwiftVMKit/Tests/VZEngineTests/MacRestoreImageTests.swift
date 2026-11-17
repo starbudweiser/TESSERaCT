@@ -36,7 +36,7 @@ import VMCore
             try await MacRestoreImage.load(from: URL(string: "https://example.com/Restore.ipsw")!)
         }
         await #expect(throws: MacRestoreImage.ImageError.self) {
-            try await MacRestoreImage.load(from: URL(fileURLWithPath: "/tmp/swiftvm-missing-\(UUID().uuidString).ipsw"))
+            try await MacRestoreImage.load(from: URL(fileURLWithPath: "/tmp/tctl-missing-\(UUID().uuidString).ipsw"))
         }
         await #expect(throws: MacRestoreImage.ImageError.self) {
             try await MacRestoreImage.load(from: FileManager.default.temporaryDirectory)
@@ -45,10 +45,10 @@ import VMCore
 
     @MainActor
     @Test func installRefusesImagesItCannotUse() async throws {
-        let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+        let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: directory) }
         let configuration = VMConfiguration(name: "Mac", os: GuestOS(family: .macOS), cpuCount: 4, memorySize: 8 << 30, disks: [])
-        let bundle = try VMBundle.create(at: directory.appending(path: "Mac.swiftvm"), configuration: configuration)
+        let bundle = try VMBundle.create(at: directory.appending(path: "Mac.tctl"), configuration: configuration)
 
         await #expect(throws: MacOSInstaller.InstallError.self) {
             try await MacOSInstaller.install(image(27, 0, 1, supported: false), into: bundle, configuration: configuration) { _ in }

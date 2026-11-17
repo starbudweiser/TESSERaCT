@@ -21,7 +21,7 @@ final class AddressWatcher: @unchecked Sendable {
         var context = SCDynamicStoreContext(
             version: 0, info: Unmanaged.passUnretained(receiver).toOpaque(), retain: nil, release: nil, copyDescription: nil
         )
-        let store = SCDynamicStoreCreate(nil, "swiftvm-agent" as CFString, { _, _, info in
+        let store = SCDynamicStoreCreate(nil, "tctl-agent" as CFString, { _, _, info in
             guard let info else { return }
             Unmanaged<Receiver>.fromOpaque(info).takeUnretainedValue().onChange()
         }, &context)

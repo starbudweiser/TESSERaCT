@@ -71,14 +71,14 @@ private struct Refusal: Error, LocalizedError {
 /// Machines in a scratch folder, each with a pretend engine of its own.
 @MainActor
 private final class Scratch {
-    let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tests-\(UUID().uuidString)")
+    let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tests-\(UUID().uuidString)")
     /// A machine only holds on to its provider loosely.
     private var providers: [USBProvider] = []
 
     func makeMachine(named name: String = "Box") throws -> (machine: VirtualMachine, backend: USBBackend) {
         let disk = DiskConfiguration(fileName: "disk.img", capacity: 1 << 20, format: .raw)
         let configuration = VMConfiguration(name: name, os: GuestOS(family: .linux), cpuCount: 2, memorySize: 4 << 30, disks: [disk])
-        let bundle = try VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).swiftvm"), configuration: configuration)
+        let bundle = try VMBundle.create(at: directory.appending(path: "\(UUID().uuidString).tctl"), configuration: configuration)
         try Data("disk".utf8).write(to: bundle.diskURL(for: disk))
         let machine = try VirtualMachine(bundle: bundle)
         let provider = USBProvider()
@@ -389,7 +389,7 @@ private let key = USBDevice(id: 4_302_399_301, vendorID: 0x1050, productID: 0x04
         let library = VMLibrary(rootDirectory: scratch.directory.appending(path: "Library"))
         library.backendProvider = provider
         let configuration = VMConfiguration(name: "Listed", os: GuestOS(family: .linux), cpuCount: 2, memorySize: 4 << 30, disks: [])
-        let listed = try library.add(VMBundle.create(at: scratch.directory.appending(path: "Listed.swiftvm"), configuration: configuration))
+        let listed = try library.add(VMBundle.create(at: scratch.directory.appending(path: "Listed.tctl"), configuration: configuration))
         listed.isHostLocked = { false }
 
         var started: [UUID] = []

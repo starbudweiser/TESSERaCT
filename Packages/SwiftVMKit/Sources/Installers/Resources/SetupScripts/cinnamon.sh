@@ -7,9 +7,9 @@
 # disk: 24
 # restart: yes
 #
-# A setup script for SwiftVM. It runs as root in a new virtual machine the first time the machine
+# A setup script for TESSERaCT. It runs as root in a new virtual machine the first time the machine
 # starts. The lines above say what it is; a line it prints that starts with "==> " is the step
-# SwiftVM shows. How these scripts are written: https://swiftvm.app/docs/features/setup-scripts/
+# TESSERaCT shows. How these scripts are written: https://swiftvm.app/docs/features/setup-scripts/
 
 set -eu
 . /etc/os-release
@@ -29,7 +29,7 @@ case $ID in
     *) echo "This script is written for Ubuntu, Debian, Fedora and Arch Linux, not for $ID." >&2; exit 1 ;;
 esac
 # What the guest tools read the screen with, part by part, for whoever drives this machine from
-# the Mac (swiftvm control): the desktop's own accessibility, and what Python takes to ask it.
+# the Mac (tctl control): the desktop's own accessibility, and what Python takes to ask it.
 case $ID in
     arch | archarm) packages="$packages at-spi2-core python-gobject wl-clipboard xclip" ;;
     fedora) packages="$packages at-spi2-core python3-gobject wl-clipboard xclip" ;;
@@ -108,20 +108,20 @@ mkdir -p /etc/lightdm/lightdm.conf.d
 # Arch Linux calls the greeter by its package's name.
 greeter=slick-greeter
 [ ! -e /usr/share/xgreeters/lightdm-slick-greeter.desktop ] || greeter=lightdm-slick-greeter
-printf '[Seat:*]\ngreeter-session=%s\nuser-session=%s\ngreeter-hide-users=false\n' "$greeter" "$session" > /etc/lightdm/lightdm.conf.d/90-swiftvm.conf
-# The account logs in by itself, as it does in a macOS or Windows machine that SwiftVM sets up, and
-# its screen doesn't lock while nobody types: whoever drives the desktop from the Mac (swiftvm
+printf '[Seat:*]\ngreeter-session=%s\nuser-session=%s\ngreeter-hide-users=false\n' "$greeter" "$session" > /etc/lightdm/lightdm.conf.d/90-tctl.conf
+# The account logs in by itself, as it does in a macOS or Windows machine that TESSERaCT sets up, and
+# its screen doesn't lock while nobody types: whoever drives the desktop from the Mac (tctl
 # desktop) finds it there after every start. The password still unlocks a locked screen, sudo and
 # SSH. Arch Linux lets only the autologin group in.
-if [ -n "${SWIFTVM_USER:-}" ]; then
-    printf '[Seat:*]\nautologin-user=%s\nautologin-session=%s\n' "$SWIFTVM_USER" "$session" > /etc/lightdm/lightdm.conf.d/91-swiftvm-autologin.conf
+if [ -n "${TESSERACT_USER:-}" ]; then
+    printf '[Seat:*]\nautologin-user=%s\nautologin-session=%s\n' "$TESSERACT_USER" "$session" > /etc/lightdm/lightdm.conf.d/91-tctl-autologin.conf
     groupadd -rf autologin
-    gpasswd -a "$SWIFTVM_USER" autologin > /dev/null
+    gpasswd -a "$TESSERACT_USER" autologin > /dev/null
 fi
 mkdir -p /etc/dconf/profile /etc/dconf/db/local.d
 [ -e /etc/dconf/profile/user ] || printf 'user-db:user\n' > /etc/dconf/profile/user
 grep -qx 'system-db:local' /etc/dconf/profile/user || echo 'system-db:local' >> /etc/dconf/profile/user
-cat > /etc/dconf/db/local.d/90-swiftvm << 'END'
+cat > /etc/dconf/db/local.d/90-tctl << 'END'
 [org/cinnamon/desktop/session]
 idle-delay=uint32 0
 
@@ -134,14 +134,14 @@ dconf update
 # watches the card, so that the desktop knows it is online. Two services that both configure
 # one card would take turns at undoing each other's work.
 mkdir -p /etc/NetworkManager/conf.d
-cat > /etc/NetworkManager/conf.d/zz-swiftvm.conf << 'END'
+cat > /etc/NetworkManager/conf.d/zz-tctl.conf << 'END'
 [main]
 no-auto-default=*
 
 [keyfile]
 unmanaged-devices=
 
-[device-swiftvm]
+[device-tctl]
 match-device=type:ethernet
 managed=1
 END

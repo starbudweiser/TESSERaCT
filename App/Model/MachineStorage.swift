@@ -180,7 +180,7 @@ extension AppModel {
     }
 
     /// Grows the disk of a machine that is shut down. The guest has to grow its own partition into the new
-    /// space; systems set up by SwiftVM from a cloud image do that at their next start.
+    /// space; systems set up by TESSERaCT from a cloud image do that at their next start.
     func resizeDisk(of machine: VirtualMachine, to capacity: UInt64) async throws {
         try await machine.whileStopped(.resizingDisk) {
             guard let disk = machine.configuration.systemDisk else {

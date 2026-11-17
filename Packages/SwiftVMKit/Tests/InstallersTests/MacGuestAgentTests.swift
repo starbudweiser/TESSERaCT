@@ -6,14 +6,14 @@ import VMCore
 @testable import Installers
 
 @Suite struct MacGuestAgentTests {
-    private let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-tools-\(UUID().uuidString)")
+    private let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-tools-\(UUID().uuidString)")
 
     /// Something to carry in place of the agent, which is built with the app and not with this package.
     /// It has every byte in it, as a program has.
     private func makeProgram() throws -> (url: URL, contents: Data) {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let contents = Data((0..<4000).map { UInt8(truncatingIfNeeded: $0 &* 31) })
-        let url = directory.appending(path: "swiftvm-agent")
+        let url = directory.appending(path: "tctl-agent")
         try contents.write(to: url)
         return (url, contents)
     }
@@ -68,22 +68,22 @@ import VMCore
         // sudo took the password's line: the marker comes first.
         let plain = try runAsRootWould(input: "the-marker\n" + script)
         let ranAs = try #require(plain.standardOutput.split(separator: "\n").first.map(String.init))
-        #expect(ranAs.hasPrefix("ran as /tmp/swiftvm-tools."))
+        #expect(ranAs.hasPrefix("ran as /tmp/tctl-tools."))
         #expect(ranAs.hasSuffix("/install.sh"))
         // The installer is run from a folder of root's own and the folder is gone afterwards.
         #expect(!FileManager.default.fileExists(atPath: String(ranAs.dropFirst("ran as ".count))))
 
         // sudo didn't ask after all, and the password's line is still there. It is skipped, not run:
         // a password that happens to be a command does nothing.
-        let leftOver = try runAsRootWould(input: "touch /tmp/swiftvm-test-must-not-exist\nthe-marker\n" + script)
-        #expect(leftOver.standardOutput.hasPrefix("ran as /tmp/swiftvm-tools."))
+        let leftOver = try runAsRootWould(input: "touch /tmp/tctl-test-must-not-exist\nthe-marker\n" + script)
+        #expect(leftOver.standardOutput.hasPrefix("ran as /tmp/tctl-tools."))
         #expect(!leftOver.standardOutput.contains("touch"))
-        #expect(!FileManager.default.fileExists(atPath: "/tmp/swiftvm-test-must-not-exist"))
+        #expect(!FileManager.default.fileExists(atPath: "/tmp/tctl-test-must-not-exist"))
 
         // The installer's own status is what comes back.
-        #expect(throws: ProcessRunner.Failure.self) { try runAsRootWould(input: "the-marker\necho \"swiftvm: no\" >&2\nexit 7\n") }
+        #expect(throws: ProcessRunner.Failure.self) { try runAsRootWould(input: "the-marker\necho \"tctl: no\" >&2\nexit 7\n") }
         do {
-            _ = try runAsRootWould(input: "the-marker\necho \"swiftvm: not on this system\" >&2\nexit 7\n")
+            _ = try runAsRootWould(input: "the-marker\necho \"tctl: not on this system\" >&2\nexit 7\n")
             Issue.record("a failing installer was reported as done")
         } catch let failure as ProcessRunner.Failure {
             #expect(failure.output.status == 7)

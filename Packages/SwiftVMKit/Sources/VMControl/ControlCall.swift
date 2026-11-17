@@ -1,7 +1,7 @@
 import Foundation
 import GuestChannel
 
-/// What `swiftvm control` and `swiftvm mcp` ask of a machine's desktop: one or more steps, done in order
+/// What `tctl control` and `tctl mcp` ask of a machine's desktop: one or more steps, done in order
 /// by the app, which stops at the first that fails.
 public struct ControlCall: Codable, Sendable, Equatable {
     public var steps: [ControlStep]

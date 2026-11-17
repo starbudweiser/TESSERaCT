@@ -4,12 +4,12 @@ import Observation
 /// A machine as it was when it was saved, kept to make new machines from: its disks, its firmware and
 /// its settings.
 ///
-/// A template is a package of its own, `<name>.swiftvmtemplate`, in the folder for templates. The files
+/// A template is a package of its own, `<name>.tctltemplate`, in the folder for templates. The files
 /// in it are those a copy of a machine is made of, under the names they have in a machine's bundle. It
 /// never runs, so nothing in it changes after it was saved, and every machine made from it starts out
 /// the same.
 public struct VMTemplate: Codable, Sendable, Hashable, Identifiable {
-    public static let pathExtension = "swiftvmtemplate"
+    public static let pathExtension = "tctltemplate"
     static let fileName = "template.json"
     /// Prefix of a template's package that is still being written.
     static let unfinishedPrefix = ".new-"

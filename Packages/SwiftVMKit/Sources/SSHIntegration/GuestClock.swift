@@ -9,7 +9,7 @@ import VMCore
 /// setting the system time from it fixes this at once.
 public enum GuestClock {
     /// The `ssh` arguments that set the system time of `alias` from its hardware clock. Needs key sign-in
-    /// and `sudo` without a password, which guests set up by SwiftVM have.
+    /// and `sudo` without a password, which guests set up by TESSERaCT have.
     static func arguments(alias: String, configURL: URL) -> [String] {
         [
             "-F", configURL.path,

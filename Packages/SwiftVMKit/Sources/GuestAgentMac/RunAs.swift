@@ -1,6 +1,6 @@
 import Foundation
 
-/// `swiftvm-agent run-as`: becomes an account of this system, and then the command it was given.
+/// `tctl-agent run-as`: becomes an account of this system, and then the command it was given.
 ///
 /// The half of the agent that runs as root starts every command this way. The process makes itself the
 /// head of a process group, so that calling the command off reaches everything it started by one
@@ -18,7 +18,7 @@ enum RunAs {
     /// account and the command.
     private static let arrived = "--arrived"
 
-    static let usage = "Usage: swiftvm-agent run-as <account> [--in-session] -- <command> [arguments]"
+    static let usage = "Usage: tctl-agent run-as <account> [--in-session] -- <command> [arguments]"
 
     /// Runs the command, which takes this process over. Returns only when that didn't work, with the
     /// status to exit with: 127 for a command that isn't there, 126 for anything else, as a shell has it.
@@ -73,6 +73,6 @@ enum RunAs {
     }
 
     private static func complain(_ message: String) {
-        FileHandle.standardError.write(Data("swiftvm-agent: \(message)\n".utf8))
+        FileHandle.standardError.write(Data("tctl-agent: \(message)\n".utf8))
     }
 }

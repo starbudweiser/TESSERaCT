@@ -105,7 +105,7 @@ extension AppModel {
             }
         }
         guard state.isAllowed else {
-            throw AccessError.failed("The switch for the guest tools in “\(machine.name)” didn't stay on. In the guest, turn on swiftvm-agent under System Settings › Privacy & Security › \(Self.listName).")
+            throw AccessError.failed("The switch for the guest tools in “\(machine.name)” didn't stay on. In the guest, turn on tctl-agent under System Settings › Privacy & Security › \(Self.listName).")
         }
     }
 
@@ -173,7 +173,7 @@ extension AppModel {
 /// How the guest tools for macOS show in the guest's System Settings.
 nonisolated enum MacGuestTools {
     /// The name on the list of what may read the screen: the program's, as the installer puts it there.
-    static let listedName = "swiftvm-agent"
+    static let listedName = "tctl-agent"
 
     /// How far in from the window's right edge the middle of a line's switch is, in points: the
     /// window's margin, the list's own, and half the switch.

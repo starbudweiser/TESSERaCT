@@ -286,7 +286,7 @@ private func eventually(within timeout: Duration = .seconds(5), _ condition: () 
         #expect(noZone?.ok == false)
         #expect(noZone?.error?.contains("time zone") == true)
         // macOS mounts shared folders by itself; nothing is mounted on the app's say-so.
-        let noMount = await connection.request { .mountSharedFolders(id: $0, tag: "swiftvm", mountPoint: "/mnt/shared") }
+        let noMount = await connection.request { .mountSharedFolders(id: $0, tag: "tctl", mountPoint: "/mnt/shared") }
         #expect(noMount?.ok == false)
         #expect(system.calls.count == 3)
 
@@ -684,7 +684,7 @@ private func eventually(within timeout: Duration = .seconds(5), _ condition: () 
 
 @Suite struct AgentSocketTests {
     @Test func aSessionIsKnownByItsUser() throws {
-        let path = "/tmp/swiftvm-agent-test-\(UInt32.random(in: 0...UInt32.max)).sock"
+        let path = "/tmp/tctl-agent-test-\(UInt32.random(in: 0...UInt32.max)).sock"
         defer { unlink(path) }
         #expect(AgentSockets.connectToUnixSocket(path: path) == nil)
         let listener = try AgentSockets.listenOnUnixSocket(path: path)
@@ -752,7 +752,7 @@ private func eventually(within timeout: Duration = .seconds(5), _ condition: () 
     }
 
     @Test(arguments: [false, true]) func aSlowReaderGetsAllTheOutput(standardError: Bool) async throws {
-        let directory = FileManager.default.temporaryDirectory.appending(path: "swiftvm-output-\(UUID().uuidString)")
+        let directory = FileManager.default.temporaryDirectory.appending(path: "tctl-output-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false)
         defer { try? FileManager.default.removeItem(at: directory) }
         let finished = directory.appending(path: "finished")

@@ -1,6 +1,6 @@
-# SwiftVM
+# TESSERaCT
 
-SwiftVM is a virtual machine software for macOS 27 that lets user to boot up virtual machines in their macs.
+TESSERaCT is a virtual machine software for macOS 27 that lets user to boot up virtual machines in their macs.
 
 ## Testing Rules
 

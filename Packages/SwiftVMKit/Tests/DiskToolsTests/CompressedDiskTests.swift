@@ -11,7 +11,7 @@ private final class Fixture {
     private var seed: UInt64 = 0x9E37_79B9_7F4A_7C15
 
     init(capacity: Int) throws {
-        folder = FileManager.default.temporaryDirectory.appending(path: "swiftvm-compressed-\(UUID().uuidString)")
+        folder = FileManager.default.temporaryDirectory.appending(path: "tctl-compressed-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         url = folder.appending(path: "disk.\(CompressedDisk.fileExtension)")
         expected = [UInt8](repeating: 0, count: capacity)

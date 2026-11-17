@@ -20,7 +20,7 @@ import VMCore
         let pair = try VmnetPort.makeSocketPair()
         defer { close(pair.engine) }
         do {
-            _ = try await VmnetPort.open(bridgedTo: "swiftvm-missing-interface", peer: pair.port)
+            _ = try await VmnetPort.open(bridgedTo: "tctl-missing-interface", peer: pair.port)
             Issue.record("A missing host interface must not fall back to the shared network.")
         } catch is BridgedNetworking.Failure {
             #expect(fcntl(pair.port, F_GETFD) == -1)

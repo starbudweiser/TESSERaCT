@@ -134,7 +134,7 @@ public final class QMPConnection: @unchecked Sendable {
     /// greets once its machine is put together, so this returns when QEMU is ready to be told what to do.
     public func open() async throws {
         let thread = Thread { [self] in readLoop() }
-        thread.name = "app.swiftvm.qmp"
+        thread.name = "app.tctl.qmp"
         thread.start()
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
             let ready = lock.withLock { () -> Bool? in

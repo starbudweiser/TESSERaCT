@@ -75,7 +75,7 @@ private extension Data {
 
 @Suite struct QCOW2ImageTests {
     private func temporaryDirectory() throws -> URL {
-        let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-qcow2-\(UUID().uuidString)")
+        let url = FileManager.default.temporaryDirectory.appending(path: "tctl-qcow2-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
         return url
     }
@@ -118,7 +118,7 @@ private extension Data {
 
 @Suite struct DiskServiceTests {
     @Test func createsSparseRawDiskAndGrowsIt() throws {
-        let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-disk-\(UUID().uuidString).img")
+        let url = FileManager.default.temporaryDirectory.appending(path: "tctl-disk-\(UUID().uuidString).img")
         defer { try? FileManager.default.removeItem(at: url) }
         let gibibyte: UInt64 = 1 << 30
         try DiskService.createBlankDisk(at: url, capacity: gibibyte, format: .raw)
@@ -132,7 +132,7 @@ private extension Data {
     }
 
     @Test func createsSparseASIFDisk() throws {
-        let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-disk-\(UUID().uuidString).asif")
+        let url = FileManager.default.temporaryDirectory.appending(path: "tctl-disk-\(UUID().uuidString).asif")
         defer { try? FileManager.default.removeItem(at: url) }
         let capacity: UInt64 = 64 << 30
         try DiskService.createBlankDisk(at: url, capacity: capacity, format: .asif)
@@ -144,7 +144,7 @@ private extension Data {
     @Test func growsDisksOfBothFormats() throws {
         let gibibyte: UInt64 = 1 << 30
         for format in [DiskConfiguration.Format.raw, .asif] {
-            let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-disk-\(UUID().uuidString).\(format.rawValue)")
+            let url = FileManager.default.temporaryDirectory.appending(path: "tctl-disk-\(UUID().uuidString).\(format.rawValue)")
             defer { try? FileManager.default.removeItem(at: url) }
             try DiskService.createBlankDisk(at: url, capacity: 2 * gibibyte, format: format)
 
@@ -163,7 +163,7 @@ private extension Data {
 
 @Suite struct ISOImageBuilderTests {
     @Test func buildsLabelledISO() throws {
-        let url = FileManager.default.temporaryDirectory.appending(path: "swiftvm-seed-\(UUID().uuidString).iso")
+        let url = FileManager.default.temporaryDirectory.appending(path: "tctl-seed-\(UUID().uuidString).iso")
         defer { try? FileManager.default.removeItem(at: url) }
         try ISOImageBuilder.makeISO(
             volumeName: "cidata",

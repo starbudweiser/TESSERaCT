@@ -125,7 +125,7 @@ public struct VMConfiguration: Codable, Sendable, Hashable, Identifiable {
     }
 
     /// Whether the guest mounts shared folders by itself. macOS guests always do; Linux guests do when
-    /// SwiftVM set them up on first boot.
+    /// TESSERaCT set them up on first boot.
     public var mountsSharedFoldersAutomatically: Bool {
         switch os.family {
         case .macOS: true
@@ -205,7 +205,7 @@ public enum VMConfigurationError: Error, LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .unsupportedSchemaVersion(let version):
-            "This virtual machine was created by a newer version of SwiftVM (schema \(version))."
+            "This virtual machine was created by a newer version of TESSERaCT (schema \(version))."
         }
     }
 }
@@ -224,7 +224,7 @@ public struct DiskConfiguration: Codable, Sendable, Hashable, Identifiable {
         case asif
         /// Raw image; kept sparse by APFS.
         case raw
-        /// SwiftVM's own: compressed, and handed to the machine by the app itself.
+        /// TESSERaCT's own: compressed, and handed to the machine by the app itself.
         case compressed
     }
 
@@ -353,7 +353,7 @@ public struct NetworkInterfaceConfiguration: Codable, Sendable, Hashable, Identi
     public var bridgedInterfaceIdentifier: String?
     /// Colon-separated MAC address, e.g. `02:1a:2b:3c:4d:5e`.
     public var macAddress: String
-    /// IPv4 address reserved on SwiftVM's shared network. Bridged addresses belong to the LAN.
+    /// IPv4 address reserved on TESSERaCT's shared network. Bridged addresses belong to the LAN.
     public var ipv4Address: String?
     public var portForwards: [PortForward]
     /// Whether the virtual cable is plugged in when the machine starts.

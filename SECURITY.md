@@ -8,7 +8,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in SwiftVM, please report it responsibly.
+If you discover a security vulnerability in TESSERaCT, please report it responsibly.
 
 **Do not open a public issue for security vulnerabilities.**
 
@@ -29,7 +29,7 @@ Instead, please use [GitHub's private vulnerability reporting](https://github.co
 
 ## Scope
 
-This policy applies to the SwiftVM app, the `swiftvm` command-line tool, the
-guest tools that SwiftVM installs in virtual machines, and the build tooling.
+This policy applies to the TESSERaCT app, the `tctl` command-line tool, the
+guest tools that TESSERaCT installs in virtual machines, and the build tooling.
 For vulnerabilities in Apple's Virtualization framework or in a guest operating
 system, please report them to Apple or to that system's vendor directly.

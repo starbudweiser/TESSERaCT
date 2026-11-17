@@ -293,7 +293,7 @@ struct SharedFoldersGuestHint: View {
                 if configuration.mountsSharedFoldersAutomatically || isMountedByAgent {
                     hint("Folders appear in the guest under \(GuestIntegration.sharedFoldersMountPoint). Changes apply right away.")
                 } else {
-                    hint("This system wasn't set up by SwiftVM, so it doesn't mount shared folders by itself. With the guest tools installed (Install Guest Tools… in the Virtual Machine menu) they are mounted whenever it runs. Without them, run this in the guest's terminal:")
+                    hint("This system wasn't set up by TESSERaCT, so it doesn't mount shared folders by itself. With the guest tools installed (Install Guest Tools… in the Virtual Machine menu) they are mounted whenever it runs. Without them, run this in the guest's terminal:")
                     CopyableCommand(command: GuestIntegration.linuxMountCommand)
                     hint("Folders then appear under \(GuestIntegration.sharedFoldersMountPoint). To mount them at every start, also run this once (after installing, not in a live session):")
                     CopyableCommand(command: GuestIntegration.linuxPersistentMountCommand)

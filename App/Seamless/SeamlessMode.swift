@@ -31,7 +31,7 @@ extension AppModel {
         guard let probe = machine.makeRegionView() else {
             machine.lastError = VMErrorInfo(
                 title: "“\(machine.name)” can't enter Seamless Mode",
-                message: "This copy of SwiftVM's display can't show the guest's windows one by one."
+                message: "This copy of TESSERaCT's display can't show the guest's windows one by one."
             )
             return
         }

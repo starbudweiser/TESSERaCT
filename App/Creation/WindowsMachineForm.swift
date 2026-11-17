@@ -109,7 +109,7 @@ struct WindowsMachineForm: View {
             TextField("Name", text: nameBinding)
         } footer: {
             if !isEngineAvailable {
-                Text("This copy of SwiftVM was built without QEMU, which runs Windows.").foregroundStyle(.red)
+                Text("This copy of TESSERaCT was built without QEMU, which runs Windows.").foregroundStyle(.red)
             } else if let localDiscProblem {
                 Text(localDiscProblem).foregroundStyle(.red)
             } else {

@@ -1,6 +1,6 @@
 # Task Scheduler owns the installer so replacing the agent cannot end it halfway through.
 $ErrorActionPreference = 'Stop'
-$d = Join-Path $env:ProgramFiles 'SwiftVM\Reinstall-@@token@@'
+$d = Join-Path $env:ProgramFiles 'TESSERaCT\Reinstall-@@token@@'
 # Program Files keeps other accounts from replacing the staged installer before SYSTEM runs it.
 New-Item -ItemType Directory -Path $d | Out-Null
 $disc = $null
@@ -11,7 +11,7 @@ for ($attempt = 0; $attempt -lt 50; $attempt++) {
 }
 if (-not $disc) { throw 'The guest tools disc did not appear.' }
 $source = $disc.DeviceID + '\'
-foreach ($file in 'install.ps1', 'swiftvm-agent.cs', 'opengl.ps1') {
+foreach ($file in 'install.ps1', 'tctl-agent.cs', 'opengl.ps1') {
     Copy-Item -LiteralPath (Join-Path $source $file) -Destination $d
 }
 if (Test-Path -LiteralPath (Join-Path $source 'graphics-driver.zip')) {
@@ -30,5 +30,5 @@ Move-Item -LiteralPath (Join-Path $d 'status.new') -Destination (Join-Path $d 's
 '@ | Set-Content -LiteralPath (Join-Path $d 'run.ps1')
 $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument ('-NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "' + $d + '\run.ps1"')
 $settings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit (New-TimeSpan -Seconds 150)
-Register-ScheduledTask -TaskName 'SwiftVM-Reinstall-@@token@@' -Action $action -Settings $settings -User 'SYSTEM' -RunLevel Highest | Out-Null
-Start-ScheduledTask -TaskName 'SwiftVM-Reinstall-@@token@@'
+Register-ScheduledTask -TaskName 'TESSERaCT-Reinstall-@@token@@' -Action $action -Settings $settings -User 'SYSTEM' -RunLevel Highest | Out-Null
+Start-ScheduledTask -TaskName 'TESSERaCT-Reinstall-@@token@@'

@@ -5,9 +5,9 @@ import Testing
 @Suite struct CommandLineToolLinkTests {
     /// A folder to install into, with a stand-in for the tool inside an app.
     private struct Scratch {
-        let root = FileManager.default.temporaryDirectory.appending(path: "swiftvm-link-\(UUID().uuidString)")
-        var tool: URL { root.appending(path: "SwiftVM.app/Contents/Helpers/swiftvm") }
-        var link: CommandLineToolLink { CommandLineToolLink(toolURL: tool, linkURL: root.appending(path: "bin/swiftvm")) }
+        let root = FileManager.default.temporaryDirectory.appending(path: "tctl-link-\(UUID().uuidString)")
+        var tool: URL { root.appending(path: "TESSERaCT.app/Contents/Helpers/tctl") }
+        var link: CommandLineToolLink { CommandLineToolLink(toolURL: tool, linkURL: root.appending(path: "bin/tctl")) }
 
         init() throws {
             try FileManager.default.createDirectory(at: tool.deletingLastPathComponent(), withIntermediateDirectories: true)
@@ -43,7 +43,7 @@ import Testing
         try fileManager.createDirectory(at: link.linkURL.deletingLastPathComponent(), withIntermediateDirectories: true)
 
         // The app was moved or deleted: the link still points at where its tool used to be.
-        let gone = scratch.root.appending(path: "Old/SwiftVM.app/Contents/Helpers/swiftvm")
+        let gone = scratch.root.appending(path: "Old/TESSERaCT.app/Contents/Helpers/tctl")
         try fileManager.createSymbolicLink(at: link.linkURL, withDestinationURL: gone)
         #expect(link.status == .occupied(linkedTo: gone.path))
         try link.install()
@@ -51,7 +51,7 @@ import Testing
 
         // A link that names the tool relative to its own folder is the same link.
         try fileManager.removeItem(at: link.linkURL)
-        try fileManager.createSymbolicLink(atPath: link.linkURL.path, withDestinationPath: "../SwiftVM.app/Contents/Helpers/swiftvm")
+        try fileManager.createSymbolicLink(atPath: link.linkURL.path, withDestinationPath: "../TESSERaCT.app/Contents/Helpers/tctl")
         #expect(link.status == .installed)
 
         // Somebody else's file of that name is replaced only when asked to install.
@@ -133,10 +133,10 @@ import Testing
         let scratch = try Scratch()
         defer { scratch.cleanUp() }
         let awkward = scratch.root.appending(path: #"It's a "test" \ folder $HOME"#)
-        let tool = awkward.appending(path: "SwiftVM.app/Contents/Helpers/swiftvm")
+        let tool = awkward.appending(path: "TESSERaCT.app/Contents/Helpers/tctl")
         try FileManager.default.createDirectory(at: tool.deletingLastPathComponent(), withIntermediateDirectories: true)
         try Data("#!/bin/sh\n".utf8).write(to: tool)
-        let link = CommandLineToolLink(toolURL: tool, linkURL: awkward.appending(path: "bin/swiftvm"))
+        let link = CommandLineToolLink(toolURL: tool, linkURL: awkward.appending(path: "bin/tctl"))
 
         _ = try runThroughAppleScript(link.installCommand)
         #expect(link.status == .installed)
@@ -147,16 +147,16 @@ import Testing
         try FileManager.default.createSymbolicLink(at: link.linkURL, withDestinationURL: scratch.root)
         _ = try runThroughAppleScript(link.installCommand)
         #expect(link.status == .installed)
-        #expect(!FileManager.default.fileExists(atPath: scratch.root.appending(path: "swiftvm").path))
+        #expect(!FileManager.default.fileExists(atPath: scratch.root.appending(path: "tctl").path))
 
         _ = try runThroughAppleScript(link.removeCommand)
         #expect(link.status == .notInstalled)
     }
 
     @Test func asksForAnAdministratorWithAnExplanation() {
-        let script = CommandLineToolLink.administratorScript(running: #"/bin/ln -sfh '/a "b"' /c"#, prompt: "SwiftVM wants to install “swiftvm”.")
-        #expect(script == #"do shell script "/bin/ln -sfh '/a \"b\"' /c" with prompt "SwiftVM wants to install “swiftvm”." with administrator privileges"#)
+        let script = CommandLineToolLink.administratorScript(running: #"/bin/ln -sfh '/a "b"' /c"#, prompt: "TESSERaCT wants to install “tctl”.")
+        #expect(script == #"do shell script "/bin/ln -sfh '/a \"b\"' /c" with prompt "TESSERaCT wants to install “tctl”." with administrator privileges"#)
         #expect(CommandLineToolLink.isCancellation("0:117: execution error: User canceled. (-128)"))
-        #expect(!CommandLineToolLink.isCancellation("0:117: execution error: ln: /usr/local/bin/swiftvm: Read-only file system (1)"))
+        #expect(!CommandLineToolLink.isCancellation("0:117: execution error: ln: /usr/local/bin/tctl: Read-only file system (1)"))
     }
 }

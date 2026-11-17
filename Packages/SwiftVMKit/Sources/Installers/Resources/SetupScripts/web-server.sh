@@ -21,7 +21,7 @@ fi
 echo "==> Setting up the site"
 mkdir -p /srv/site
 echo "<h1>Hello from $(hostname)</h1>" > /srv/site/index.html
-chown -R "$SWIFTVM_USER" /srv/site
+chown -R "$TESSERACT_USER" /srv/site
 if [ -d /etc/nginx/sites-available ]; then
     cat > /etc/nginx/sites-available/default << 'END'
 server {
