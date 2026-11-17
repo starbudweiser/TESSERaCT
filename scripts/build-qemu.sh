@@ -28,7 +28,7 @@
 # what the README in the result is for. The result is kept in .build/qemu and used again until this
 # script, what is in Native/QEMU or Homebrew's libraries change.
 set -euo pipefail
-script=${0:A}
+script=${0:a}
 root=${script:h:h}
 source "$root/scripts/common.sh"
 
@@ -70,7 +70,7 @@ done
 # What the result depends on: this script, Native/QEMU, the display's interface, whether Direct3D is
 # in, and Homebrew's libraries.
 key=$( { cat "$script" "$native"/* "$bridge"/*; print -r -- "$direct3d"; pkg-config --modversion glib-2.0 pixman-1 openssl; } | shasum -a 256 | cut -c1-12)
-cache=$root/.build/qemu
+cache=${TESSERACT_QEMU_CACHE:-$HOME/.cache/tesseract-qemu}   # sans espace : la construction de QEMU ne gère pas les espaces du chemin
 result=$cache/$qemu_version-$key/QEMU
 if [[ -x $result/bin/qemu-system-aarch64 && -f $result/lib/libTESSERaCTDisplay.dylib ]]; then
     print -r -- "$result"
