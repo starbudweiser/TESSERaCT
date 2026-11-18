@@ -217,14 +217,42 @@ extension AppModel {
         return nil
     }
 
+    /// Grows C: into the space the disk gained. Windows puts its recovery partition right after C:, which
+    /// stops C: from growing: it is removed, C: grown, and the recovery partition made again at the end.
+    private static let windowsExtendScript = #"""
+$ErrorActionPreference = 'Stop'
+Update-HostStorageCache
+$c = Get-Partition -DriveLetter C
+$max = (Get-PartitionSupportedSize -DriveLetter C).SizeMax
+if ($max -gt $c.Size + 1MB) {
+    Resize-Partition -DriveLetter C -Size $max
+    'extended'
+} else {
+    $end = $c.Offset + $c.Size
+    $next = Get-Partition -DiskNumber $c.DiskNumber | Where-Object { $_.Offset -ge $end } | Sort-Object Offset | Select-Object -First 1
+    if ($next -and $next.Type -eq 'Recovery') {
+        reagentc /disable | Out-Null
+        Remove-Partition -DiskNumber $c.DiskNumber -PartitionNumber $next.PartitionNumber -Confirm:$false
+        $max = (Get-PartitionSupportedSize -DriveLetter C).SizeMax
+        if ($max -le $c.Size + 1MB) { reagentc /enable | Out-Null; 'blocked' } else {
+            Resize-Partition -DriveLetter C -Size ($max - 1GB)
+            $r = New-Partition -DiskNumber $c.DiskNumber -UseMaximumSize
+            $r | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'Recovery' -Confirm:$false | Out-Null
+            "select disk $($c.DiskNumber)", "select partition $($r.PartitionNumber)", 'remove', 'set id=de94bba4-06d1-4d40-a16a-bfd50179d6ac override', 'gpt attributes=0x8000000000000001' | diskpart | Out-Null
+            reagentc /enable | Out-Null
+            'extended'
+        }
+    } else { 'blocked' }
+}
+"""#
+
     /// Grows the guest's last partition and its file system into the space a disk has gained, through the
     /// guest tools. Says in a sentence what happened: it never throws, because the disk has grown already.
     func extendGuestPartition(of machine: VirtualMachine) async -> String {
         let job: GuestJob
         switch machine.configuration.os.family {
         case .windows:
-            let script = "Update-HostStorageCache; $p = Get-Partition -DriveLetter C; $max = (Get-PartitionSupportedSize -DriveLetter C).SizeMax; "
-                + "if ($max -gt $p.Size) { Resize-Partition -DriveLetter C -Size $max; 'extended' } else { 'blocked' }"
+            let script = Self.windowsExtendScript
             job = .exec(.init(arguments: ["powershell", "-NoProfile", "-NonInteractive", "-Command", script], user: "root"))
         case .linux:
             let script = "src=$(findmnt -n -o SOURCE /); disk=/dev/$(lsblk -no PKNAME \"$src\"); part=$(cat /sys/class/block/$(basename \"$src\")/partition); "
@@ -238,7 +266,7 @@ extension AppModel {
             let text = String(decoding: output, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
             if text.hasSuffix("extended") { return "The disk and the guest's system partition are larger." }
             if text.hasSuffix("blocked") {
-                return "The disk is larger, but the system partition can't grow: another partition sits right after it. Move or delete it in the guest."
+                return "The disk is larger, but the system partition can't grow: a partition that isn't the recovery one sits right after it. Move or delete it in the guest."
             }
             return "The disk is larger. The guest answered: \(text.isEmpty ? "nothing" : text)"
         } catch {
