@@ -108,6 +108,7 @@ struct WindowSpaceBehavior: NSViewRepresentable {
         override func viewDidMoveToWindow() {
             super.viewDidMoveToWindow()
             window?.collectionBehavior.insert(.moveToActiveSpace)
+            window?.backgroundColor = Theme.chatNS
         }
     }
 }

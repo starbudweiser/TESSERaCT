@@ -99,6 +99,7 @@ struct AppSettingsView: View {
             if UpdateService.shared.isAvailable {
                 updatesSection
             }
+            appearanceSection
             deletingSection
         case .storage:
             storageSection
@@ -116,6 +117,22 @@ struct AppSettingsView: View {
     }
 
     // MARK: General
+
+    @AppStorage(AppAppearance.storageKey) private var appearance = AppAppearance.dark.rawValue
+
+    private var appearanceSection: some View {
+        Section {
+            Picker("Appearance", selection: Binding(
+                get: { AppAppearance(rawValue: appearance) ?? .dark },
+                set: { appearance = $0.rawValue; AppAppearance.apply($0) }
+            )) {
+                ForEach(AppAppearance.allCases) { Text($0.title).tag($0) }
+            }
+            .pickerStyle(.segmented)
+        } header: {
+            Text("Appearance")
+        }
+    }
 
     private var deletingSection: some View {
         Section {

@@ -5,6 +5,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         DockPresence.shared.keepsDockIcon = { !AppModel.shared.seamlessMachineIDs.isEmpty }
         DockPresence.shared.start()
+        AppAppearance.apply()
         UpdateService.shared.start()
     }
 

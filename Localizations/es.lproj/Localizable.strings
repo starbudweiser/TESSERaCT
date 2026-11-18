@@ -74,6 +74,7 @@
 "Always use DXMT" = "Usar siempre DXMT";
 "An attached device is gone from this Mac until it is detached. Eject a drive in the guest before detaching it or pulling it out." = "Un dispositivo conectado deja de estar disponible en este Mac hasta que se desconecta. Expulsa una unidad en el invitado antes de desconectarla o retirarla.";
 "An update is installed when %@ quits. If virtual machines are running then, you are asked what to do with them first, as you are whenever you quit." = "Una actualización se instala cuando %@ se cierra. Si hay máquinas virtuales en ejecución en ese momento, primero se te pregunta qué hacer con ellas, como siempre que sales.";
+"Appearance" = "Apariencia";
 "Asking Microsoft for Windows…" = "Solicitando Windows a Microsoft…";
 "Assigned by your LAN" = "Asignada por tu red local";
 "Assigned when the machine starts" = "Se asigna al iniciar la máquina";
@@ -83,6 +84,7 @@
 "Attach Disk Image…" = "Conectar imagen de disco…";
 "Attach whenever it is plugged in" = "Conectar siempre que se enchufe";
 "Attached whenever it is here" = "Conectado siempre que esté presente";
+"Auto" = "Automático";
 "Automatically download and install updates" = "Descargar e instalar actualizaciones automáticamente";
 "Automation" = "Automatización";
 "Bridged networking gives the guest its own address on your LAN. Choose Ethernet for local device discovery. Shut down the machine before changing networks or its MAC address. Changing the MAC address may also require updating network settings inside the guest." = "La red en puente da al invitado su propia dirección en tu red local. Elige Ethernet para la detección de dispositivos locales. Apaga la máquina antes de cambiar de red o de dirección MAC. Cambiar la dirección MAC también puede requerir actualizar los ajustes de red dentro del invitado.";
@@ -171,6 +173,7 @@
 "D3DMetal: Direct3D 11 and 12" = "D3DMetal: Direct3D 11 y 12";
 "DXMT runs natively and has Direct3D 11 only. Turn this on if an app draws incorrectly with D3DMetal." = "DXMT se ejecuta de forma nativa y solo admite Direct3D 11. Actívalo si una app se dibuja incorrectamente con D3DMetal.";
 "DXMT: Direct3D 11" = "DXMT: Direct3D 11";
+"Dark" = "Oscuro";
 "Date Created" = "Fecha de creación";
 "Delete" = "Eliminar";
 "Delete %@" = "Eliminar %@";
@@ -280,6 +283,7 @@
 "Latest macOS" = "Última versión de macOS";
 "Latest macOS (unavailable)" = "Última versión de macOS (no disponible)";
 "Let other devices on the network connect" = "Permitir que se conecten otros dispositivos de la red";
+"Light" = "Claro";
 "Location" = "Ubicación";
 "Log in automatically" = "Iniciar sesión automáticamente";
 "Looking for USB devices…" = "Buscando dispositivos USB…";

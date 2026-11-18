@@ -35,6 +35,7 @@ struct TESSERaCTApp: App {
         Window("New Virtual Machine", id: WindowID.newMachine) {
             NewMachineWindow()
                 .environment(model)
+                .flatRoundWindow()
                 .background(WindowSpaceBehavior())
         }
         .auxiliaryWindow()
@@ -42,6 +43,7 @@ struct TESSERaCTApp: App {
         WindowGroup(id: WindowID.machineSettings, for: UUID.self) { $machineID in
             MachineSettingsWindow(machineID: machineID)
                 .environment(model)
+                .flatRoundWindow()
                 .background(WindowSpaceBehavior())
         }
         .auxiliaryWindow()
@@ -50,6 +52,7 @@ struct TESSERaCTApp: App {
         WindowGroup(id: WindowID.snapshots, for: UUID.self) { $machineID in
             SnapshotsWindow(machineID: machineID)
                 .environment(model)
+                .flatRoundWindow()
                 .background(WindowSpaceBehavior())
         }
         .auxiliaryWindow()
@@ -57,6 +60,7 @@ struct TESSERaCTApp: App {
         Window("Templates", id: WindowID.templates) {
             TemplatesView()
                 .environment(model)
+                .flatRoundWindow()
                 .background(WindowSpaceBehavior())
         }
         .auxiliaryWindow()
@@ -66,6 +70,7 @@ struct TESSERaCTApp: App {
         Window("\(AppIdentity.current.name) Settings", id: WindowID.settings) {
             AppSettingsView()
                 .environment(model)
+                .flatRoundWindow()
                 .background(WindowSpaceBehavior())
         }
         .auxiliaryWindow()

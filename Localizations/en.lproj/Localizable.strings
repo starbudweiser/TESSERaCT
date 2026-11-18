@@ -74,6 +74,7 @@
 "Always use DXMT" = "Always use DXMT";
 "An attached device is gone from this Mac until it is detached. Eject a drive in the guest before detaching it or pulling it out." = "An attached device is gone from this Mac until it is detached. Eject a drive in the guest before detaching it or pulling it out.";
 "An update is installed when %@ quits. If virtual machines are running then, you are asked what to do with them first, as you are whenever you quit." = "An update is installed when %@ quits. If virtual machines are running then, you are asked what to do with them first, as you are whenever you quit.";
+"Appearance" = "Appearance";
 "Asking Microsoft for Windows…" = "Asking Microsoft for Windows…";
 "Assigned by your LAN" = "Assigned by your LAN";
 "Assigned when the machine starts" = "Assigned when the machine starts";
@@ -83,6 +84,7 @@
 "Attach Disk Image…" = "Attach Disk Image…";
 "Attach whenever it is plugged in" = "Attach whenever it is plugged in";
 "Attached whenever it is here" = "Attached whenever it is here";
+"Auto" = "Auto";
 "Automatically download and install updates" = "Automatically download and install updates";
 "Automation" = "Automation";
 "Bridged networking gives the guest its own address on your LAN. Choose Ethernet for local device discovery. Shut down the machine before changing networks or its MAC address. Changing the MAC address may also require updating network settings inside the guest." = "Bridged networking gives the guest its own address on your LAN. Choose Ethernet for local device discovery. Shut down the machine before changing networks or its MAC address. Changing the MAC address may also require updating network settings inside the guest.";
@@ -171,6 +173,7 @@
 "D3DMetal: Direct3D 11 and 12" = "D3DMetal: Direct3D 11 and 12";
 "DXMT runs natively and has Direct3D 11 only. Turn this on if an app draws incorrectly with D3DMetal." = "DXMT runs natively and has Direct3D 11 only. Turn this on if an app draws incorrectly with D3DMetal.";
 "DXMT: Direct3D 11" = "DXMT: Direct3D 11";
+"Dark" = "Dark";
 "Date Created" = "Date Created";
 "Delete" = "Delete";
 "Delete %@" = "Delete %@";
@@ -280,6 +283,7 @@
 "Latest macOS" = "Latest macOS";
 "Latest macOS (unavailable)" = "Latest macOS (unavailable)";
 "Let other devices on the network connect" = "Let other devices on the network connect";
+"Light" = "Light";
 "Location" = "Location";
 "Log in automatically" = "Log in automatically";
 "Looking for USB devices…" = "Looking for USB devices…";

@@ -50,12 +50,10 @@ struct SettingsSplitView<Pane: SettingsPane, SidebarHeader: View, Detail: View>:
     var body: some View {
         HStack(spacing: 0) {
             sidebar
-                .frame(width: Self.sidebarWidth)
+                .frame(width: Self.sidebarWidth - 16)
                 .frame(maxHeight: .infinity, alignment: .top)
-                .background(.primary.opacity(0.035))
-            // Up to the top, as the sidebar's colour goes: in a window, past the buttons on it.
-            Divider()
-                .ignoresSafeArea(edges: .top)
+                .surface()
+                .padding(8)
             detail(selection)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 // Each pane starts at its top, rather than where the last one was scrolled to.
@@ -118,7 +116,7 @@ private struct SettingsSidebarRow<Pane: SettingsPane>: View {
             .foregroundStyle(isSelected && isKey ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
             .background {
                 if isSelected {
-                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                    Capsule()
                         .fill(isKey ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.primary.opacity(0.1)))
                 }
             }
@@ -176,5 +174,6 @@ struct SettingsPage<Pane: SettingsPane, Content: View>: View {
             content
         }
         .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
     }
 }
