@@ -264,6 +264,9 @@ if [[ -n $qemu ]]; then
     if [[ $identity == - ]]; then
         /usr/libexec/PlistBuddy -c "Add :com.apple.security.cs.disable-library-validation bool true" "$stage/tpm-entitlements.plist"
     fi
+    if [[ -f $contents/Helpers/QEMU/bin/qemu-img ]]; then
+        sign --identifier fr.stephan.tesseract.qemu.img --entitlements "$stage/tpm-entitlements.plist" "$contents/Helpers/QEMU/bin/qemu-img"
+    fi
     if [[ -f $contents/Helpers/QEMU/bin/swtpm ]]; then
         sign --identifier fr.stephan.tesseract.qemu.tpm --entitlements "$stage/tpm-entitlements.plist" "$contents/Helpers/QEMU/bin/swtpm"
     fi

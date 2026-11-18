@@ -14,6 +14,7 @@ let package = Package(
         .library(name: "DiskTools", targets: ["DiskTools"]),
         .library(name: "Installers", targets: ["Installers"]),
         .library(name: "VMControl", targets: ["VMControl"]),
+        .library(name: "MachineImport", targets: ["MachineImport"]),
         .library(name: "GuestChannel", targets: ["GuestChannel"]),
         .library(name: "AgentControl", targets: ["AgentControl"]),
         .library(name: "GuestAgentMac", targets: ["GuestAgentMac"]),
@@ -40,7 +41,9 @@ let package = Package(
         // Runs Windows guests on QEMU, which the app carries in Contents/Helpers.
         .target(name: "GuestDisplayBridge"),
         .target(name: "QEMUEngine", dependencies: ["VMCore", "VMNetworking", "DiskTools", "GuestChannel", "GuestDisplayBridge"]),
-        .target(name: "VMControl", dependencies: ["GuestChannel"]),
+        // Reads the machines of UTM, VirtualBox, VMware Fusion and Parallels Desktop, to import them.
+        .target(name: "MachineImport"),
+        .target(name: "VMControl", dependencies: ["GuestChannel", "MachineImport"]),
         // What `tctl control` and `tctl mcp` ask of a machine's desktop, done in the app.
         .target(name: "AgentControl", dependencies: ["VMCore", "VMControl", "GuestChannel"]),
         // Not named `tctl`: a target's build folder is named after it, and on a disk that doesn't tell

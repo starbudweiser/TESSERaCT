@@ -43,7 +43,7 @@ configure_options=(
     --target-list=aarch64-softmmu --without-default-features
     --enable-hvf --disable-tcg --enable-coreaudio --enable-pixman --enable-fdt=internal --enable-virtfs
     --enable-vnc --enable-spice --enable-opengl --enable-virglrenderer --enable-tpm
-    --disable-docs --disable-tools --disable-werror --enable-trace-backends=nop
+    --disable-docs --enable-tools --enable-vdi --enable-vmdk --enable-vpc --enable-vhdx --enable-parallels --enable-qcow1 --enable-qed --disable-werror --enable-trace-backends=nop
 )
 
 brew_prefix=${HOMEBREW_PREFIX:-/opt/homebrew}
@@ -353,7 +353,7 @@ build_qemu() {
     (
         cd "$sources/qemu/build"
         ../configure --python="$python" --prefix=/ --extra-cflags="-I$prefix/include" $configure_options
-        ninja qemu-system-aarch64
+        ninja qemu-system-aarch64 qemu-img
     )
 }
 
@@ -385,7 +385,7 @@ package() {
     local source_dir=$sources/qemu
     out=$work/QEMU
     mkdir -p "$out/bin" "$out/lib" "$out/share/keymaps" "$out/licenses"
-    cp "$source_dir/build/qemu-system-aarch64" "$out/bin/"
+    cp "$source_dir/build/qemu-system-aarch64" "$source_dir/build/qemu-img" "$out/bin/"
     if [[ $direct3d == yes ]]; then
         # One render server with both halves. QEMU starts the Intel one for D3DMetal.
         lipo -create "$prefix/libexec/virgl_render_server" "$intel_prefix/libexec/virgl_render_server" -output "$out/bin/virgl_render_server"

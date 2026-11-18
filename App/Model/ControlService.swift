@@ -37,6 +37,22 @@ extension AppModel {
         case .create:
             guard let parameters = request.create else { return .failure("Missing creation parameters.") }
             return await createMachine(parameters)
+        case .importScan:
+            let found = importableMachines(at: request.importPath)
+            let note = found.isEmpty ? "No machines of UTM, VirtualBox, VMware Fusion or Parallels Desktop were found." : nil
+            return ControlResponse(ok: true, note: note, importCandidates: found)
+        case .importMachine:
+            guard let path = request.importPath else { return .failure("Say which machine to import: its path.") }
+            do {
+                let machine = try await importMachine(
+                    at: path, named: request.name, in: request.location.map { URL(filePath: $0) }
+                )
+                var response = success(machine)
+                response.note = "Imported as a copy: the original is as it was. Start it with `tctl start`."
+                return response
+            } catch {
+                return .failure(error.localizedDescription)
+            }
         case .usbList:
             guard usb.availability == .available else {
                 return .failure(USBPassthrough.Failure.unavailable(usb.availability).localizedDescription)
@@ -541,7 +557,7 @@ extension AppModel {
                 return .failure(error.localizedDescription)
             }
             return templatesResponse()
-        case .list, .info, .console, .vsock, .job, .control, .create, .quit, .usbList, .networkInterfaces, .scripts, .templates, .deleteTemplate, .renameTemplate:
+        case .list, .info, .console, .vsock, .job, .control, .create, .importScan, .importMachine, .quit, .usbList, .networkInterfaces, .scripts, .templates, .deleteTemplate, .renameTemplate:
             break
         }
 

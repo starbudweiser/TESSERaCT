@@ -1,4 +1,5 @@
 import Foundation
+import MachineImport
 import GuestChannel
 
 /// A request sent to the running app over its control socket (one JSON document per line).
@@ -17,6 +18,12 @@ public struct ControlRequest: Codable, Sendable, Equatable {
         case open
         case create
         case delete
+        /// Look for machines of UTM, VirtualBox, VMware Fusion and Parallels Desktop: in ``ControlRequest/importPath``
+        /// if it is given, in the places they keep them otherwise.
+        case importScan = "import-scan"
+        /// Make a machine of its own from the other program's machine at ``ControlRequest/importPath``. It is copied,
+        /// never changed.
+        case importMachine = "import"
         /// Quit the app. Refused while a machine is running, and while one is being created unless
         /// ``ControlRequest/cancelsCreations`` is set.
         case quit
@@ -249,6 +256,8 @@ public struct ControlRequest: Codable, Sendable, Equatable {
     public var timeout: Double?
     /// For `move`: absolute path of the folder the machine is to be kept in.
     public var location: String?
+    /// For `import-scan` and `import`: absolute path of a machine of another program, or of a folder of them.
+    public var importPath: String?
 
     public var networkMode: String?
     public var bridgedInterfaceIdentifier: String?
@@ -261,7 +270,7 @@ public struct ControlRequest: Codable, Sendable, Equatable {
         forward: ForwardParameters? = nil, cancelsCreations: Bool? = nil, port: UInt32? = nil, usesDisc: Bool? = nil,
         password: String? = nil, isOn: Bool? = nil, usbDevice: String? = nil, system: String? = nil, job: GuestJob? = nil,
         control: ControlCall? = nil, timeout: Double? = nil, location: String? = nil, template: String? = nil,
-        networkMode: String? = nil, bridgedInterfaceIdentifier: String? = nil, macAddress: String? = nil
+        networkMode: String? = nil, bridgedInterfaceIdentifier: String? = nil, macAddress: String? = nil, importPath: String? = nil
     ) {
         self.command = command
         self.machine = machine
@@ -287,6 +296,7 @@ public struct ControlRequest: Codable, Sendable, Equatable {
         self.networkMode = networkMode
         self.bridgedInterfaceIdentifier = bridgedInterfaceIdentifier
         self.macAddress = macAddress
+        self.importPath = importPath
     }
 }
 
@@ -618,11 +628,13 @@ public struct ControlResponse: Codable, Sendable, Equatable {
     /// than this.
     public var creations: [CreationSummary]?
     public var networkInterfaces: [NetworkInterface]?
+    /// The machines of other programs that were found, for `import-scan`.
+    public var importCandidates: [ImportCandidate]?
 
     public init(
         ok: Bool, error: String? = nil, machines: [MachineSummary] = [], snapshots: [SnapshotSummary]? = nil, note: String? = nil,
         usbDevices: [USBDeviceSummary]? = nil, setupScripts: [SetupScriptSummary]? = nil, templates: [TemplateSummary]? = nil,
-        creations: [CreationSummary]? = nil, networkInterfaces: [NetworkInterface]? = nil
+        creations: [CreationSummary]? = nil, networkInterfaces: [NetworkInterface]? = nil, importCandidates: [ImportCandidate]? = nil
     ) {
         self.ok = ok
         self.error = error
@@ -634,6 +646,7 @@ public struct ControlResponse: Codable, Sendable, Equatable {
         self.templates = templates
         self.creations = creations
         self.networkInterfaces = networkInterfaces
+        self.importCandidates = importCandidates
     }
 
     public static func failure(_ message: String) -> ControlResponse {

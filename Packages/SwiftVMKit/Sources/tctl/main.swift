@@ -160,6 +160,7 @@ Machines
   snapshot, snapshots, revert, delete-snapshot, rename-snapshot
   templates, save-template, rename-template, delete-template
   resize, compression, share, unshare, attach, eject, usb, install-tools, automation, share-clipboard
+  import-scan, import           Find machines of UTM, VirtualBox, VMware Fusion and Parallels, and import them
 
 Network
   ip, forward, unforward, plug, unplug, network, network-interfaces
@@ -759,6 +760,35 @@ case "move":
     if let machine = send(ControlRequest(command: .move, machine: machine, location: folder)).machines.first {
         printDetails(of: machine)
     }
+
+case "import-scan":
+    rejectUnknownOptions(arguments.dropFirst(arguments.first.map { $0.hasPrefix("--") ? 0 : 1 } ?? 0), allowed: [])
+    let path = arguments.first.flatMap { $0.hasPrefix("--") ? nil : URL(fileURLWithPath: $0).standardizedFileURL.path }
+    let found = send(ControlRequest(command: .importScan, importPath: path))
+    for candidate in found.importCandidates ?? [] {
+        let verdict = candidate.verdict == .compatible ? "OK" : "NO"
+        print("\(verdict)\t\(candidate.source.displayName)\t\(candidate.name)\t\(candidate.family) \(candidate.architecture)\t\(candidate.cpuCount ?? 0) CPU\t\((candidate.memoryMegabytes ?? 0) / 1024) GB\t\(candidate.disks.count) disk(s)\t\(candidate.path)")
+        for note in candidate.notes { print("\t  - \(note)") }
+    }
+    if let note = found.note { print(note) }
+
+case "import":
+    guard let first = arguments.first, !first.hasPrefix("--") else { fail("Missing machine: the path of a machine of UTM, VirtualBox, VMware Fusion or Parallels. `tctl import-scan` lists them.") }
+    var name: String?
+    var location: String?
+    var index = 1
+    while index < arguments.count {
+        switch arguments[index] {
+        case "--name": index += 1; guard index < arguments.count else { fail("--name needs a value.") }; name = arguments[index]
+        case "--location": index += 1; guard index < arguments.count else { fail("--location needs a value.") }
+            location = URL(fileURLWithPath: arguments[index]).standardizedFileURL.path
+        default: fail("Unknown option \(arguments[index]).")
+        }
+        index += 1
+    }
+    let imported = send(ControlRequest(command: .importMachine, name: name, location: location, importPath: URL(fileURLWithPath: first).standardizedFileURL.path))
+    printTable(imported.machines)
+    if let note = imported.note { print("\n" + note) }
 
 case "clone", "duplicate":
     let machine = requireMachine()

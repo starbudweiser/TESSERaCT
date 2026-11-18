@@ -160,6 +160,16 @@ enum MCP {
                 "inputSchema": ["type": "object", "properties": [:] as [String: Any], "additionalProperties": false],
                 "annotations": ["readOnlyHint": true],
             ],
+            [
+                "name": "vm_import_scan", "description": "Find the virtual machines of UTM, VirtualBox, VMware Fusion and Parallels Desktop that can be imported, with their system, size and whether TESSERaCT can run them (ARM64 only). Without a path it looks in the places they keep machines and on plugged-in disks.",
+                "inputSchema": ["type": "object", "properties": ["path": ["type": "string", "description": "A machine, or a folder of them"]] as [String: Any], "additionalProperties": false],
+                "annotations": ["readOnlyHint": true],
+            ],
+            [
+                "name": "vm_import", "description": "Make a machine of its own from one of another program (see vm_import_scan). It is copied, the original is never changed; a raw disk is cloned in an instant on the same volume, any other disk is converted. The new machine isn't started.",
+                "inputSchema": ["type": "object", "properties": ["path": ["type": "string"], "name": ["type": "string", "description": "The new machine's name, if not the original's"]] as [String: Any], "required": ["path"], "additionalProperties": false],
+                "annotations": ["readOnlyHint": false, "destructiveHint": false],
+            ],
             tool("vm_info", "Everything about one machine, as JSON: state, system, address, ssh name, processors, memory, disk used and size.", [:], readOnly: true),
             tool("vm_clone", "Copy a machine that is shut down, in an instant (the copy shares the unchanged disk blocks). The copy has its own name and starts from the same state. For many identical test machines, clone one prepared machine.", [
                 "name": ["type": "string", "description": "The copy's name"],
@@ -241,6 +251,22 @@ enum MCP {
                 return result(table(try client.send(ControlRequest(command: .list))))
             }
             if name == "vm_create" { return try create(arguments, client: client) }
+            if name == "vm_import_scan" || name == "vm_import" {
+                let path = (arguments["path"] as? String).map { URL(fileURLWithPath: $0).standardizedFileURL.path }
+                if name == "vm_import", path == nil { throw Problem("Say which machine to import: its path.") }
+                let response = try client.send(ControlRequest(
+                    command: name == "vm_import" ? .importMachine : .importScan, name: arguments["name"] as? String, importPath: path
+                ))
+                if let error = response.error { return result(error, isError: true) }
+                if name == "vm_import" { return result([response.note, table(response)].compactMap { $0 }.joined(separator: "\n")) }
+                let list = (response.importCandidates ?? []).map { c -> [String: Any] in
+                    ["path": c.path, "source": c.source.displayName, "name": c.name, "system": c.family, "architecture": c.architecture,
+                     "cpus": c.cpuCount ?? 0, "memory_mb": c.memoryMegabytes ?? 0, "disks": c.disks.count,
+                     "importable": c.verdict == .compatible, "notes": c.notes]
+                }
+                let data = try JSONSerialization.data(withJSONObject: list, options: [.prettyPrinted, .sortedKeys])
+                return result(list.isEmpty ? (response.note ?? "Nothing found.") : String(decoding: data, as: UTF8.self))
+            }
             if name == "vm_templates" {
                 let response = try client.send(ControlRequest(command: .templates))
                 if let error = response.error { return result(error, isError: true) }
