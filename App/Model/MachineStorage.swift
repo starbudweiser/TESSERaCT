@@ -225,7 +225,7 @@ extension AppModel {
         case .windows:
             let script = "Update-HostStorageCache; $p = Get-Partition -DriveLetter C; $max = (Get-PartitionSupportedSize -DriveLetter C).SizeMax; "
                 + "if ($max -gt $p.Size) { Resize-Partition -DriveLetter C -Size $max; 'extended' } else { 'blocked' }"
-            job = .exec(.init(arguments: ["powershell", "-NoProfile", "-NonInteractive", "-Command", script]))
+            job = .exec(.init(arguments: ["powershell", "-NoProfile", "-NonInteractive", "-Command", script], user: "root"))
         case .linux:
             let script = "src=$(findmnt -n -o SOURCE /); disk=/dev/$(lsblk -no PKNAME \"$src\"); part=$(cat /sys/class/block/$(basename \"$src\")/partition); "
                 + "growpart \"$disk\" \"$part\" >/dev/null 2>&1; case $(findmnt -n -o FSTYPE /) in ext*) resize2fs \"$src\" >/dev/null 2>&1;; xfs) xfs_growfs / >/dev/null 2>&1;; btrfs) btrfs filesystem resize max / >/dev/null 2>&1;; esac; echo extended"
