@@ -8,6 +8,7 @@
 #   --build-number        what tells a newer build from an older one: by default the number of commits
 #   --sparkle-public-key  the public half of the key that updates are signed with, and
 #   --sparkle-feed-url    where the app looks for updates. Without the two the app doesn't update
+#   --no-image            only the app, no disk image (scripts/release.sh packs a zip, like the other apps)
 #   --output              the folder for the app and its disk image: build/release by default
 #
 # A release is signed with a Developer ID Application certificate and carries the provisioning profile
@@ -22,7 +23,7 @@ root=${0:A:h:h}
 source "$root/scripts/common.sh"
 
 usage="Usage: scripts/build-release.sh --version <X.Y.Z or X.Y.Z-beta.N> [--build-number <n>] [--sparkle-public-key <key> --sparkle-feed-url <url>] [--output <folder>]"
-version="" build_number="" sparkle_public_key="" sparkle_feed_url="" output=$root/build/release
+no_image=false version="" build_number="" sparkle_public_key="" sparkle_feed_url="" output=$root/build/release
 while (( $# )); do
     case $1 in
         --version) version=${2:?}; shift 2 ;;
@@ -30,6 +31,7 @@ while (( $# )); do
         --sparkle-public-key) sparkle_public_key=${2:?}; shift 2 ;;
         --sparkle-feed-url) sparkle_feed_url=${2:?}; shift 2 ;;
         --output) output=${${2:?}:a}; shift 2 ;;
+        --no-image) no_image=true; shift ;;
         *) fail "$usage" ;;
     esac
 done
@@ -65,37 +67,40 @@ fi
     --helpers "$(swift build -c release --package-path Packages/SwiftVMKit --show-bin-path)" \
     $bundle_options > /dev/null
 
-# The disk image holds the app and a way to the Applications folder, to drag the one onto the other.
-rm -f "$image"
-stage=$(mktemp -d "$root/.build/image.XXXXXX")
-trap 'rm -rf "$stage"' EXIT
-trap 'exit 130' INT TERM HUP
-if (( $+commands[create-dmg] )); then
-    # It names the image after the app and its version, and tries to sign it with whatever certificate
-    # it finds, which is this script's to do: what counts is that the image is there.
-    create-dmg --overwrite "$app" "$stage" > /dev/null 2>&1 || true
-    made=("$stage"/*.dmg(N))
-    (( ${#made} == 1 )) || fail "create-dmg made no disk image of $app."
-    mv "$made[1]" "$image"
-else
-    mkdir "$stage/TESSERaCT"
-    cp -R "$app" "$stage/TESSERaCT/"
-    ln -s /Applications "$stage/TESSERaCT/Applications"
-    hdiutil create -quiet -volname TESSERaCT -srcfolder "$stage/TESSERaCT" -format UDZO -ov "$image" \
-        || fail "The disk image couldn't be made."
-fi
+if ! $no_image; then
+    # The disk image holds the app and a way to the Applications folder, to drag the one onto the other.
+    rm -f "$image"
+    stage=$(mktemp -d "$root/.build/image.XXXXXX")
+    trap 'rm -rf "$stage"' EXIT
+    trap 'exit 130' INT TERM HUP
+    if (( $+commands[create-dmg] )); then
+        # It names the image after the app and its version, and tries to sign it with whatever certificate
+        # it finds, which is this script's to do: what counts is that the image is there.
+        create-dmg --overwrite "$app" "$stage" > /dev/null 2>&1 || true
+        made=("$stage"/*.dmg(N))
+        (( ${#made} == 1 )) || fail "create-dmg made no disk image of $app."
+        mv "$made[1]" "$image"
+    else
+        mkdir "$stage/TESSERaCT"
+        cp -R "$app" "$stage/TESSERaCT/"
+        ln -s /Applications "$stage/TESSERaCT/Applications"
+        hdiutil create -quiet -volname TESSERaCT -srcfolder "$stage/TESSERaCT" -format UDZO -ov "$image" \
+            || fail "The disk image couldn't be made."
+    fi
 
-# The image is signed like the app, so that it says who it is from before it is opened.
-# The first authority codesign lists is the certificate itself. awk reads on to the end: leaving at the
-# first line would cut codesign off in mid-sentence, which counts as a failure.
-identity=$(codesign --display --verbose=2 "$app" 2>&1 | awk -F= '$1 == "Authority" && !found { print $2; found = 1 }')
-if [[ -n $identity ]]; then
-    # The same certificate may be in two keychains, which makes its name ambiguous: TESSERACT_SIGN_IDENTITY, a
-    # certificate's SHA-1, says which one.
-    codesign --force --sign "${TESSERACT_SIGN_IDENTITY:-$identity}" --timestamp "$image" || fail "The disk image couldn't be signed."
-else
-    print -u2 "TESSERaCT is signed to run on this Mac, so the disk image isn't signed: it is no release."
+    # The image is signed like the app, so that it says who it is from before it is opened.
+    # The first authority codesign lists is the certificate itself. awk reads on to the end: leaving at the
+    # first line would cut codesign off in mid-sentence, which counts as a failure.
+    identity=$(codesign --display --verbose=2 "$app" 2>&1 | awk -F= '$1 == "Authority" && !found { print $2; found = 1 }')
+    if [[ -n $identity ]]; then
+        # The same certificate may be in two keychains, which makes its name ambiguous: TESSERACT_SIGN_IDENTITY, a
+        # certificate's SHA-1, says which one.
+        codesign --force --sign "${TESSERACT_SIGN_IDENTITY:-$identity}" --timestamp "$image" || fail "The disk image couldn't be signed."
+    else
+        print -u2 "TESSERaCT is signed to run on this Mac, so the disk image isn't signed: it is no release."
+    fi
+
 fi
 
 print "App: $app"
-print "Disk image: $image"
+$no_image || print "Disk image: $image"
