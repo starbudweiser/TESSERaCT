@@ -144,6 +144,31 @@ enum MCP {
                 "inputSchema": ["type": "object", "properties": [:] as [String: Any], "additionalProperties": false],
                 "annotations": ["readOnlyHint": true],
             ],
+            [
+                "name": "vm_create", "description": "Create a machine and start it: a system to install (macos, windows, or a Linux image such as ubuntu-26.04) or a template to copy. Returns at once; the system sets itself up for seconds to half an hour, so then call vm_power with action wait. Windows needs a password. Use gpu for Direct3D 11/12 acceleration on Windows and Linux (QEMU).",
+                "inputSchema": ["type": "object", "properties": [
+                    "system": ["type": "string"], "template": ["type": "string", "description": "A template name, instead of system"],
+                    "name": ["type": "string"], "cpus": ["type": "integer"], "memory_gb": ["type": "integer"], "disk_gb": ["type": "integer"],
+                    "user": ["type": "string"], "password": ["type": "string"], "gpu": ["type": "boolean"],
+                    "iso": ["type": "string", "description": "Windows: a local Windows 11 Arm64 ISO instead of downloading one"],
+                    "start": ["type": "boolean", "description": "Start it once made. True by default"],
+                ] as [String: Any], "additionalProperties": false],
+                "annotations": ["readOnlyHint": false, "destructiveHint": false],
+            ],
+            [
+                "name": "vm_templates", "description": "List the templates machines can be created from (vm_create with template).",
+                "inputSchema": ["type": "object", "properties": [:] as [String: Any], "additionalProperties": false],
+                "annotations": ["readOnlyHint": true],
+            ],
+            tool("vm_info", "Everything about one machine, as JSON: state, system, address, ssh name, processors, memory, disk used and size.", [:], readOnly: true),
+            tool("vm_clone", "Copy a machine that is shut down, in an instant (the copy shares the unchanged disk blocks). The copy has its own name and starts from the same state. For many identical test machines, clone one prepared machine.", [
+                "name": ["type": "string", "description": "The copy's name"],
+            ]),
+            tool("vm_delete", "Delete a machine that is shut down, with its disks and snapshots. It can't be brought back.", [:], destructive: true),
+            tool("vm_forward", "Make a port of the guest reachable on this Mac (forward), or stop doing so (unforward).", [
+                "action": ["type": "string", "enum": ["forward", "unforward"]], "port": ["type": "integer", "description": "The port on this Mac"],
+                "guest_port": ["type": "integer", "description": "The port in the machine, if it isn't the same"], "udp": ["type": "boolean"],
+            ], required: ["action", "port"]),
             tool("vm_power", "Start, shut down, restart, suspend or force-stop a machine, or wait until it is ready for control after starting.", [
                 "action": ["type": "string", "enum": ["start", "stop", "force-stop", "restart", "suspend", "wait"]],
                 "timeout": ["type": "number", "description": "For wait: seconds, 300 by default"],
@@ -215,8 +240,46 @@ enum MCP {
             if name == "vm_list" {
                 return result(table(try client.send(ControlRequest(command: .list))))
             }
+            if name == "vm_create" { return try create(arguments, client: client) }
+            if name == "vm_templates" {
+                let response = try client.send(ControlRequest(command: .templates))
+                if let error = response.error { return result(error, isError: true) }
+                let lines = (response.templates ?? []).map { "\($0.name)\t\($0.system)\t\($0.cpuCount) CPU\t\($0.memorySize >> 30) GB\t\($0.diskCapacity >> 30) GB disk" }
+                return result(lines.isEmpty ? "No templates." : lines.joined(separator: "\n"))
+            }
             guard let machine = arguments["machine"] as? String, !machine.isEmpty else { throw Problem("Say which machine.") }
             switch name {
+            case "vm_info":
+                let response = try client.send(ControlRequest(command: .info, machine: machine))
+                if let error = response.error { return result(error, isError: true) }
+                guard let m = response.machines.first else { return result("No such machine.", isError: true) }
+                let info: [String: Any] = [
+                    "name": m.name, "id": m.id.uuidString, "state": m.state, "system": m.system, "family": m.family ?? "",
+                    "address": m.address ?? "", "ssh": m.sshAlias ?? "", "cpus": m.cpuCount,
+                    "memory_gb": Double(m.memorySize) / 1_073_741_824, "disk_used_gb": Double(m.diskAllocated) / 1_073_741_824,
+                    "disk_gb": Double(m.diskCapacity) / 1_073_741_824,
+                ]
+                let data = try JSONSerialization.data(withJSONObject: info, options: [.prettyPrinted, .sortedKeys])
+                return result(String(decoding: data, as: UTF8.self))
+            case "vm_clone":
+                let response = try client.send(ControlRequest(command: .clone, machine: machine, name: arguments["name"] as? String))
+                if let error = response.error { return result(error, isError: true) }
+                return result([response.note, table(response)].compactMap { $0 }.joined(separator: "\n"))
+            case "vm_delete":
+                let response = try client.send(ControlRequest(command: .delete, machine: machine))
+                if let error = response.error { return result(error, isError: true) }
+                return result("deleted")
+            case "vm_forward":
+                guard let action = arguments["action"] as? String, ["forward", "unforward"].contains(action),
+                      let port = (arguments["port"] as? NSNumber)?.intValue, port > 0, port < 65536 else { throw Problem("Say forward or unforward, and a port.") }
+                let guest = (arguments["guest_port"] as? NSNumber)?.intValue
+                let parameters = ControlRequest.ForwardParameters(
+                    hostPort: UInt16(port), guestPort: guest.flatMap { UInt16(exactly: $0) },
+                    udp: (arguments["udp"] as? Bool) ?? false, allowsOtherDevices: false
+                )
+                let response = try client.send(ControlRequest(command: action == "forward" ? .forward : .unforward, machine: machine, forward: parameters))
+                if let error = response.error { return result(error, isError: true) }
+                return result([response.note, table(response)].compactMap { $0 }.joined(separator: "\n"))
             case "vm_power":
                 return try power(machine, arguments, client: client)
             case "vm_snapshot":
@@ -312,6 +375,27 @@ enum MCP {
                 "\(machine.name)\t\(machine.state)\t\(machine.system)\t\(machine.address ?? "-")"
             }
             return lines.isEmpty ? "No virtual machines." : (["NAME\tSTATE\tSYSTEM\tADDRESS"] + lines).joined(separator: "\n")
+        }
+
+        private static func create(_ arguments: [String: Any], client: ControlClient) throws -> [String: Any] {
+            let template = arguments["template"] as? String
+            let system = arguments["system"] as? String
+            guard (template != nil) != (system != nil) else { throw Problem("Give a system to install, or a template, not both.") }
+            var parameters = ControlRequest.CreateParameters(distribution: system ?? "")
+            parameters.template = template
+            parameters.name = arguments["name"] as? String
+            parameters.cpuCount = (arguments["cpus"] as? NSNumber)?.intValue
+            parameters.memoryGigabytes = (arguments["memory_gb"] as? NSNumber)?.intValue
+            parameters.diskGigabytes = (arguments["disk_gb"] as? NSNumber)?.intValue
+            parameters.user = arguments["user"] as? String
+            parameters.password = arguments["password"] as? String
+            parameters.acceleratesGraphics = arguments["gpu"] as? Bool
+            parameters.installerPath = arguments["iso"] as? String
+            parameters.start = (arguments["start"] as? Bool) ?? true
+            let response = try client.send(ControlRequest(command: .create, create: parameters))
+            if let error = response.error { return result(error, isError: true) }
+            let next = parameters.start ? "\nNext: vm_power with action wait, until it is set up and ready for exec and control." : ""
+            return result([response.note, table(response) + next].compactMap { $0 }.joined(separator: "\n"))
         }
 
         private static func power(_ machine: String, _ arguments: [String: Any], client: ControlClient) throws -> [String: Any] {
