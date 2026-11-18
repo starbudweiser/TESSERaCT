@@ -191,6 +191,9 @@ enum MCP {
             tool("vm_copy", "Copy a file or a folder between this Mac and the guest.", [
                 "direction": ["type": "string", "enum": ["into", "out-of"]], "from": ["type": "string"], "to": ["type": "string"], "root": ["type": "boolean"],
             ], required: ["direction", "from", "to"]),
+            tool("vm_disk_resize", "Make the machine's disk larger, to a size in GB. On a QEMU machine that runs (Windows, Linux with graphics) it grows live: the guest sees the new size at once and its system partition is grown into it. Other machines have to be shut down first. A disk can't shrink. Take a snapshot before for a machine that matters.", [
+                "gigabytes": ["type": "integer", "minimum": 1, "description": "The new size of the whole disk"],
+            ], required: ["gigabytes"], destructive: true),
             tool("vm_snapshot", "Save the machine's state to go back to before a risky step, list what was saved, or go back.", [
                 "action": ["type": "string", "enum": ["take", "list", "revert"]], "name": ["type": "string"],
             ], required: ["action"], destructive: true),
@@ -218,6 +221,13 @@ enum MCP {
                 return try power(machine, arguments, client: client)
             case "vm_snapshot":
                 return try snapshot(machine, arguments, client: client)
+            case "vm_disk_resize":
+                guard let gigabytes = (arguments["gigabytes"] as? Int) ?? (arguments["gigabytes"] as? Double).map(Int.init), gigabytes > 0 else {
+                    throw Problem("Say the new size of the disk in GB.")
+                }
+                let response = try client.send(ControlRequest(command: .resize, machine: machine, diskGigabytes: gigabytes))
+                if let error = response.error { return result(error, isError: true) }
+                return result([response.note, table(response)].compactMap { $0 }.joined(separator: "\n"))
             case "vm_exec":
                 return try exec(machine, arguments, client: client)
             case "vm_copy":
