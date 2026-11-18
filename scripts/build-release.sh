@@ -90,7 +90,9 @@ fi
 # first line would cut codesign off in mid-sentence, which counts as a failure.
 identity=$(codesign --display --verbose=2 "$app" 2>&1 | awk -F= '$1 == "Authority" && !found { print $2; found = 1 }')
 if [[ -n $identity ]]; then
-    codesign --force --sign "$identity" --timestamp "$image" || fail "The disk image couldn't be signed."
+    # The same certificate may be in two keychains, which makes its name ambiguous: TESSERACT_SIGN_IDENTITY, a
+    # certificate's SHA-1, says which one.
+    codesign --force --sign "${TESSERACT_SIGN_IDENTITY:-$identity}" --timestamp "$image" || fail "The disk image couldn't be signed."
 else
     print -u2 "TESSERaCT is signed to run on this Mac, so the disk image isn't signed: it is no release."
 fi
