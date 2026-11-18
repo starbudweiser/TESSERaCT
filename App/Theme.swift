@@ -105,3 +105,13 @@ struct PillButtonStyle: ButtonStyle {
             .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
     }
 }
+
+/// Texte où la lettre minuscule du nom « TESSERaCT » prend la couleur de la marque (règle Socle « Nom de l'appli »).
+func brandText(_ string: String) -> Text {
+    var attributed = AttributedString(string)
+    for range in Brand.lowercaseRanges(in: string) {
+        guard let r = Range(range, in: string), let lower = AttributedString.Index(r.lowerBound, within: attributed), let upper = AttributedString.Index(r.upperBound, within: attributed) else { continue }
+        attributed[lower ..< upper].foregroundColor = Theme.brand
+    }
+    return Text(attributed)
+}

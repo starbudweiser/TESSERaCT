@@ -48,6 +48,7 @@
 "A desktop takes about ten minutes and needs the internet." = "Un desktop richiede circa dieci minuti e una connessione a internet.";
 "A device can be attached while the virtual machine is running." = "Un dispositivo può essere collegato mentre la macchina virtuale è in esecuzione.";
 "A disk can have %lld GB at most." = "Un disco può avere al massimo %lld GB.";
+"A fork of swiftvm, with no link to its authors." = "Un fork di swiftvm, senza legami con i suoi autori.";
 "A forwarded port makes a service in the guest reachable as localhost on this Mac, for example localhost:8080 for a web server on port 80. The guest can always be reached at its own address without forwarding." = "Una porta inoltrata rende raggiungibile un servizio dell'ospite come localhost su questo Mac, ad esempio localhost:8080 per un server web sulla porta 80. L'ospite è sempre raggiungibile al proprio indirizzo, senza inoltro.";
 "A machine is set up with %lld scripts at most." = "Una macchina può essere configurata con al massimo %lld script.";
 "A running virtual machine uses GPU acceleration and can't be suspended. Shut down the virtual machines before quitting." = "Una macchina virtuale in esecuzione usa l'accelerazione GPU e non può essere sospesa. Spegni le macchine virtuali prima di uscire.";
@@ -74,6 +75,7 @@
 "Always use DXMT" = "Usa sempre DXMT";
 "An attached device is gone from this Mac until it is detached. Eject a drive in the guest before detaching it or pulling it out." = "Un dispositivo collegato non è più disponibile su questo Mac finché non viene scollegato. Espelli un'unità nell'ospite prima di scollegarla o estrarla.";
 "An update is installed when %@ quits. If virtual machines are running then, you are asked what to do with them first, as you are whenever you quit." = "Un aggiornamento viene installato quando %@ si chiude. Se in quel momento ci sono macchine virtuali in esecuzione, ti viene chiesto prima cosa farne, come ogni volta che esci.";
+"Apache 2.0 license. © 2026 Starbudweiser." = "Licenza Apache 2.0. © 2026 Starbudweiser.";
 "Appearance" = "Aspetto";
 "Asking Microsoft for Windows…" = "Richiesta di Windows a Microsoft…";
 "Assigned by your LAN" = "Assegnato dalla tua rete locale";
@@ -380,6 +382,7 @@
 "Processors, memory, display and sound." = "Processori, memoria, display e audio.";
 "Protect disk images from changes" = "Proteggi le immagini disco dalle modifiche";
 "Protocol" = "Protocollo";
+"Provided as is, without warranty." = "Fornito così com'è, senza garanzia.";
 "Quick Create" = "Creazione rapida";
 "Quit" = "Esci";
 "Quit %@" = "Esci da %@";
@@ -578,11 +581,13 @@
 "User Name" = "Nome utente";
 "Version" = "Versione";
 "Version %@" = "Versione %@";
+"Version %@ (%@)" = "Versione %1$@ (%2$@)";
 "Versions before macOS %lld can't be set up automatically. Create the account in the setup assistant when the virtual machine first starts." = "Le versioni precedenti a macOS %lld non possono essere configurate automaticamente. Crea l'account nell'assistente di configurazione al primo avvio della macchina virtuale.";
 "Virtual Machine" = "Macchina virtuale";
 "Virtual Machine Not Found" = "Macchina virtuale non trovata";
 "Virtual Machines" = "Macchine virtuali";
 "Virtual machine settings" = "Impostazioni della macchina virtuale";
+"Virtual machines for macOS: Windows, Linux and macOS, driven by you or by AI agents." = "Macchine virtuali per macOS: Windows, Linux e macOS, controllate da te o da agenti IA.";
 "What the tctl command may do in the virtual machine." = "Cosa può fare il comando tctl nella macchina virtuale.";
 "Where system shortcuts go while the virtual machine has focus." = "Dove vanno le scorciatoie di sistema mentre la macchina virtuale ha il focus.";
 "Where virtual machines, templates and downloaded images are kept." = "Dove vengono conservate le macchine virtuali, i modelli e le immagini scaricate.";

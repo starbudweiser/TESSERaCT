@@ -48,6 +48,7 @@
 "A desktop takes about ten minutes and needs the internet." = "A desktop takes about ten minutes and needs the internet.";
 "A device can be attached while the virtual machine is running." = "A device can be attached while the virtual machine is running.";
 "A disk can have %lld GB at most." = "A disk can have %lld GB at most.";
+"A fork of swiftvm, with no link to its authors." = "A fork of swiftvm, with no link to its authors.";
 "A forwarded port makes a service in the guest reachable as localhost on this Mac, for example localhost:8080 for a web server on port 80. The guest can always be reached at its own address without forwarding." = "A forwarded port makes a service in the guest reachable as localhost on this Mac, for example localhost:8080 for a web server on port 80. The guest can always be reached at its own address without forwarding.";
 "A machine is set up with %lld scripts at most." = "A machine is set up with %lld scripts at most.";
 "A running virtual machine uses GPU acceleration and can't be suspended. Shut down the virtual machines before quitting." = "A running virtual machine uses GPU acceleration and can't be suspended. Shut down the virtual machines before quitting.";
@@ -74,6 +75,7 @@
 "Always use DXMT" = "Always use DXMT";
 "An attached device is gone from this Mac until it is detached. Eject a drive in the guest before detaching it or pulling it out." = "An attached device is gone from this Mac until it is detached. Eject a drive in the guest before detaching it or pulling it out.";
 "An update is installed when %@ quits. If virtual machines are running then, you are asked what to do with them first, as you are whenever you quit." = "An update is installed when %@ quits. If virtual machines are running then, you are asked what to do with them first, as you are whenever you quit.";
+"Apache 2.0 license. © 2026 Starbudweiser." = "Apache 2.0 license. © 2026 Starbudweiser.";
 "Appearance" = "Appearance";
 "Asking Microsoft for Windows…" = "Asking Microsoft for Windows…";
 "Assigned by your LAN" = "Assigned by your LAN";
@@ -380,6 +382,7 @@
 "Processors, memory, display and sound." = "Processors, memory, display and sound.";
 "Protect disk images from changes" = "Protect disk images from changes";
 "Protocol" = "Protocol";
+"Provided as is, without warranty." = "Provided as is, without warranty.";
 "Quick Create" = "Quick Create";
 "Quit" = "Quit";
 "Quit %@" = "Quit %@";
@@ -578,11 +581,13 @@
 "User Name" = "User Name";
 "Version" = "Version";
 "Version %@" = "Version %@";
+"Version %@ (%@)" = "Version %@ (%@)";
 "Versions before macOS %lld can't be set up automatically. Create the account in the setup assistant when the virtual machine first starts." = "Versions before macOS %lld can't be set up automatically. Create the account in the setup assistant when the virtual machine first starts.";
 "Virtual Machine" = "Virtual Machine";
 "Virtual Machine Not Found" = "Virtual Machine Not Found";
 "Virtual Machines" = "Virtual Machines";
 "Virtual machine settings" = "Virtual machine settings";
+"Virtual machines for macOS: Windows, Linux and macOS, driven by you or by AI agents." = "Virtual machines for macOS: Windows, Linux and macOS, driven by you or by AI agents.";
 "What the tctl command may do in the virtual machine." = "What the tctl command may do in the virtual machine.";
 "Where system shortcuts go while the virtual machine has focus." = "Where system shortcuts go while the virtual machine has focus.";
 "Where virtual machines, templates and downloaded images are kept." = "Where virtual machines, templates and downloaded images are kept.";

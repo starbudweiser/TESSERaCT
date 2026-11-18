@@ -332,7 +332,7 @@ struct MachineBadge: View {
 enum PanelMetrics {
     /// The side of a symbol button's square.
     static let controlSize: CGFloat = 26
-    static let rowShape = RoundedRectangle(cornerRadius: 9, style: .continuous)
+    static let rowShape = RoundedRectangle(cornerRadius: 12, style: .continuous)
 }
 
 /// The label of a symbol button in the panel: the symbol alone, in an area large enough to hit.

@@ -45,6 +45,7 @@ struct MenuBarPanel: View {
             footer
         }
         .frame(width: Self.width)
+        .containerBackground(Theme.win, for: .window)
         .focusable()
         .focusEffectDisabled()
         .focused($isFocused)
@@ -68,7 +69,7 @@ struct MenuBarPanel: View {
     private var header: some View {
         HStack(spacing: 2) {
             VStack(alignment: .leading, spacing: 1) {
-                Text(AppIdentity.current.name)
+                brandText(AppIdentity.current.name)
                     .font(.headline)
                 Text(MachineListing.headline(running: model.activeMachines.count, total: model.library.machines.count))
                     .font(.caption)
@@ -117,7 +118,7 @@ struct MenuBarPanel: View {
                 }
                 Button("About \(AppIdentity.current.name)") {
                     model.windows.bringAppForward()
-                    NSApp.orderFrontStandardAboutPanel(nil)
+                    About.show()
                     dismiss()
                 }
             } label: {
