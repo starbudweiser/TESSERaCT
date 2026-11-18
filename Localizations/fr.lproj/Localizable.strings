@@ -170,6 +170,8 @@
 "Create, start and connect to virtual machines from Terminal." = "Créez, démarrez et connectez-vous aux machines virtuelles depuis Terminal.";
 "Creating disk…" = "Création du disque…";
 "D3DMetal" = "D3DMetal";
+"D3DMetal comes with Apple's Game Porting Toolkit, and with CrossOver. Download the toolkit from developer.apple.com, open its disk image, then come back and choose Install… or Choose…." = "D3DMetal est fourni avec le Game Porting Toolkit d'Apple, et avec CrossOver. Téléchargez le toolkit sur developer.apple.com, ouvrez son image disque, puis revenez choisir Installer… ou Choisir….";
+"D3DMetal isn't on this Mac" = "D3DMetal n'est pas sur ce Mac";
 "D3DMetal: Direct3D 11 and 12" = "D3DMetal : Direct3D 11 et 12";
 "DXMT runs natively and has Direct3D 11 only. Turn this on if an app draws incorrectly with D3DMetal." = "DXMT s'exécute en natif et ne gère que Direct3D 11. Activez cette option si une app s'affiche incorrectement avec D3DMetal.";
 "DXMT: Direct3D 11" = "DXMT : Direct3D 11";
@@ -262,6 +264,7 @@
 "In use by “%@”" = "Utilisé par « %@ »";
 "Install" = "Installer";
 "Install Command Line Tool…" = "Installer l'outil en ligne de commande…";
+"Install D3DMetal from %@?" = "Installer D3DMetal depuis %@ ?";
 "Install Guest Tools…" = "Installer les outils invités…";
 "Install Rosetta?" = "Installer Rosetta ?";
 "Installed" = "Installé";
@@ -346,6 +349,7 @@
 "One virtual machine that is running or busy stays as it is." = "Une machine virtuelle en cours d'exécution ou occupée reste telle quelle.";
 "Only a snapshot that was taken while the virtual machine was shut down can be saved as a template" = "Seul un instantané pris lorsque la machine virtuelle était éteinte peut être enregistré comme modèle";
 "Open" = "Ouvert";
+"Open Download Page" = "Ouvrir la page de téléchargement";
 "Open Scripts Folder" = "Ouvrir le dossier des scripts";
 "Open Serial Console" = "Ouvrir la console série";
 "Open Window" = "Ouvrir la fenêtre";
@@ -489,6 +493,7 @@
 "Suspending…" = "Suspension…";
 "System" = "Système";
 "TCP" = "TCP";
+"TESSERaCT keeps a copy of Apple's D3DMetal, found in %@. It stays Apple's software, under Apple's licence. Machines use it the next time they start." = "TESSERaCT garde une copie du D3DMetal d'Apple, trouvé dans %@. Il reste un logiciel d'Apple, sous licence Apple. Les machines l'utilisent à leur prochain démarrage.";
 "TPM 2.0" = "TPM 2.0";
 "Take Snapshot" = "Prendre un instantané";
 "Take one before you try something risky." = "Prenez-en un avant de tenter quelque chose de risqué.";

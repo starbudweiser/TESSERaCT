@@ -66,3 +66,33 @@ final class WindowsGraphics {
         try await D3DMetal.installRosetta()
     }
 }
+
+/// A D3DMetal that is on this Mac already, from which the app can keep its own copy.
+struct D3DMetalSource {
+    /// Where it comes from, as the user knows it: CrossOver, or the toolkit's disk image.
+    let name: String
+    /// What `WindowsGraphics.installD3DMetal(from:)` takes.
+    let url: URL
+}
+
+extension WindowsGraphics {
+    /// The D3DMetal that CrossOver brings, or the Game Porting Toolkit's disk image if it is open: the
+    /// newest first. Apple's licence keeps the app from bringing D3DMetal itself.
+    static func availableD3DMetalSources() -> [D3DMetalSource] {
+        var places: [(String, URL)] = []
+        for app in ["CrossOver", "CrossOver Preview"] {
+            for toolkit in ["apple_gptk3", "apple_gptk"] {
+                places.append((app, URL(fileURLWithPath: "/Applications/\(app).app/Contents/SharedSupport/CrossOver/lib/\(toolkit)/external", isDirectory: true)))
+            }
+        }
+        let volumes = (try? FileManager.default.contentsOfDirectory(atPath: "/Volumes")) ?? []
+        for volume in volumes where volume.localizedCaseInsensitiveContains("evaluation environment") || volume.localizedCaseInsensitiveContains("game porting") {
+            places.append((volume, URL(fileURLWithPath: "/Volumes/\(volume)", isDirectory: true)))
+        }
+        var found: [D3DMetalSource] = []
+        for (name, url) in places where (try? D3DMetal.locate(in: url)) != nil && !found.contains(where: { $0.name == name }) {
+            found.append(D3DMetalSource(name: name, url: url))
+        }
+        return found
+    }
+}

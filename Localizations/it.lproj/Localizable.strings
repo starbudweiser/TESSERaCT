@@ -170,6 +170,8 @@
 "Create, start and connect to virtual machines from Terminal." = "Crea, avvia e collegati alle macchine virtuali da Terminale.";
 "Creating disk…" = "Creazione del disco…";
 "D3DMetal" = "D3DMetal";
+"D3DMetal comes with Apple's Game Porting Toolkit, and with CrossOver. Download the toolkit from developer.apple.com, open its disk image, then come back and choose Install… or Choose…." = "D3DMetal è incluso nel Game Porting Toolkit di Apple e in CrossOver. Scarica il toolkit da developer.apple.com, apri la sua immagine disco, poi torna qui e scegli Installa… o Scegli….";
+"D3DMetal isn't on this Mac" = "D3DMetal non è su questo Mac";
 "D3DMetal: Direct3D 11 and 12" = "D3DMetal: Direct3D 11 e 12";
 "DXMT runs natively and has Direct3D 11 only. Turn this on if an app draws incorrectly with D3DMetal." = "DXMT funziona in modo nativo e supporta solo Direct3D 11. Attivalo se un'app viene disegnata in modo errato con D3DMetal.";
 "DXMT: Direct3D 11" = "DXMT: Direct3D 11";
@@ -262,6 +264,7 @@
 "In use by “%@”" = "In uso da “%@”";
 "Install" = "Installa";
 "Install Command Line Tool…" = "Installa lo strumento da riga di comando…";
+"Install D3DMetal from %@?" = "Installare D3DMetal da %@?";
 "Install Guest Tools…" = "Installa strumenti ospite…";
 "Install Rosetta?" = "Installare Rosetta?";
 "Installed" = "Installato";
@@ -346,6 +349,7 @@
 "One virtual machine that is running or busy stays as it is." = "Una macchina virtuale in esecuzione o occupata resta così com'è.";
 "Only a snapshot that was taken while the virtual machine was shut down can be saved as a template" = "Solo un'istantanea creata a macchina virtuale spenta può essere salvata come modello";
 "Open" = "Aperto";
+"Open Download Page" = "Apri la pagina di download";
 "Open Scripts Folder" = "Apri cartella degli script";
 "Open Serial Console" = "Apri console seriale";
 "Open Window" = "Apri finestra";
@@ -489,6 +493,7 @@
 "Suspending…" = "Sospensione…";
 "System" = "Sistema";
 "TCP" = "TCP";
+"TESSERaCT keeps a copy of Apple's D3DMetal, found in %@. It stays Apple's software, under Apple's licence. Machines use it the next time they start." = "TESSERaCT conserva una copia del D3DMetal di Apple, trovato in %@. Resta software di Apple, con licenza Apple. Le macchine lo usano al prossimo avvio.";
 "TPM 2.0" = "TPM 2.0";
 "Take Snapshot" = "Crea istantanea";
 "Take one before you try something risky." = "Creane una prima di provare qualcosa di rischioso.";

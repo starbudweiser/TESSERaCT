@@ -181,6 +181,7 @@ struct AppSettingsView: View {
                 HStack {
                     Text(d3dMetalStatus).foregroundStyle(.secondary)
                     if graphics.d3dMetal == nil {
+                        Button("Install…", action: installD3DMetal)
                         Button("Choose…", action: chooseD3DMetal)
                     } else {
                         Menu("Change") {
@@ -248,6 +249,34 @@ struct AppSettingsView: View {
             startingAt: URL(fileURLWithPath: "/Volumes", isDirectory: true)
         ) else { return }
         changeGraphics { try await graphics.installD3DMetal(from: chosen) }
+    }
+
+    /// Keeps a copy of the D3DMetal that is on this Mac already (CrossOver's, or the toolkit's open disk
+    /// image). Where there is none, says where it comes from: Apple's licence keeps the app from bringing it.
+    private func installD3DMetal() {
+        let alert = NSAlert()
+        guard let source = WindowsGraphics.availableD3DMetalSources().first else {
+            alert.messageText = String(localized: "D3DMetal isn't on this Mac")
+            alert.informativeText = String(localized: "D3DMetal comes with Apple's Game Porting Toolkit, and with CrossOver. Download the toolkit from developer.apple.com, open its disk image, then come back and choose Install… or Choose….")
+            alert.addButton(withTitle: String(localized: "Open Download Page"))
+            alert.addButton(withTitle: String(localized: "Choose…"))
+            alert.addButton(withTitle: String(localized: "Cancel"))
+            switch alert.runModal() {
+            case .alertFirstButtonReturn:
+                if let page = URL(string: "https://developer.apple.com/games/game-porting-toolkit/") { NSWorkspace.shared.open(page) }
+            case .alertSecondButtonReturn:
+                chooseD3DMetal()
+            default:
+                break
+            }
+            return
+        }
+        alert.messageText = String(localized: "Install D3DMetal from \(source.name)?")
+        alert.informativeText = String(localized: "TESSERaCT keeps a copy of Apple's D3DMetal, found in \(source.name). It stays Apple's software, under Apple's licence. Machines use it the next time they start.")
+        alert.addButton(withTitle: String(localized: "Install"))
+        alert.addButton(withTitle: String(localized: "Cancel"))
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        changeGraphics { try await graphics.installD3DMetal(from: source.url) }
     }
 
     private func installRosetta() {
