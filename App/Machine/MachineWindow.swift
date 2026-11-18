@@ -83,26 +83,26 @@ struct MachineView: View {
             placeholder(
                 title: machine.name,
                 detail: Formatting.summary(of: machine),
-                actionTitle: "Start",
+                actionTitle: String(localized: "Start"),
                 action: { Task { await machine.start() } }
             )
         case .suspended:
             placeholder(
-                title: "\(machine.name) is suspended",
-                detail: "Its state is saved on disk and uses no memory.",
-                actionTitle: "Resume",
+                title: String(localized: "\(machine.name) is suspended"),
+                detail: String(localized: "Its state is saved on disk and uses no memory."),
+                actionTitle: String(localized: "Resume"),
                 action: { Task { await machine.start() } }
             )
         case .starting, .restoring:
             display
-                .overlay { progressOverlay(machine.state == .restoring ? "Resuming…" : "Starting…") }
+                .overlay { progressOverlay(machine.state == .restoring ? String(localized: "Resuming…") : String(localized: "Starting…")) }
         case .running where model.isSeamless(machine):
             // Its windows are on the Mac one by one. The whole screen here would ask for a size of
             // its own, and take the guest's windows away from where they are.
             placeholder(
-                title: "\(machine.name) is in Seamless Mode",
-                detail: "Its windows are on your desktop. Click TESSERaCT in the Dock for the Start menu.",
-                actionTitle: "Exit Seamless Mode",
+                title: String(localized: "\(machine.name) is in Seamless Mode"),
+                detail: String(localized: "Its windows are on your desktop. Click TESSERaCT in the Dock for the Start menu."),
+                actionTitle: String(localized: "Exit Seamless Mode"),
                 actionImage: "macwindow",
                 action: { model.exitSeamlessMode(machine, reopeningWindow: false) }
             )
@@ -115,7 +115,7 @@ struct MachineView: View {
                 }
         case .suspending:
             display
-                .overlay { progressOverlay("Suspending…") }
+                .overlay { progressOverlay(String(localized: "Suspending…")) }
         case .paused:
             display
                 .overlay {

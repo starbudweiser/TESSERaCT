@@ -182,7 +182,7 @@ struct LocationRow: View {
                     .truncationMode(.middle)
                     .help(folder.path)
                 Button("Choose…") {
-                    if let chosen = FolderPanel.choose(message: "Choose the folder to keep the new virtual machine in.", startingAt: folder) {
+                    if let chosen = FolderPanel.choose(message: String(localized: "Choose the folder to keep the new virtual machine in."), startingAt: folder) {
                         location = chosen
                     }
                 }
@@ -232,7 +232,7 @@ struct DiskSizeRow: View {
 
     /// What is wrong with a size, for the form to say and to hold the machine back for.
     static func problem(with gigabytes: Int, in range: ClosedRange<Int>) -> String? {
-        range.contains(gigabytes) ? nil : "The disk can be from \(range.lowerBound) GB to \(range.upperBound) GB."
+        range.contains(gigabytes) ? nil : String(localized: "The disk can be from \(range.lowerBound) GB to \(range.upperBound) GB.")
     }
 }
 
@@ -277,6 +277,13 @@ private struct LinuxMachineForm: View {
         case installer = "Installer Disc"
 
         var id: Self { self }
+
+        var title: String {
+            switch self {
+            case .quickCreate: String(localized: "Quick Create")
+            case .installer: String(localized: "Installer Disc")
+            }
+        }
     }
 
     @Binding var source: NewMachineSource
@@ -382,7 +389,7 @@ private struct LinuxMachineForm: View {
         Section {
             NewMachineSourcePicker(selection: $source)
             Picker("Setup", selection: $method) {
-                ForEach(Method.allCases) { Text($0.rawValue).tag($0) }
+                ForEach(Method.allCases) { Text($0.title).tag($0) }
             }
             .pickerStyle(.menu)
             if isQuickCreate {
@@ -400,7 +407,7 @@ private struct LinuxMachineForm: View {
             } else if let missingScriptsNote {
                 Text(missingScriptsNote).foregroundStyle(.orange)
             } else {
-                Text(setupNote ?? "Downloads a ready-made server. Add setup scripts for a desktop or other software.")
+                Text(setupNote ?? String(localized: "Downloads a ready-made server. Add setup scripts for a desktop or other software."))
             }
         }
 
@@ -416,7 +423,7 @@ private struct LinuxMachineForm: View {
 
         if isQuickCreate {
             Section {
-                SecureField("Password", text: $password, prompt: Text(isPasswordRequired ? "Required" : "Optional"))
+                SecureField("Password", text: $password, prompt: isPasswordRequired ? Text("Required") : Text("Optional"))
             } header: {
                 Text("Account")
             } footer: {
@@ -430,7 +437,7 @@ private struct LinuxMachineForm: View {
     }
 
     private var hardwareSummary: String {
-        "\(chosenCPUCount) processors · \(chosenMemoryGigabytes) GB memory · \(chosenDiskGigabytes) GB disk"
+        String(localized: "\(chosenCPUCount) processors · \(chosenMemoryGigabytes) GB memory · \(chosenDiskGigabytes) GB disk")
     }
 
     // Collapsing Advanced only hides the controls. Creation still uses the entered settings.
@@ -454,11 +461,11 @@ private struct LinuxMachineForm: View {
 
     private var graphicsNote: String {
         if chosenAcceleratesGraphics {
-            "Draws with your Mac's GPU. The machine runs on QEMU: it can't be suspended or use Rosetta or nested virtualization, and shared folders added while it runs appear after a restart."
+            String(localized: "Draws with your Mac's GPU. The machine runs on QEMU: it can't be suspended or use Rosetta or nested virtualization, and shared folders added while it runs appear after a restart.")
         } else if isQuickCreate, selectedScripts.contains(where: \.isDesktop) {
-            "Recommended for a desktop. Without it, the machine's processors draw everything on the screen."
+            String(localized: "Recommended for a desktop. Without it, the machine's processors draw everything on the screen.")
         } else {
-            "Draws with your Mac's GPU, for a smooth desktop."
+            String(localized: "Draws with your Mac's GPU, for a smooth desktop.")
         }
     }
 
@@ -565,7 +572,7 @@ private struct LinuxMachineForm: View {
             } label: {
                 // With more than one, the number says when its turn is.
                 Text(scripts.count > 1 ? "\(index + 1). \(script.name)" : script.name)
-                Text(script.summary ?? (script.origin == .file ? "From a file" : "A script of yours"))
+                Text(script.summary ?? (script.origin == .file ? String(localized: "From a file") : String(localized: "A script of yours")))
             }
             .padding(.leading, 12)
         }
@@ -588,7 +595,9 @@ private struct LinuxMachineForm: View {
         // to anyone who was told.
         let missing = scripts.filter { script in script.origin != .file && !catalog.contains { $0.id == script.id } }
         if !missing.isEmpty {
-            missingScriptsNote = "\(missing.setupName) \(missing.count == 1 ? "is no longer a script in your folder, and was" : "are no longer scripts in your folder, and were") taken out. Add… lists the files that can't be read as scripts, and why."
+            missingScriptsNote = missing.count == 1
+                ? String(localized: "\(missing.setupName) is no longer a script in your folder, and was taken out. Add… lists the files that can't be read as scripts, and why.")
+                : String(localized: "\(missing.setupName) are no longer scripts in your folder, and were taken out. Add… lists the files that can't be read as scripts, and why.")
         }
         if refreshed != scripts {
             scripts = refreshed
@@ -611,19 +620,19 @@ private struct LinuxMachineForm: View {
         guard let first = scripts.first else { return nil }
         var sentences: [String] = []
         if selectedDistribution?.preparedImage(for: scripts) != nil {
-            sentences.append("Downloads a ready-made desktop. The first start sets up your account and guest tools, without building the applications.")
+            sentences.append(String(localized: "Downloads a ready-made desktop. The first start sets up your account and guest tools, without building the applications."))
         } else if scripts.count == 1 {
             sentences.append(first.isDesktop
-                ? "\(first.name) is installed the first time the machine starts, which takes about ten minutes and needs the internet."
-                : "“\(first.name)” runs the first time the machine starts.")
+                ? String(localized: "\(first.name) is installed the first time the machine starts, which takes about ten minutes and needs the internet.")
+                : String(localized: "“\(first.name)” runs the first time the machine starts."))
         } else {
-            sentences.append("The scripts run in this order the first time the machine starts.")
+            sentences.append(String(localized: "The scripts run in this order the first time the machine starts."))
             if scripts.contains(where: \.isDesktop) {
-                sentences.append("A desktop takes about ten minutes and needs the internet.")
+                sentences.append(String(localized: "A desktop takes about ten minutes and needs the internet."))
             }
         }
         if scripts.restartsWhenDone {
-            sentences.append(scripts.count == 1 ? "The machine restarts when it is done." : "The machine restarts when they are done.")
+            sentences.append(scripts.count == 1 ? String(localized: "The machine restarts when it is done.") : String(localized: "The machine restarts when they are done."))
         }
         return sentences.joined(separator: " ")
     }
@@ -674,8 +683,8 @@ private struct LinuxMachineForm: View {
     private func chooseISO() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [UTType(filenameExtension: "iso") ?? .diskImage, .diskImage]
-        panel.message = "Choose an ARM64 Linux installer image."
-        panel.prompt = "Choose"
+        panel.message = String(localized: "Choose an ARM64 Linux installer image.")
+        panel.prompt = String(localized: "Choose")
         guard panel.runModal() == .OK, let url = panel.url else { return }
         localISO = url
         installerURL = url
@@ -700,7 +709,7 @@ private struct LinuxMachineForm: View {
 
     private var nameProblem: String? {
         if trimmedName.isEmpty { return nil }
-        return model.isNameTaken(trimmedName) ? "That name is already in use." : nil
+        return model.isNameTaken(trimmedName) ? String(localized: "That name is already in use.") : nil
     }
 
     /// Whether the account can't do without a password: a desktop asks for it at its login screen,
@@ -711,12 +720,12 @@ private struct LinuxMachineForm: View {
 
     private var accountProblem: String? {
         let user = chosenUserName
-        if user.isEmpty { return "Enter a user name." }
+        if user.isEmpty { return String(localized: "Enter a user name.") }
         if let problem = CloudInitSeed.problem(withUserName: user) {
             return problem
         }
         if password.isEmpty, !chosenInstallsSSHKey {
-            return "Set a password or turn on SSH key sign-in, otherwise nobody can sign in."
+            return String(localized: "Set a password or turn on SSH key sign-in, otherwise nobody can sign in.")
         }
         return nil
     }
@@ -873,13 +882,13 @@ private struct SetupScriptChooser: View {
                         }
                         if !shownFiles.isEmpty {
                             // Two files may go by one name, so they are told apart by what is in them.
-                            card("From a File", rows: shownFiles, id: \.self) { script in
+                            card(String(localized: "From a File"), rows: shownFiles, id: \.self) { script in
                                 SetupScriptRow(script: script, turn: turn(of: script)) { toggle(script) }
                             }
                         }
                         if !shownSkipped.isEmpty {
                             // A file that was meant to be here and isn't: better said than left to wonder about.
-                            card("In Your Folder, but Not a Script", rows: shownSkipped, id: \.self) { file in
+                            card(String(localized: "In Your Folder, but Not a Script"), rows: shownSkipped, id: \.self) { file in
                                 SkippedFileRow(file: file)
                             }
                         }
@@ -982,7 +991,7 @@ private struct SetupScriptChooser: View {
     /// Adds a script to the end of the machine's, unless the machine can take no more.
     private func add(_ script: SetupScript) {
         guard scripts.count < SetupScript.maximumPerMachine else {
-            problem = "A machine is set up with \(SetupScript.maximumPerMachine) scripts at most."
+            problem = String(localized: "A machine is set up with \(SetupScript.maximumPerMachine) scripts at most.")
             return
         }
         scripts.append(script)
@@ -996,17 +1005,17 @@ private struct SetupScriptChooser: View {
 
     private func chooseFile() {
         let panel = NSOpenPanel()
-        panel.message = "Choose a script to run in the new virtual machine the first time it starts."
-        panel.prompt = "Choose"
+        panel.message = String(localized: "Choose a script to run in the new virtual machine the first time it starts.")
+        panel.prompt = String(localized: "Choose")
         guard panel.runModal() == .OK, let url = panel.url else { return }
         do {
             let script = try SetupScript(contentsOf: url)
             guard script.supports(distribution) else {
-                problem = "\(script.name) isn't written for \(distribution.name). It is for: \(script.systems.joined(separator: ", "))."
+                problem = String(localized: "\(script.name) isn't written for \(distribution.name). It is for: \(script.systems.joined(separator: ", ")).")
                 return
             }
             guard !scripts.contains(where: { $0.source == script.source }) else {
-                problem = "\(script.name) is added already."
+                problem = String(localized: "\(script.name) is added already.")
                 return
             }
             problem = nil
@@ -1022,7 +1031,7 @@ private struct SetupScriptChooser: View {
             NSWorkspace.shared.open(try SetupScriptCatalog.makeUserDirectory())
             problem = nil
         } catch {
-            problem = "The folder for your setup scripts couldn't be made: \(error.localizedDescription)"
+            problem = String(localized: "The folder for your setup scripts couldn't be made: \(error.localizedDescription)")
         }
     }
 
@@ -1077,7 +1086,7 @@ private struct SetupScriptChooser: View {
                 problem = nil
                 add(script)
             } else {
-                problem = "\(script.name) is saved, but it isn't written for \(distribution.name), so it isn't added."
+                problem = String(localized: "\(script.name) is saved, but it isn't written for \(distribution.name), so it isn't added.")
             }
         } catch {
             problem = error.localizedDescription
@@ -1131,7 +1140,7 @@ private struct SetupScriptRow: View {
         }
         .buttonStyle(SetupScriptRowStyle())
         .accessibilityAddTraits(.isToggle)
-        .accessibilityValue(turn.map { "Added, number \($0)" } ?? "Not added")
+        .accessibilityValue(turn.map { String(localized: "Added, number \($0)") } ?? String(localized: "Not added"))
     }
 
     /// The checkbox. Ticked, it says when the script's turn is: they run in the order they are added.
@@ -1159,19 +1168,28 @@ private struct SetupScriptRow: View {
         let memory = script.minimumMemoryGigabytes
         let disk = script.minimumDiskGigabytes
         if memory != nil || disk != nil {
-            let inWords = [memory.map { "\($0) GB of memory" }, disk.map { "a disk of \($0) GB" }]
-                .compactMap { $0 }
-                .joined(separator: " and ")
+            let description = Self.needsDescription(memory: memory, disk: disk)
             HStack(spacing: 4) {
                 need(memory, symbol: "memorychip")
                 need(disk, symbol: "internaldrive")
             }
             .font(.caption)
             .foregroundStyle(.secondary)
-            .help("Needs at least \(inWords)")
+            .help(description)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Needs at least \(inWords)")
+            .accessibilityLabel(description)
         }
+    }
+
+    private static func needsDescription(memory: Int?, disk: Int?) -> String {
+        if let memory, let disk {
+            return String(localized: "Needs at least \(memory) GB of memory and a disk of \(disk) GB")
+        } else if let memory {
+            return String(localized: "Needs at least \(memory) GB of memory")
+        } else if let disk {
+            return String(localized: "Needs at least a disk of \(disk) GB")
+        }
+        return ""
     }
 
     /// One of the two things a script can need. It keeps its place when the script doesn't say, so that
@@ -1251,9 +1269,9 @@ private struct FilterField: NSViewRepresentable {
 
     func makeNSView(context: Context) -> NSSearchField {
         let field = NSSearchField()
-        field.placeholderString = "Filter"
+        field.placeholderString = String(localized: "Filter")
         field.delegate = context.coordinator
-        field.setAccessibilityLabel("Filter scripts")
+        field.setAccessibilityLabel(String(localized: "Filter scripts"))
         return field
     }
 
@@ -1306,7 +1324,7 @@ private struct ScriptTextEditor: NSViewRepresentable {
         textView.isContinuousSpellCheckingEnabled = false
         textView.isGrammarCheckingEnabled = false
         textView.textContainerInset = NSSize(width: 4, height: 6)
-        textView.setAccessibilityLabel("Script")
+        textView.setAccessibilityLabel(String(localized: "Script"))
         return scrollView
     }
 
@@ -1489,7 +1507,7 @@ private struct MacMachineForm: View {
     }
 
     private var hardwareSummary: String {
-        "\(settings.cpuCount) processors · \(Int(settings.memoryGigabytes)) GB memory · \(settings.diskGigabytes) GB disk"
+        String(localized: "\(settings.cpuCount) processors · \(Int(settings.memoryGigabytes)) GB memory · \(settings.diskGigabytes) GB disk")
     }
 
     // MARK: Restore image
@@ -1514,9 +1532,9 @@ private struct MacMachineForm: View {
 
     private var latestTitle: String {
         switch latest {
-        case .loading: "Latest macOS"
-        case .available(let image): "Latest (\(image.productName))"
-        case .unavailable: "Latest macOS (unavailable)"
+        case .loading: String(localized: "Latest macOS")
+        case .available(let image): String(localized: "Latest (\(image.productName))")
+        case .unavailable: String(localized: "Latest macOS (unavailable)")
         }
     }
 
@@ -1528,28 +1546,28 @@ private struct MacMachineForm: View {
         }
         if usesLocalImage {
             if let localImage, localImage.requirements == nil {
-                return "This Mac can't run \(localImage.productName) in a virtual machine."
+                return String(localized: "This Mac can't run \(localImage.productName) in a virtual machine.")
             }
             return nil
         }
         if case .unavailable(let reason) = latest {
-            return "Couldn't look up the latest macOS: \(reason) You can still install from a restore image file."
+            return String(localized: "Couldn't look up the latest macOS: \(reason) You can still install from a restore image file.")
         }
         return nil
     }
 
     private var sourceNote: String {
-        guard let image = selectedImage else { return "Checking for the latest macOS…" }
+        guard let image = selectedImage else { return String(localized: "Checking for the latest macOS…") }
         if usesLocalImage {
-            return "Installs \(image.guestOS.summary) from the chosen file. This takes several minutes."
+            return String(localized: "Installs \(image.guestOS.summary) from the chosen file. This takes several minutes.")
         }
         if model.downloader.isCached(RemoteImage(url: image.url)) {
-            return "\(image.guestOS.summary) is already downloaded. Installing it takes several minutes."
+            return String(localized: "\(image.guestOS.summary) is already downloaded. Installing it takes several minutes.")
         }
         if let latestDownloadSize {
-            return "Downloads \(image.guestOS.summary) from Apple (\(Formatting.bytes(UInt64(latestDownloadSize)))) and installs it. This takes a while; you can keep using your Mac."
+            return String(localized: "Downloads \(image.guestOS.summary) from Apple (\(Formatting.bytes(UInt64(latestDownloadSize)))) and installs it. This takes a while; you can keep using your Mac.")
         }
-        return "Downloads \(image.guestOS.summary) from Apple and installs it. This takes a while; you can keep using your Mac."
+        return String(localized: "Downloads \(image.guestOS.summary) from Apple and installs it. This takes a while; you can keep using your Mac.")
     }
 
     private func lookUpLatest() async {
@@ -1570,8 +1588,8 @@ private struct MacMachineForm: View {
     private func chooseImage() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [UTType(filenameExtension: "ipsw") ?? .data]
-        panel.message = "Choose a macOS restore image (IPSW) for Apple silicon."
-        panel.prompt = "Choose"
+        panel.message = String(localized: "Choose a macOS restore image (IPSW) for Apple silicon.")
+        panel.prompt = String(localized: "Choose")
         guard panel.runModal() == .OK, let url = panel.url else { return }
         Task { await useLocalImage(at: url) }
     }
@@ -1582,7 +1600,7 @@ private struct MacMachineForm: View {
             localImageProblem = nil
             usesLocalImage = true
         } catch {
-            localImageProblem = "“\(url.lastPathComponent)” isn't a usable restore image: \(error.localizedDescription)"
+            localImageProblem = String(localized: "“\(url.lastPathComponent)” isn't a usable restore image: \(error.localizedDescription)")
         }
     }
 
@@ -1620,7 +1638,7 @@ private struct MacMachineForm: View {
 
     private var nameProblem: String? {
         if trimmedName.isEmpty { return nil }
-        return model.isNameTaken(trimmedName) ? "That name is already in use." : nil
+        return model.isNameTaken(trimmedName) ? String(localized: "That name is already in use.") : nil
     }
 
     /// What is wrong with the account, once the user has started filling it in.

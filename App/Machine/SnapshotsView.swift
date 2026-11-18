@@ -109,8 +109,8 @@ struct SnapshotsView: View {
                 Label("No Snapshots", systemImage: "clock.arrow.circlepath")
             } description: {
                 Text(machine.state.isActive
-                    ? "Take one before you try something risky. The virtual machine pauses for a moment while it is taken."
-                    : "Take one before you try something risky.")
+                    ? String(localized: "Take one before you try something risky. The virtual machine pauses for a moment while it is taken.")
+                    : String(localized: "Take one before you try something risky."))
             }
             .frame(maxHeight: .infinity)
         } else {
@@ -125,7 +125,7 @@ struct SnapshotsView: View {
                         Text(snapshot.name)
                             .fontWeight(.medium)
                             .lineLimit(1)
-                        Text("\(Self.dateText(snapshot.createdAt)) · \(snapshot.includesMemory ? "Resumes where it was" : "Starts up from shut down")")
+                        Text(verbatim: "\(Self.dateText(snapshot.createdAt)) · \(snapshot.includesMemory ? String(localized: "Resumes where it was") : String(localized: "Starts up from shut down"))")
                             .font(.callout)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
@@ -152,8 +152,8 @@ struct SnapshotsView: View {
                         Button("Save as Template") { model.saveTemplateReportingErrors(of: machine, at: snapshot) }
                             .disabled(snapshot.includesMemory)
                             .help(snapshot.includesMemory
-                                ? "Only a snapshot that was taken while the virtual machine was shut down can be saved as a template"
-                                : "Save the virtual machine as it was then, to make new virtual machines from")
+                                ? String(localized: "Only a snapshot that was taken while the virtual machine was shut down can be saved as a template")
+                                : String(localized: "Save the virtual machine as it was then, to make new virtual machines from"))
                         Divider()
                         Button("Delete…", role: .destructive) { snapshotPendingDeletion = snapshot }
                     }
@@ -180,7 +180,7 @@ struct SnapshotsView: View {
             do {
                 try await machine.takeSnapshot(named: name)
             } catch {
-                problem = VMErrorInfo(title: "Couldn't take the snapshot", message: error.localizedDescription)
+                problem = VMErrorInfo(title: String(localized: "Couldn't take the snapshot"), message: error.localizedDescription)
             }
             isWorking = false
         }
@@ -197,7 +197,7 @@ struct SnapshotsView: View {
                     await machine.start()
                 }
             } catch {
-                problem = VMErrorInfo(title: "Couldn't go back to “\(snapshot.name)”", message: error.localizedDescription)
+                problem = VMErrorInfo(title: String(localized: "Couldn't go back to “\(snapshot.name)”"), message: error.localizedDescription)
             }
             isWorking = false
         }
@@ -207,7 +207,7 @@ struct SnapshotsView: View {
         do {
             try machine.renameSnapshot(snapshot, to: editedName)
         } catch {
-            problem = VMErrorInfo(title: "Couldn't rename “\(snapshot.name)”", message: error.localizedDescription)
+            problem = VMErrorInfo(title: String(localized: "Couldn't rename “\(snapshot.name)”"), message: error.localizedDescription)
         }
     }
 
@@ -215,7 +215,7 @@ struct SnapshotsView: View {
         do {
             try machine.deleteSnapshot(snapshot)
         } catch {
-            problem = VMErrorInfo(title: "Couldn't delete “\(snapshot.name)”", message: error.localizedDescription)
+            problem = VMErrorInfo(title: String(localized: "Couldn't delete “\(snapshot.name)”"), message: error.localizedDescription)
         }
     }
 }

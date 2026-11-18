@@ -72,7 +72,7 @@ struct ResizeDiskView: View {
     }
 
     private var note: String {
-        let base = "The disk is \(currentGigabytes) GB now. It can grow, but it can't shrink again, and it only takes up space on your Mac as the guest fills it."
+        let base = String(localized: "The disk is \(currentGigabytes) GB now. It can grow, but it can't shrink again, and it only takes up space on your Mac as the guest fills it.")
         return "\(base) \(GuestIntegration.diskGrowthNote(for: machine.configuration))"
     }
 

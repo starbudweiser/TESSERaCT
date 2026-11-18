@@ -14,7 +14,7 @@ final class MachineCreation: Identifiable {
     let id = UUID()
     let name: String
     let os: GuestOS
-    var status = "Preparing…"
+    var status = String(localized: "Preparing…")
     /// Progress of the current step, or `nil` when it can't be measured.
     var fraction: Double?
     /// Set when creation failed; the row stays until the user dismisses it.
@@ -225,7 +225,7 @@ extension AppModel {
 
     private func performQuickCreate(_ request: LinuxQuickCreateRequest, os: GuestOS, creation: MachineCreation) async throws -> VirtualMachine {
         guard let image = request.distribution.image(for: request.setupScripts) else {
-            throw VMError.invalidConfiguration("\(request.distribution.name) has no ready-made image.")
+            throw VMError.invalidConfiguration(String(localized: "\(request.distribution.name) has no ready-made image."))
         }
         try requireGraphicsAcceleration(request.acceleratesGraphics)
         // Rosetta is Apple's virtualization's, which a machine on QEMU doesn't run on.
@@ -271,7 +271,7 @@ extension AppModel {
             setupScripts: request.setupScripts
         )
 
-        creation.update("Preparing disk…", fraction: 0)
+        creation.update(String(localized: "Preparing disk…"), fraction: 0)
         let bundle = try VMBundle.create(at: library.makeStagingBundleURL(in: request.location), configuration: configuration)
         do {
             let diskURL = bundle.diskURL(for: disk)
@@ -285,7 +285,7 @@ extension AppModel {
             }.value
             try Task.checkCancellation()
             if request.compressesDisk {
-                creation.update("Compressing disk…", fraction: 0)
+                creation.update(String(localized: "Compressing disk…"), fraction: 0)
                 try await Task.detached(priority: .userInitiated) {
                     try DiskService.convertDisk(at: unpacked, format: .raw, to: diskURL, format: .compressed) { progress.report($0) }
                     // Not left to chance: it is as large as the image, and nobody would see it in the package.
@@ -304,7 +304,7 @@ extension AppModel {
     /// Stops a machine that is to draw with the Mac's GPU from being made where it can't start.
     private func requireGraphicsAcceleration(_ wanted: Bool) throws {
         guard wanted, qemuProvider?.canAccelerateGraphics != true else { return }
-        throw VMError.invalidConfiguration("Graphics acceleration needs QEMU with OpenGL, which this copy of TESSERaCT was built without.")
+        throw VMError.invalidConfiguration(String(localized: "Graphics acceleration needs QEMU with OpenGL, which this copy of TESSERaCT was built without."))
     }
 
     private func performInstallerCreate(_ request: LinuxInstallerRequest, os: GuestOS, creation: MachineCreation) async throws -> VirtualMachine {
@@ -319,7 +319,7 @@ extension AppModel {
         }
         try Task.checkCancellation()
 
-        creation.update("Creating disk…")
+        creation.update(String(localized: "Creating disk…"))
         // QEMU reads no ASIF disk: a machine on it has a plain one.
         let disk = request.compressesDisk
             ? DiskConfiguration(fileName: "disk.\(CompressedDisk.fileExtension)", capacity: request.diskCapacity, bus: .virtio, format: .compressed)
@@ -356,13 +356,13 @@ extension AppModel {
         if let requested = request.image {
             image = requested
         } else {
-            creation.update("Checking for the latest macOS…")
+            creation.update(String(localized: "Checking for the latest macOS…"))
             image = try await MacRestoreImage.latestSupported()
         }
         if image.isRemote {
             let file = try await download(RemoteImage(url: image.url), named: image.productName, creation: creation)
             try Task.checkCancellation()
-            creation.update("Checking \(image.productName)…")
+            creation.update(String(localized: "Checking \(image.productName)…"))
             // From here on, go by what the downloaded file says about itself.
             do {
                 image = try await MacRestoreImage.load(from: file)
@@ -371,7 +371,7 @@ extension AppModel {
                 // sit in the cache and fail the same way every time.
                 try? FileManager.default.removeItem(at: file)
                 throw VMError.invalidConfiguration(
-                    "The downloaded restore image is damaged and was removed (\(error.localizedDescription)) Try again to download it anew."
+                    String(localized: "The downloaded restore image is damaged and was removed (\(error.localizedDescription)) Try again to download it anew.")
                 )
             }
         }
@@ -397,12 +397,12 @@ extension AppModel {
             ssh: SSHConfiguration(alias: alias, user: account?.userName ?? "", identityFile: keyPair?.privateKeyPath)
         )
 
-        creation.update("Creating disk…")
+        creation.update(String(localized: "Creating disk…"))
         let bundle = try VMBundle.create(at: library.makeStagingBundleURL(in: request.location), configuration: configuration)
         do {
             try MacOSInstaller.prepare(bundle, for: requirements)
             try DiskService.createBlankDisk(at: bundle.diskURL(for: disk), capacity: disk.capacity, format: disk.format)
-            creation.update("Installing \(image.productName)…", fraction: 0)
+            creation.update(String(localized: "Installing \(image.productName)…"), fraction: 0)
             try await MacOSInstaller.install(image, into: bundle, configuration: configuration) { fraction in
                 creation.fraction = fraction
             }
@@ -431,12 +431,12 @@ extension AppModel {
         case .localFile(let url):
             installer = url
         case .download:
-            creation.update("Asking Microsoft for Windows…")
+            creation.update(String(localized: "Asking Microsoft for Windows…"))
             let release = try await WindowsDownloads.latest()
             installer = try await download(release.image, named: "Windows 11", creation: creation)
         }
         try Task.checkCancellation()
-        creation.update("Checking the Windows installer…")
+        creation.update(String(localized: "Checking the Windows installer…"))
         let language = try await Task.detached(priority: .userInitiated) { try WindowsInstaller.inspect(installer) }.value
         let drivers = try await download(WindowsDownloads.drivers, named: "drivers for Windows", creation: creation)
         try Task.checkCancellation()
@@ -471,7 +471,7 @@ extension AppModel {
             acceleratesGraphics: request.acceleratesGraphics && qemuProvider?.canAccelerateWindowsGraphics == true
         )
 
-        creation.update("Creating disk…")
+        creation.update(String(localized: "Creating disk…"))
         let bundle = try VMBundle.create(at: library.makeStagingBundleURL(in: request.location), configuration: configuration)
         do {
             try DiskService.createBlankDisk(at: bundle.diskURL(for: disk), capacity: disk.capacity, format: disk.format)
@@ -488,7 +488,7 @@ extension AppModel {
         try prepareLocation(request.location)
         let template = request.template
         guard let source = templates.bundle(of: template), FileManager.default.fileExists(atPath: source.url.path) else {
-            throw VMError.invalidConfiguration("The template “\(template.name)” isn't there any more.")
+            throw VMError.invalidConfiguration(String(localized: "The template “\(template.name)” isn't there any more."))
         }
         let alias = reserveAlias(for: request.name)
         defer { reservedAliases.remove(alias) }
@@ -497,7 +497,7 @@ extension AppModel {
             memorySize: request.memorySize, diskCapacity: request.diskCapacity
         )
         // On the disk the template is on this is over at once. To another one its disks are copied.
-        creation.update("Copying “\(template.name)”…")
+        creation.update(String(localized: "Copying “\(template.name)”…"))
         let progress = ProgressRelay { fraction in creation.fraction = fraction }
         return try await templates.whileUsing(template) {
             try await makeCopy(
@@ -563,8 +563,8 @@ extension AppModel {
             // A machine that was stopped before it finished setting up has nothing to report.
             guard machine.state.isActive else { return }
             machine.lastError = VMErrorInfo(
-                title: "Couldn't add your SSH key to “\(machine.name)”",
-                message: "The virtual machine didn't accept an SSH sign-in in time. You can still connect with the account's password."
+                title: String(localized: "Couldn't add your SSH key to “\(machine.name)”"),
+                message: String(localized: "The virtual machine didn't accept an SSH sign-in in time. You can still connect with the account's password.")
             )
         }
     }
@@ -589,8 +589,8 @@ extension AppModel {
             guard machine.state.isActive else { return }
             automationSetupProblems[machine.id] = "\(error.localizedDescription) `tctl control \(machine.configuration.ssh.alias) allow --password <password>` tries again."
             machine.notice = VMErrorInfo(
-                title: "“\(machine.name)” doesn't let the guest tools read its desktop yet",
-                message: "\(error.localizedDescription)\n\n`tctl control \(machine.configuration.ssh.alias) allow --password <password>` tries again."
+                title: String(localized: "“\(machine.name)” doesn't let the guest tools read its desktop yet"),
+                message: String(localized: "\(error.localizedDescription)\n\n`tctl control \(machine.configuration.ssh.alias) allow --password <password>` tries again.")
             )
         }
         // Installing the tools and discovering bundled extensions can leave persistent banners over
@@ -618,16 +618,16 @@ extension AppModel {
             reason = Self.sentence(complaint)
         }
         machine.notice = VMErrorInfo(
-            title: "The guest tools couldn't be installed in “\(machine.name)”",
-            message: "\(reason)\n\nThe virtual machine works without them, but it asks on its screen before it shuts down and doesn't share the clipboard. Install Guest Tools… in the machine's menu tries again."
+            title: String(localized: "The guest tools couldn't be installed in “\(machine.name)”"),
+            message: String(localized: "\(reason)\n\nThe virtual machine works without them, but it asks on its screen before it shuts down and doesn't share the clipboard. Install Guest Tools… in the machine's menu tries again.")
         )
     }
 
     private func download(_ image: RemoteImage, named name: String, creation: MachineCreation) async throws -> URL {
-        if image.latestRelease != nil { creation.update("Checking for the latest \(name) image…") }
+        if image.latestRelease != nil { creation.update(String(localized: "Checking for the latest \(name) image…")) }
         let image = try await downloader.resolve(image)
         let isCached = downloader.isCached(image)
-        creation.update(isCached ? "Preparing…" : "Downloading \(name)…", fraction: isCached ? nil : 0)
+        creation.update(isCached ? String(localized: "Preparing…") : String(localized: "Downloading \(name)…"), fraction: isCached ? nil : 0)
         let progress = ProgressRelay { fraction in creation.fraction = fraction }
         let url = try await downloader.fetch(image) { update in
             if let fraction = update.fraction {

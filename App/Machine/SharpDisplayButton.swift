@@ -26,11 +26,11 @@ struct SharpDisplayButton: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("The display isn't sharp at this size")
                 .font(.headline)
-            Text("\(machine.configuration.os.productName ?? "The guest") takes a new screen size only when it starts, so this window shows its screen scaled. To make it sharp again, restart it at this window's size, or return the window to the size it was sharp at.")
+            Text(explanation)
                 .fixedSize(horizontal: false, vertical: true)
             if let shown = machine.displaySize, let wanted = machine.wantedDisplaySize {
                 // Pixels, as Windows' own settings show them, without a thousands separator.
-                Text(verbatim: "\(shown.width) × \(shown.height) now, \(wanted.width) × \(wanted.height) at this window's size")
+                Text(String(localized: "\(shown.width) × \(shown.height) now, \(wanted.width) × \(wanted.height) at this window's size"))
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
@@ -55,11 +55,18 @@ struct SharpDisplayButton: View {
         .frame(width: 380)
     }
 
+    private var explanation: String {
+        if let name = machine.configuration.os.productName {
+            return String(localized: "\(name) takes a new screen size only when it starts, so this window shows its screen scaled. To make it sharp again, restart it at this window's size, or return the window to the size it was sharp at.")
+        }
+        return String(localized: "The guest takes a new screen size only when it starts, so this window shows its screen scaled. To make it sharp again, restart it at this window's size, or return the window to the size it was sharp at.")
+    }
+
     private func restartAtWindowSize() {
         do {
             try machine.startAtWantedDisplaySize()
         } catch {
-            machine.lastError = VMErrorInfo(title: "Couldn't save the new screen size", message: error.localizedDescription)
+            machine.lastError = VMErrorInfo(title: String(localized: "Couldn't save the new screen size"), message: error.localizedDescription)
             return
         }
         Task { await model.shutDown(machine, thenRestart: true) }

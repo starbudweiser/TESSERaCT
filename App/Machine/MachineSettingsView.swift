@@ -28,16 +28,16 @@ nonisolated enum MachineSettingsPane: String, SettingsPane {
 
     var title: String {
         switch self {
-        case .general: "General"
-        case .hardware: "Hardware"
-        case .storage: "Storage"
-        case .sharing: "Sharing"
-        case .network: "Network"
+        case .general: String(localized: "General")
+        case .hardware: String(localized: "Hardware")
+        case .storage: String(localized: "Storage")
+        case .sharing: String(localized: "Sharing")
+        case .network: String(localized: "Network")
         case .ssh: "SSH"
-        case .usb: "USB Devices"
-        case .keyboard: "Keyboard"
-        case .automation: "Automation"
-        case .startup: "Startup"
+        case .usb: String(localized: "USB Devices")
+        case .keyboard: String(localized: "Keyboard")
+        case .automation: String(localized: "Automation")
+        case .startup: String(localized: "Startup")
         }
     }
 
@@ -72,16 +72,16 @@ nonisolated enum MachineSettingsPane: String, SettingsPane {
 
     var summary: String {
         switch self {
-        case .general: "The name of the virtual machine, its system, and where it is kept."
-        case .hardware: "Processors, memory, display and sound."
-        case .storage: "The disk, and disc and disk images plugged in as drives."
-        case .sharing: "Folders and the clipboard shared with this Mac."
-        case .network: "The network connection, and ports forwarded from this Mac."
-        case .ssh: "How ssh and tctl reach the virtual machine."
-        case .usb: "USB devices of this Mac that the virtual machine uses."
-        case .keyboard: "Where system shortcuts go while the virtual machine has focus."
-        case .automation: "What the tctl command may do in the virtual machine."
-        case .startup: "How the virtual machine starts its system."
+        case .general: String(localized: "The name of the virtual machine, its system, and where it is kept.")
+        case .hardware: String(localized: "Processors, memory, display and sound.")
+        case .storage: String(localized: "The disk, and disc and disk images plugged in as drives.")
+        case .sharing: String(localized: "Folders and the clipboard shared with this Mac.")
+        case .network: String(localized: "The network connection, and ports forwarded from this Mac.")
+        case .ssh: String(localized: "How ssh and tctl reach the virtual machine.")
+        case .usb: String(localized: "USB devices of this Mac that the virtual machine uses.")
+        case .keyboard: String(localized: "Where system shortcuts go while the virtual machine has focus.")
+        case .automation: String(localized: "What the tctl command may do in the virtual machine.")
+        case .startup: String(localized: "How the virtual machine starts its system.")
         }
     }
 }
@@ -274,8 +274,8 @@ struct MachineSettingsView: View {
                         Button("Move…", action: chooseLocation)
                             .disabled(machine.state != .stopped || machine.activity != nil)
                             .help(machine.state == .stopped
-                                ? "Move the virtual machine to another folder or disk"
-                                : "Shut down the virtual machine to move it")
+                                ? String(localized: "Move the virtual machine to another folder or disk")
+                                : String(localized: "Shut down the virtual machine to move it"))
                     }
                 }
             }
@@ -286,8 +286,8 @@ struct MachineSettingsView: View {
     private func chooseLocation() {
         let current = machine.bundle.url.deletingLastPathComponent()
         guard let folder = FolderPanel.choose(
-            message: "Choose the folder to move “\(machine.name)” into. On another disk this copies the virtual machine, which can take a while.",
-            prompt: "Move", startingAt: current
+            message: String(localized: "Choose the folder to move “\(machine.name)” into. On another disk this copies the virtual machine, which can take a while."),
+            prompt: String(localized: "Move"), startingAt: current
         ) else { return }
         model.moveReportingErrors(machine, to: folder)
     }
@@ -348,7 +348,7 @@ struct MachineSettingsView: View {
                     Text("\(Formatting.bytes(machine.allocatedDiskSize)) used of \(Formatting.bytes(configuration.totalDiskCapacity))")
                     Button("Resize…") { isResizingDisk = true }
                         .disabled((machine.state != .stopped && !machine.canGrowDiskLive) || machine.activity != nil || configuration.systemDisk == nil)
-                        .help(machine.state == .stopped || machine.canGrowDiskLive ? "Make the disk larger" : "Shut down the virtual machine to resize its disk")
+                        .help(machine.state == .stopped || machine.canGrowDiskLive ? String(localized: "Make the disk larger") : String(localized: "Shut down the virtual machine to resize its disk"))
                         .popover(isPresented: $isResizingDisk, arrowEdge: .bottom) {
                             ResizeDiskView(machine: machine)
                         }
@@ -357,7 +357,7 @@ struct MachineSettingsView: View {
             if configuration.supportsDiskCompression {
                 LabeledContent("Compression") {
                     HStack {
-                        Text(isDiskCompressed ? "On" : "Off")
+                        Text(isDiskCompressed ? String(localized: "On") : String(localized: "Off"))
                         if machine.activity == .convertingDisk {
                             // All of the disk is written out anew, which takes as long as there is on it.
                             ProgressView(value: machine.activityProgress)
@@ -367,12 +367,12 @@ struct MachineSettingsView: View {
                             Button("Cancel") { model.cancelConversion(of: machine) }
                                 .accessibilityLabel("Cancel converting the disk")
                         } else {
-                            Button(isDiskCompressed ? "Turn Off…" : "Turn On…") { isChangingCompression = true }
-                                .accessibilityLabel(isDiskCompressed ? "Turn off compression" : "Turn on compression")
+                            Button(isDiskCompressed ? String(localized: "Turn Off…") : String(localized: "Turn On…")) { isChangingCompression = true }
+                                .accessibilityLabel(isDiskCompressed ? String(localized: "Turn off compression") : String(localized: "Turn on compression"))
                                 .disabled(machine.state != .stopped || machine.activity != nil)
                                 .help(machine.state == .stopped
-                                    ? (isDiskCompressed ? "Keep the disk as an ordinary disk image again, without compressing it" : "Keep the disk compressed, usually in less than half the space")
-                                    : "Shut down the virtual machine to change how its disk is kept")
+                                    ? (isDiskCompressed ? String(localized: "Keep the disk as an ordinary disk image again, without compressing it") : String(localized: "Keep the disk compressed, usually in less than half the space"))
+                                    : String(localized: "Shut down the virtual machine to change how its disk is kept"))
                                 .popover(isPresented: $isChangingCompression, arrowEdge: .bottom) {
                                     CompressDiskView(machine: machine)
                                 }
@@ -426,10 +426,10 @@ struct MachineSettingsView: View {
             Text("Clipboard")
         } footer: {
             Text(configuration.os.family == .linux && configuration.engine == .virtualization
-                ? "Text you copy on this Mac can be pasted in the virtual machine, and the other way round. This needs spice-vdagent in the guest, which most desktop systems bring along."
+                ? String(localized: "Text you copy on this Mac can be pasted in the virtual machine, and the other way round. This needs spice-vdagent in the guest, which most desktop systems bring along.")
                 : configuration.os.family == .linux
-                    ? "Text you copy on this Mac can be pasted in the virtual machine, and the other way round. This needs the guest tools and wl-clipboard in a Wayland desktop with data-control support, such as Omarchy."
-                    : "Text you copy on this Mac can be pasted in the virtual machine, and the other way round. This needs the guest tools in the virtual machine.")
+                    ? String(localized: "Text you copy on this Mac can be pasted in the virtual machine, and the other way round. This needs the guest tools and wl-clipboard in a Wayland desktop with data-control support, such as Omarchy.")
+                    : String(localized: "Text you copy on this Mac can be pasted in the virtual machine, and the other way round. This needs the guest tools in the virtual machine."))
         }
     }
 
@@ -453,12 +453,12 @@ struct MachineSettingsView: View {
                 Button("Refresh Interfaces") { bridgeInterfaces = BridgedNetworking.interfaces }
                 Toggle("Connected", isOn: binding(\.networkInterfaces[0].isConnected))
                 LabeledContent("IP Address", value: model.address(for: machine)
-                    ?? (interface.usesSharedNetwork ? "Assigned when the machine starts" : "Assigned by your LAN"))
+                    ?? (interface.usesSharedNetwork ? String(localized: "Assigned when the machine starts") : String(localized: "Assigned by your LAN")))
                 if isActive || machine.activity != nil {
                     LabeledContent("MAC Address", value: interface.macAddress)
                         .textSelection(.enabled)
                 } else {
-                    TextField("MAC Address", text: $macAddress, prompt: Text("02:1a:2b:3c:4d:5e"))
+                    TextField("MAC Address", text: $macAddress, prompt: Text(verbatim: "02:1a:2b:3c:4d:5e"))
                         .onSubmit { commitTextFields() }
                 }
             } else {
@@ -486,7 +486,7 @@ struct MachineSettingsView: View {
                 do {
                     try model.setNetwork(of: machine, bridgedTo: identifier.isEmpty ? nil : identifier)
                 } catch {
-                    machine.lastError = VMErrorInfo(title: "Couldn't change the network", message: error.localizedDescription)
+                    machine.lastError = VMErrorInfo(title: String(localized: "Couldn't change the network"), message: error.localizedDescription)
                 }
             }
         )
@@ -511,7 +511,7 @@ struct MachineSettingsView: View {
                 .help("The name that ssh and tctl reach this virtual machine by")
             TextField("User", text: $sshUser, prompt: Text(NSUserName()))
                 .onSubmit { commitTextFields() }
-            TextField("Port", text: $sshPort, prompt: Text("22"))
+            TextField("Port", text: $sshPort, prompt: Text(verbatim: "22"))
                 .onSubmit { commitTextFields() }
             if let command = model.sshCommand(for: machine) {
                 LabeledContent("Connect") {
@@ -645,7 +645,7 @@ struct MachineSettingsView: View {
         name = machine.configuration.name
         sshProblem = nil
         if port == nil {
-            sshProblem = "The SSH port is a number from 1 to 65535."
+            sshProblem = String(localized: "The SSH port is a number from 1 to 65535.")
         } else {
             sshPort = String(machine.configuration.ssh.port)
         }
@@ -677,7 +677,7 @@ struct MachineSettingsView: View {
         do {
             try machine.updateConfiguration(body)
         } catch {
-            machine.lastError = VMErrorInfo(title: "Couldn't save the settings", message: error.localizedDescription)
+            machine.lastError = VMErrorInfo(title: String(localized: "Couldn't save the settings"), message: error.localizedDescription)
         }
     }
 }
@@ -719,6 +719,6 @@ struct DisplayResolution: Hashable, Identifiable {
     func label(for configuration: VMConfiguration) -> String {
         let pixels = "\(width) × \(height)"
         guard configuration.os.family == .macOS, configuration.display.pixelsPerInch >= 200 else { return pixels }
-        return "\(pixels) (looks like \(width / 2) × \(height / 2))"
+        return String(localized: "\(pixels) (looks like \(width / 2) × \(height / 2))")
     }
 }

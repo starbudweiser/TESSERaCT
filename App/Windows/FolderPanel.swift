@@ -7,7 +7,7 @@ enum FolderPanel {
     ///   - prompt: The button that chooses.
     ///   - directory: The folder the panel opens in.
     /// - Returns: The folder that was chosen, which may have been made in the panel, or `nil`.
-    static func choose(message: String, prompt: String = "Choose", startingAt directory: URL? = nil) -> URL? {
+    static func choose(message: String, prompt: String = String(localized: "Choose"), startingAt directory: URL? = nil) -> URL? {
         let panel = NSOpenPanel()
         panel.canChooseFiles = false
         panel.canChooseDirectories = true

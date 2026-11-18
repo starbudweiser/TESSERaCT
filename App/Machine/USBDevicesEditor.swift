@@ -6,7 +6,7 @@ import VMCore
 enum USBDevicesHint {
     /// macOS decides which app a USB device is used with, and asks the person at the Mac.
     static var howToGiveOne: String {
-        "To use a USB device in a virtual machine, plug it in and choose “Use with \(AppIdentity.current.name)” for it in the Virtual Machine Accessories menu, in the menu bar."
+        String(localized: "To use a USB device in a virtual machine, plug it in and choose “Use with \(AppIdentity.current.name)” for it in the Virtual Machine Accessories menu, in the menu bar.")
     }
 }
 
@@ -29,16 +29,16 @@ struct USBDevicesEditor: View {
             switch usb.availability {
             case .available:
                 if usb.devices.isEmpty {
-                    note("No USB devices have been given to \(AppIdentity.current.name).")
+                    note(String(localized: "No USB devices have been given to \(AppIdentity.current.name)."))
                 }
                 ForEach(usb.devices) { device in
                     row(for: device)
                 }
                 if machine.state != .running, !usb.devices.isEmpty {
-                    note("A device can be attached while the virtual machine is running.")
+                    note(String(localized: "A device can be attached while the virtual machine is running."))
                 }
             case .starting:
-                note("Looking for USB devices…")
+                note(String(localized: "Looking for USB devices…"))
             case .notSigned, .failed:
                 note(USBPassthrough.Failure.unavailable(usb.availability).localizedDescription)
             }
@@ -84,7 +84,7 @@ struct USBDevicesEditor: View {
                     Text(device.name)
                         .lineLimit(1)
                         .truncationMode(.middle)
-                    Text(isElsewhere ? "In use by “\(holder?.name ?? "")”" : [device.manufacturer, device.identifier].compactMap(\.self).joined(separator: " · "))
+                    Text(isElsewhere ? String(localized: "In use by “\(holder?.name ?? "")”") : [device.manufacturer, device.identifier].compactMap(\.self).joined(separator: " · "))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -95,7 +95,7 @@ struct USBDevicesEditor: View {
                     .toggleStyle(.switch)
                     .labelsHidden()
                     .disabled(!canChange)
-                    .help(isElsewhere ? "Detach it from “\(holder?.name ?? "")” first" : "Hand this device to the virtual machine, or give it back to this Mac")
+                    .help(isElsewhere ? String(localized: "Detach it from “\(holder?.name ?? "")” first") : String(localized: "Hand this device to the virtual machine, or give it back to this Mac"))
             }
             Toggle("Attach whenever it is plugged in", isOn: automaticBinding(for: device))
                 .toggleStyle(.checkbox)
@@ -123,7 +123,8 @@ struct USBDevicesEditor: View {
                     }
                 } catch {
                     machine.lastError = VMErrorInfo(
-                        title: "Couldn't \(attach ? "attach" : "detach") “\(device.name)”", message: error.localizedDescription
+                        title: attach ? String(localized: "Couldn't attach “\(device.name)”") : String(localized: "Couldn't detach “\(device.name)”"),
+                        message: error.localizedDescription
                     )
                 }
             }
@@ -135,7 +136,7 @@ struct USBDevicesEditor: View {
             do {
                 try usb.setConnectsAutomatically(isOn, device, to: machine)
             } catch {
-                machine.lastError = VMErrorInfo(title: "Couldn't save the setting", message: error.localizedDescription)
+                machine.lastError = VMErrorInfo(title: String(localized: "Couldn't save the setting"), message: error.localizedDescription)
             }
         })
     }
@@ -144,7 +145,7 @@ struct USBDevicesEditor: View {
         do {
             try machine.updateConfiguration(body)
         } catch {
-            machine.lastError = VMErrorInfo(title: "Couldn't save the setting", message: error.localizedDescription)
+            machine.lastError = VMErrorInfo(title: String(localized: "Couldn't save the setting"), message: error.localizedDescription)
         }
     }
 }
@@ -170,7 +171,7 @@ struct USBDevicesPopover: View {
 /// How devices get here and what attaching one means, under the list.
 struct USBDevicesFootnote: View {
     var body: some View {
-        Text("\(USBDevicesHint.howToGiveOne) An attached device is gone from this Mac until it is detached. Eject a drive in the guest before detaching it or pulling it out.")
+        Text(verbatim: "\(USBDevicesHint.howToGiveOne) \(String(localized: "An attached device is gone from this Mac until it is detached. Eject a drive in the guest before detaching it or pulling it out."))")
             .font(.callout)
             .foregroundStyle(.secondary)
             .fixedSize(horizontal: false, vertical: true)

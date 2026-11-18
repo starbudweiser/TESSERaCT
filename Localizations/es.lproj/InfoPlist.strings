@@ -1,0 +1,3 @@
+"NSMicrophoneUsageDescription" = "TESSERaCT transmite el audio del micrófono a las máquinas virtuales que tienen el micrófono activado.";
+"NSRemovableVolumesUsageDescription" = "TESSERaCT guarda las máquinas virtuales, las plantillas y las imágenes descargadas en los discos que usted elija.";
+"NSNetworkVolumesUsageDescription" = "TESSERaCT guarda las máquinas virtuales, las plantillas y las imágenes descargadas en los discos que usted elija.";

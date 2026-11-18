@@ -16,7 +16,7 @@ struct CompressDiskView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(isCompressed ? "Turn Off Compression" : "Compress Disk")
+            Text(isCompressed ? String(localized: "Turn Off Compression") : String(localized: "Compress Disk"))
                 .font(.headline)
 
             Text(note)
@@ -28,7 +28,7 @@ struct CompressDiskView: View {
                 Spacer()
                 Button("Cancel", role: .cancel) { dismiss() }
                     .keyboardShortcut(.cancelAction)
-                Button(isCompressed ? "Turn Off" : "Compress", action: convert)
+                Button(isCompressed ? String(localized: "Turn Off") : String(localized: "Compress"), action: convert)
                     .keyboardShortcut(.defaultAction)
             }
         }
@@ -39,32 +39,35 @@ struct CompressDiskView: View {
     private var note: String {
         let used = Formatting.bytes(machine.allocatedDiskSize)
         if isCompressed {
-            return """
+            return String(localized: """
                 The disk is written out anew as an ordinary disk image, without compression. That takes a \
                 while, and needs room for all of it next to the \(used) it takes up now, until it is done.
-                """
+                """)
         }
-        return """
-            The disk takes up \(used) now, and compressed usually less than half of that: files that \
-            are compressed already, such as video and archives, stay as large as they are. It is written \
-            out anew, which takes a while and needs room for the new disk next to the old one until it is done.
-
-            Reading stays as fast or gets faster. Writing gets slower, which a machine that writes a lot \
-            will notice.
-
-            If your Mac crashes or loses power while the machine runs, what the guest wrote in its last \
-            second can be lost. The disk itself comes back whole.
-
-            \(earlierCopiesNote)
-            """
+        return [
+            String(localized: """
+                The disk takes up \(used) now, and compressed usually less than half of that: files that \
+                are compressed already, such as video and archives, stay as large as they are. It is written \
+                out anew, which takes a while and needs room for the new disk next to the old one until it is done.
+                """),
+            String(localized: """
+                Reading stays as fast or gets faster. Writing gets slower, which a machine that writes a lot \
+                will notice.
+                """),
+            String(localized: """
+                If your Mac crashes or loses power while the machine runs, what the guest wrote in its last \
+                second can be lost. The disk itself comes back whole.
+                """),
+            earlierCopiesNote,
+        ].joined(separator: "\n\n")
     }
 
     /// A snapshot, a template or a copy shares its space with the disk as it is now. Once the disk is
     /// written out anew they hold that space alone, so compressing wins nothing until they are gone.
     private var earlierCopiesNote: String {
         machine.snapshots.isEmpty
-            ? "If templates or copies were made from this machine, they keep the disk as it is now, and space is only won once they are deleted."
-            : "Its snapshots stay as they are, and so do templates and copies made from it. They keep the disk as it is now, so space is only won once they are deleted."
+            ? String(localized: "If templates or copies were made from this machine, they keep the disk as it is now, and space is only won once they are deleted.")
+            : String(localized: "Its snapshots stay as they are, and so do templates and copies made from it. They keep the disk as it is now, so space is only won once they are deleted.")
     }
 
     private func convert() {

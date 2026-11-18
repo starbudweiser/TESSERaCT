@@ -9,6 +9,14 @@ enum MachineListing {
         case name = "Name"
 
         var id: Self { self }
+
+        /// What the picker calls it; the raw value is what is stored.
+        var title: String {
+            switch self {
+            case .created: String(localized: "Date Created")
+            case .name: String(localized: "Name")
+            }
+        }
     }
 
     /// The machines of the panel's two groups.
@@ -70,12 +78,12 @@ enum MachineListing {
     /// The panel's second line and what the menu bar item says of itself: `2 of 5 running`.
     static func headline(running: Int, total: Int) -> String {
         if total == 0 {
-            return "No virtual machines"
+            return String(localized: "No virtual machines")
         }
         if running == 0 {
-            return total == 1 ? "1 virtual machine" : "\(total) virtual machines"
+            return total == 1 ? String(localized: "1 virtual machine") : String(localized: "\(total) virtual machines")
         }
-        return "\(running) of \(total) running"
+        return String(localized: "\(running) of \(total) running")
     }
 }
 
@@ -83,9 +91,9 @@ extension UnavailableMachine {
     /// The line under its name in the panel.
     var statusLine: String {
         switch reason {
-        case .diskNotConnected(let volumeName?): "On “\(volumeName)”, which isn't connected"
-        case .diskNotConnected(nil): "On a disk that isn't connected"
-        case .unreadable: "Can't be opened"
+        case .diskNotConnected(let volumeName?): String(localized: "On “\(volumeName)”, which isn't connected")
+        case .diskNotConnected(nil): String(localized: "On a disk that isn't connected")
+        case .unreadable: String(localized: "Can't be opened")
         }
     }
 
@@ -93,11 +101,11 @@ extension UnavailableMachine {
     var explanation: String {
         switch reason {
         case .diskNotConnected(let volumeName?):
-            "“\(name)” is kept on “\(volumeName)”, which isn't connected. Connect the disk to use it."
+            String(localized: "“\(name)” is kept on “\(volumeName)”, which isn't connected. Connect the disk to use it.")
         case .diskNotConnected(nil):
-            "“\(name)” is kept on a disk that isn't connected. Connect the disk to use it."
+            String(localized: "“\(name)” is kept on a disk that isn't connected. Connect the disk to use it.")
         case .unreadable(let reason):
-            "“\(name)” can't be opened: \(reason)"
+            String(localized: "“\(name)” can't be opened: \(reason)")
         }
     }
 

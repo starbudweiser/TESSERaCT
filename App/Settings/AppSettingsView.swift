@@ -9,11 +9,11 @@ nonisolated enum AppSettingsPane: String, SettingsPane {
 
     var title: String {
         switch self {
-        case .general: "General"
-        case .storage: "Storage"
-        case .network: "Network"
-        case .graphics: "Graphics"
-        case .commandLine: "Command Line"
+        case .general: String(localized: "General")
+        case .storage: String(localized: "Storage")
+        case .network: String(localized: "Network")
+        case .graphics: String(localized: "Graphics")
+        case .commandLine: String(localized: "Command Line")
         }
     }
 
@@ -39,11 +39,11 @@ nonisolated enum AppSettingsPane: String, SettingsPane {
 
     var summary: String {
         switch self {
-        case .general: "Updates, and what happens to virtual machines that are deleted."
-        case .storage: "Where virtual machines, templates and downloaded images are kept."
-        case .network: "The network virtual machines share, and reaching them with ssh."
-        case .graphics: "Direct3D and OpenGL in Windows machines that draw with your Mac's GPU."
-        case .commandLine: "Create, start and connect to virtual machines from Terminal."
+        case .general: String(localized: "Updates, and what happens to virtual machines that are deleted.")
+        case .storage: String(localized: "Where virtual machines, templates and downloaded images are kept.")
+        case .network: String(localized: "The network virtual machines share, and reaching them with ssh.")
+        case .graphics: String(localized: "Direct3D and OpenGL in Windows machines that draw with your Mac's GPU.")
+        case .commandLine: String(localized: "Create, start and connect to virtual machines from Terminal.")
         }
     }
 }
@@ -134,8 +134,8 @@ struct AppSettingsView: View {
 
     private var networkSection: some View {
         Section("Shared Network") {
-            LabeledContent("Address Range", value: model.networkManager?.defaultSubnet.description ?? "Unavailable")
-            LabeledContent("This Mac", value: model.networkManager?.defaultSubnet.hostAddress.description ?? "Unavailable")
+            LabeledContent("Address Range", value: model.networkManager?.defaultSubnet.description ?? String(localized: "Unavailable"))
+            LabeledContent("This Mac", value: model.networkManager?.defaultSubnet.hostAddress.description ?? String(localized: "Unavailable"))
         }
     }
 
@@ -178,7 +178,7 @@ struct AppSettingsView: View {
             }
             LabeledContent("Rosetta") {
                 HStack {
-                    Text(graphics.hasRosetta ? "Installed" : "Not installed").foregroundStyle(.secondary)
+                    Text(graphics.hasRosetta ? String(localized: "Installed") : String(localized: "Not installed")).foregroundStyle(.secondary)
                     if !graphics.hasRosetta {
                         Button("Install…", action: installRosetta)
                             .disabled(isChangingGraphics || !canUseD3DMetal)
@@ -213,21 +213,21 @@ struct AppSettingsView: View {
     }
 
     private var d3dMetalStatus: String {
-        guard graphics.d3dMetal != nil else { return "Not installed" }
-        return graphics.d3dMetalVersion.map { "Version \($0)" } ?? "Installed"
+        guard graphics.d3dMetal != nil else { return String(localized: "Not installed") }
+        return graphics.d3dMetalVersion.map { String(localized: "Version \($0)") } ?? String(localized: "Installed")
     }
 
     private var backendDescription: String {
         switch model.qemuProvider?.directXBackend(on: graphics.host) {
-        case .d3dMetal?: "D3DMetal: Direct3D 11 and 12"
-        case .dxmt?: "DXMT: Direct3D 11"
-        case nil: "No Direct3D"
+        case .d3dMetal?: String(localized: "D3DMetal: Direct3D 11 and 12")
+        case .dxmt?: String(localized: "DXMT: Direct3D 11")
+        case nil: String(localized: "No Direct3D")
         }
     }
 
     private func chooseD3DMetal() {
         guard let chosen = FolderPanel.choose(
-            message: "Choose the Game Porting Toolkit's “Evaluation environment for Windows games” disk image, or the D3DMetal.framework in it.",
+            message: String(localized: "Choose the Game Porting Toolkit's “Evaluation environment for Windows games” disk image, or the D3DMetal.framework in it."),
             startingAt: URL(fileURLWithPath: "/Volumes", isDirectory: true)
         ) else { return }
         changeGraphics { try await graphics.installD3DMetal(from: chosen) }
@@ -235,10 +235,10 @@ struct AppSettingsView: View {
 
     private func installRosetta() {
         let alert = NSAlert()
-        alert.messageText = "Install Rosetta?"
-        alert.informativeText = "Rosetta lets your Mac run D3DMetal, whose code is for Intel processors. Installing it means you agree to Apple's software license agreement for Rosetta. macOS asks for an administrator's password."
-        alert.addButton(withTitle: "Install")
-        alert.addButton(withTitle: "Cancel")
+        alert.messageText = String(localized: "Install Rosetta?")
+        alert.informativeText = String(localized: "Rosetta lets your Mac run D3DMetal, whose code is for Intel processors. Installing it means you agree to Apple's software license agreement for Rosetta. macOS asks for an administrator's password.")
+        alert.addButton(withTitle: String(localized: "Install"))
+        alert.addButton(withTitle: String(localized: "Cancel"))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         changeGraphics { try await graphics.installRosetta() }
     }
@@ -261,21 +261,21 @@ struct AppSettingsView: View {
     private var storageSection: some View {
         Section {
             folderRow(
-                "New Virtual Machines", folder: model.library.machinesDirectory,
+                String(localized: "New Virtual Machines"), folder: model.library.machinesDirectory,
                 isDefault: model.library.machinesDirectory.path == model.library.defaultMachinesDirectory.path,
-                message: "Choose the folder that new virtual machines are created in.",
+                message: String(localized: "Choose the folder that new virtual machines are created in."),
                 change: model.setMachinesDirectory
             )
             folderRow(
-                "Templates", folder: model.templates.directory,
+                String(localized: "Templates"), folder: model.templates.directory,
                 isDefault: model.templates.directory.path == model.templates.defaultDirectory.path,
-                message: "Choose the folder that templates are kept in.",
+                message: String(localized: "Choose the folder that templates are kept in."),
                 change: model.setTemplatesDirectory
             )
             folderRow(
-                "Downloaded Images", folder: model.downloader.cacheDirectory,
+                String(localized: "Downloaded Images"), folder: model.downloader.cacheDirectory,
                 isDefault: model.isUsingDefaultDownloadsDirectory,
-                message: "Choose the folder that downloaded Linux images and macOS restore images are kept in.",
+                message: String(localized: "Choose the folder that downloaded Linux images and macOS restore images are kept in."),
                 change: model.setDownloadsDirectory
             )
         } header: {
@@ -365,7 +365,7 @@ struct AppSettingsView: View {
     private func commandLineSection(_ link: CommandLineToolLink) -> some View {
         Section {
             LabeledContent {
-                Button(toolStatus == .installed ? "Uninstall…" : "Install Command Line Tool…") {
+                Button(toolStatus == .installed ? String(localized: "Uninstall…") : String(localized: "Install Command Line Tool…")) {
                     setToolInstalled(toolStatus != .installed, link: link)
                 }
                 .disabled(isChangingTool)
@@ -387,14 +387,14 @@ struct AppSettingsView: View {
     private func toolStatusText(for link: CommandLineToolLink) -> String {
         switch toolStatus {
         case .installed:
-            "Installed at \(link.linkURL.path)"
+            String(localized: "Installed at \(link.linkURL.path)")
         case .notInstalled:
-            "Not installed"
+            String(localized: "Not installed")
         case .occupied(let target?):
             // Another copy of the app, or one that has been moved or deleted since.
-            "\(link.linkURL.path) leads to \((target as NSString).abbreviatingWithTildeInPath). Installing points it at this copy of TESSERaCT."
+            String(localized: "\(link.linkURL.path) leads to \((target as NSString).abbreviatingWithTildeInPath). Installing points it at this copy of TESSERaCT.")
         case .occupied(nil):
-            "Something else is at \(link.linkURL.path). Installing replaces it, unless it is a folder."
+            String(localized: "Something else is at \(link.linkURL.path). Installing replaces it, unless it is a folder.")
         }
     }
 

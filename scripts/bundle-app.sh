@@ -128,6 +128,10 @@ fi
 cp "$assets/Assets.car" "$assets/AppIcon.icns" "$contents/Resources/"
 
 cp "$root/Config/Info.plist" "$contents/Info.plist"
+for lang in en fr es it; do
+    mkdir -p "$contents/Resources/$lang.lproj"
+    cp "$root/Localizations/$lang.lproj/"*.strings "$contents/Resources/$lang.lproj/"
+done
 cp "$root/Config/TESSERaCT.entitlements" "$stage/entitlements.plist"
 if $development; then
     plutil -replace CFBundleIdentifier -string "$identifier" "$contents/Info.plist"

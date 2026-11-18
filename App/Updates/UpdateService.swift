@@ -66,7 +66,7 @@ final class UpdateService: NSObject {
         do {
             try updater.start()
         } catch {
-            AppModel.shared.generalError = VMErrorInfo(title: "Updates aren't available", message: error.localizedDescription)
+            AppModel.shared.generalError = VMErrorInfo(title: String(localized: "Updates aren't available"), message: error.localizedDescription)
         }
     }
 

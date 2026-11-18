@@ -103,9 +103,9 @@ struct MachineToolbar: ToolbarContent {
 
     private var networkStateLabel: String {
         if machine.configuration.networkInterfaces.isEmpty {
-            return "No network interface"
+            return String(localized: "No network interface")
         }
-        return isConnected ? "Connected" : "Cable unplugged"
+        return isConnected ? String(localized: "Connected") : String(localized: "Cable unplugged")
     }
 
     private var audioButton: some View {
@@ -116,10 +116,12 @@ struct MachineToolbar: ToolbarContent {
                 restartNotice = .audio
             }
         }
-        .help(isOn ? "Sound is on" : "Sound is off")
-        .accessibilityValue(isOn ? "On" : "Off")
+        .help(isOn ? String(localized: "Sound is on") : String(localized: "Sound is off"))
+        .accessibilityValue(isOn ? String(localized: "On") : String(localized: "Off"))
         .popover(isPresented: noticeBinding(.audio), arrowEdge: .bottom) {
-            restartNoticeView("Sound will be \(isOn ? "on" : "off") the next time this virtual machine starts.")
+            restartNoticeView(isOn
+                ? String(localized: "Sound will be on the next time this virtual machine starts.")
+                : String(localized: "Sound will be off the next time this virtual machine starts."))
         }
     }
 
@@ -131,10 +133,12 @@ struct MachineToolbar: ToolbarContent {
                 restartNotice = .microphone
             }
         }
-        .help(isOn ? "Microphone is on" : "Microphone is off")
-        .accessibilityValue(isOn ? "On" : "Off")
+        .help(isOn ? String(localized: "Microphone is on") : String(localized: "Microphone is off"))
+        .accessibilityValue(isOn ? String(localized: "On") : String(localized: "Off"))
         .popover(isPresented: noticeBinding(.microphone), arrowEdge: .bottom) {
-            restartNoticeView("The microphone will be \(isOn ? "on" : "off") the next time this virtual machine starts.")
+            restartNoticeView(isOn
+                ? String(localized: "The microphone will be on the next time this virtual machine starts.")
+                : String(localized: "The microphone will be off the next time this virtual machine starts."))
         }
     }
 
@@ -153,7 +157,7 @@ struct MachineToolbar: ToolbarContent {
         do {
             try machine.updateConfiguration(body)
         } catch {
-            machine.lastError = VMErrorInfo(title: "Couldn't change the setting", message: error.localizedDescription)
+            machine.lastError = VMErrorInfo(title: String(localized: "Couldn't change the setting"), message: error.localizedDescription)
         }
     }
 }
@@ -171,7 +175,7 @@ private struct NetworkPopover: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Network")
                         .font(.headline)
-                    Text(isConnected ? "Connected to the shared network" : "Cable unplugged")
+                    Text(isConnected ? String(localized: "Connected to the shared network") : String(localized: "Cable unplugged"))
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }
@@ -182,13 +186,13 @@ private struct NetworkPopover: View {
 
             Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 10) {
                 if let address = model.address(for: machine) {
-                    valueRow("IP Address", value: address)
+                    valueRow(String(localized: "IP Address"), value: address)
                 }
                 if let command = model.sshCommand(for: machine) {
                     valueRow("SSH", value: command)
                 }
                 if let interface = machine.configuration.networkInterfaces.first {
-                    valueRow("MAC Address", value: interface.macAddress)
+                    valueRow(String(localized: "MAC Address"), value: interface.macAddress)
                 }
             }
 
@@ -228,7 +232,7 @@ private struct NetworkPopover: View {
                     configuration.networkInterfaces[0].isConnected = connected
                 }
             } catch {
-                machine.lastError = VMErrorInfo(title: "Couldn't change the network connection", message: error.localizedDescription)
+                machine.lastError = VMErrorInfo(title: String(localized: "Couldn't change the network connection"), message: error.localizedDescription)
             }
         })
     }
@@ -283,19 +287,19 @@ struct SharedFoldersGuestHint: View {
         VStack(alignment: .leading, spacing: 8) {
             switch configuration.os.family {
             case .macOS:
-                hint("Folders appear in the guest under “My Shared Files” in the Finder sidebar.")
+                hint(String(localized: "Folders appear in the guest under “My Shared Files” in the Finder sidebar."))
             case .windows:
-                hint("Folders appear in the guest on drive \(GuestIntegration.windowsSharedFoldersDrive), once the guest tools are installed. Changes apply right away.")
+                hint(String(localized: "Folders appear in the guest on drive \(GuestIntegration.windowsSharedFoldersDrive), once the guest tools are installed. Changes apply right away."))
             case .linux where configuration.engine == .qemu:
                 // A device for each folder, which QEMU adds only when the machine starts.
-                hint("Each folder appears in the guest under \(GuestIntegration.sharedFoldersMountPoint)/<name>, mounted by the guest tools. Folders shared while the machine runs appear after it restarts.")
+                hint(String(localized: "Each folder appears in the guest under \(GuestIntegration.sharedFoldersMountPoint)/<name>, mounted by the guest tools. Folders shared while the machine runs appear after it restarts."))
             case .linux:
                 if configuration.mountsSharedFoldersAutomatically || isMountedByAgent {
-                    hint("Folders appear in the guest under \(GuestIntegration.sharedFoldersMountPoint). Changes apply right away.")
+                    hint(String(localized: "Folders appear in the guest under \(GuestIntegration.sharedFoldersMountPoint). Changes apply right away."))
                 } else {
-                    hint("This system wasn't set up by TESSERaCT, so it doesn't mount shared folders by itself. With the guest tools installed (Install Guest Tools… in the Virtual Machine menu) they are mounted whenever it runs. Without them, run this in the guest's terminal:")
+                    hint(String(localized: "This system wasn't set up by TESSERaCT, so it doesn't mount shared folders by itself. With the guest tools installed (Install Guest Tools… in the Virtual Machine menu) they are mounted whenever it runs. Without them, run this in the guest's terminal:"))
                     CopyableCommand(command: GuestIntegration.linuxMountCommand)
-                    hint("Folders then appear under \(GuestIntegration.sharedFoldersMountPoint). To mount them at every start, also run this once (after installing, not in a live session):")
+                    hint(String(localized: "Folders then appear under \(GuestIntegration.sharedFoldersMountPoint). To mount them at every start, also run this once (after installing, not in a live session):"))
                     CopyableCommand(command: GuestIntegration.linuxPersistentMountCommand)
                 }
             }
@@ -397,8 +401,8 @@ struct SharedFoldersEditor: View {
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
         panel.allowsMultipleSelection = true
-        panel.prompt = "Share"
-        panel.message = "Choose folders to share with “\(machine.name)”."
+        panel.prompt = String(localized: "Share")
+        panel.message = String(localized: "Choose folders to share with “\(machine.name)”.")
         guard panel.runModal() == .OK else { return }
         update { configuration in
             for url in panel.urls where !configuration.sharedFolders.contains(where: { $0.path == url.path }) {
@@ -411,7 +415,7 @@ struct SharedFoldersEditor: View {
         do {
             try machine.updateConfiguration(body)
         } catch {
-            machine.lastError = VMErrorInfo(title: "Couldn't change shared folders", message: error.localizedDescription)
+            machine.lastError = VMErrorInfo(title: String(localized: "Couldn't change shared folders"), message: error.localizedDescription)
         }
     }
 }

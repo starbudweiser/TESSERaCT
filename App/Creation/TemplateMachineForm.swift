@@ -27,11 +27,11 @@ struct TemplateSourceForm: View {
                     .fixedSize(horizontal: false, vertical: true)
 
                     ContentUnavailableView(
-                        model.templates.isDirectoryMissing ? "Templates Folder Unavailable" : "No Templates Yet",
+                        model.templates.isDirectoryMissing ? String(localized: "Templates Folder Unavailable") : String(localized: "No Templates Yet"),
                         systemImage: "square.stack.3d.up",
                         description: Text(model.templates.isDirectoryMissing
-                            ? "The folder for templates, \(model.templates.directory.abbreviatedPath), isn't there. If it is on an external disk, connect the disk."
-                            : "Set up a virtual machine, shut it down, and choose Save as Template in its menu. Your saved templates will appear here.")
+                            ? String(localized: "The folder for templates, \(model.templates.directory.abbreviatedPath), isn't there. If it is on an external disk, connect the disk.")
+                            : String(localized: "Set up a virtual machine, shut it down, and choose Save as Template in its menu. Your saved templates will appear here."))
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
@@ -167,7 +167,7 @@ struct TemplateMachineForm: View {
         let memory = Int(settings.memoryGigabytes) == TemplateMachineSettings.memoryGigabytes(of: template)
             ? template.configuration.memorySize : UInt64(settings.memoryGigabytes) * HostResources.gibibyte
         // Avoid converting an invalid typed disk size; validation is shown beside Create.
-        return "\(settings.cpuCount) processors · \(Formatting.bytes(memory)) memory · \(settings.diskGigabytes) GB system disk"
+        return String(localized: "\(settings.cpuCount) processors · \(Formatting.bytes(memory)) memory · \(settings.diskGigabytes) GB system disk")
     }
 
     // MARK: Limits
@@ -203,15 +203,15 @@ struct TemplateMachineForm: View {
 
     private var nameProblem: String? {
         if trimmedName.isEmpty { return nil }
-        return model.isNameTaken(trimmedName) ? "That name is already in use." : nil
+        return model.isNameTaken(trimmedName) ? String(localized: "That name is already in use.") : nil
     }
 
     private var diskProblem: String? {
         guard template.configuration.systemDisk != nil else { return nil }
         if settings.diskGigabytes < templateDiskGigabytes {
-            return "The template's disk is \(templateDiskGigabytes) GB. A disk can grow, but it can't shrink."
+            return String(localized: "The template's disk is \(templateDiskGigabytes) GB. A disk can grow, but it can't shrink.")
         }
-        return diskRange.contains(settings.diskGigabytes) ? nil : "A disk can have \(diskRange.upperBound) GB at most."
+        return diskRange.contains(settings.diskGigabytes) ? nil : String(localized: "A disk can have \(diskRange.upperBound) GB at most.")
     }
 
     private var canCreate: Bool {

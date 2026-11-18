@@ -104,7 +104,7 @@ struct NewMachineWindow: View {
                 didAccept = true
                 didAddMachine = true
             } catch {
-                model.generalError = VMErrorInfo(title: "Couldn't open “\(url.lastPathComponent)”", message: error.localizedDescription)
+                model.generalError = VMErrorInfo(title: String(localized: "Couldn't open “\(url.lastPathComponent)”"), message: error.localizedDescription)
             }
         }
         // One form at a time: the first file a machine can be made from.

@@ -117,14 +117,14 @@ struct MachinePanelRow: View {
         } else {
             switch machine.state {
             case .stopped, .suspended:
-                symbolButton("play", label: machine.state == .suspended ? "Resume" : "Start", action: start)
+                symbolButton("play", label: machine.state == .suspended ? String(localized: "Resume") : String(localized: "Start"), action: start)
             case .paused:
-                symbolButton("play", label: "Resume") { Task { await machine.resume() } }
+                symbolButton("play", label: String(localized: "Resume")) { Task { await machine.resume() } }
             case .running:
                 if machine.canSuspend {
-                    symbolButton("pause.circle", label: "Suspend") { Task { await machine.suspend() } }
+                    symbolButton("pause.circle", label: String(localized: "Suspend")) { Task { await machine.suspend() } }
                 } else {
-                    symbolButton("pause", label: "Pause") { Task { await machine.pause() } }
+                    symbolButton("pause", label: String(localized: "Pause")) { Task { await machine.pause() } }
                 }
             case .starting, .restoring, .suspending, .stopping:
                 progress(machine.state.label)
@@ -158,8 +158,8 @@ struct MachinePanelRow: View {
                     .fontWeight(.medium)
                     .lineLimit(2)
                 Text(model.deletesMachinesPermanently
-                    ? "The virtual machine and its disks are deleted immediately. This can't be undone."
-                    : "The virtual machine and its disks are moved to the Trash.")
+                    ? String(localized: "The virtual machine and its disks are deleted immediately. This can't be undone.")
+                    : String(localized: "The virtual machine and its disks are moved to the Trash."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -167,7 +167,7 @@ struct MachinePanelRow: View {
             HStack {
                 Spacer()
                 Button("Cancel", role: .cancel) { isAskingToDelete = false }
-                Button(model.deletesMachinesPermanently ? "Delete" : "Move to Trash", role: .destructive) {
+                Button(model.deletesMachinesPermanently ? String(localized: "Delete") : String(localized: "Move to Trash"), role: .destructive) {
                     isAskingToDelete = false
                     model.delete(machine)
                 }
@@ -279,16 +279,16 @@ struct CreationPanelRow: View {
 
             Spacer(minLength: 8)
 
-            Button(creation.errorMessage == nil ? "Cancel" : "Dismiss", systemImage: "xmark", action: onDismiss)
+            Button(creation.errorMessage == nil ? String(localized: "Cancel") : String(localized: "Dismiss"), systemImage: "xmark", action: onDismiss)
                 .panelSymbolButton()
-                .help(creation.errorMessage == nil ? "Cancel" : "Dismiss")
-                .accessibilityLabel(creation.errorMessage == nil ? "Cancel creating \(creation.name)" : "Dismiss")
+                .help(creation.errorMessage == nil ? String(localized: "Cancel") : String(localized: "Dismiss"))
+                .accessibilityLabel(creation.errorMessage == nil ? String(localized: "Cancel creating \(creation.name)") : String(localized: "Dismiss"))
         }
         .padding(.leading, 8)
         .padding(.trailing, 6)
         .padding(.vertical, 6)
         .accessibilityElement(children: .contain)
-        .accessibilityLabel("\(creation.name), \(creation.errorMessage == nil ? "being created" : "couldn't be created")")
+        .accessibilityLabel(creation.errorMessage == nil ? String(localized: "\(creation.name), being created") : String(localized: "\(creation.name), couldn't be created"))
     }
 
     private var statusText: String {

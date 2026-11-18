@@ -86,7 +86,7 @@ struct MenuBarPanel: View {
             Menu {
                 Picker("Sort By", selection: $sortOrder) {
                     ForEach(MachineListing.SortOrder.allCases) { order in
-                        Text(order.rawValue).tag(order)
+                        Text(order.title).tag(order)
                     }
                 }
                 .pickerStyle(.inline)
@@ -192,7 +192,7 @@ struct MenuBarPanel: View {
         .id(machine.id)
     }
 
-    private func sectionTitle(_ title: String) -> some View {
+    private func sectionTitle(_ title: LocalizedStringKey) -> some View {
         Text(title)
             .font(.caption.weight(.semibold))
             .foregroundStyle(.secondary)
@@ -259,19 +259,19 @@ struct MenuBarPanel: View {
             alert.alertStyle = .warning
             let others = model.library.machines.count - machines.count
             alert.messageText = machines.count == 1
-                ? "Delete “\(machines[0].name)”?"
-                : others > 0 ? "Delete \(machines.count) virtual machines?" : "Delete all \(machines.count) virtual machines?"
+                ? String(localized: "Delete “\(machines[0].name)”?")
+                : others > 0 ? String(localized: "Delete \(machines.count) virtual machines?") : String(localized: "Delete all \(machines.count) virtual machines?")
             alert.informativeText = permanently
-                ? "Their disks and snapshots are deleted immediately. This can't be undone."
-                : "They are moved to the Trash with their disks and snapshots."
+                ? String(localized: "Their disks and snapshots are deleted immediately. This can't be undone.")
+                : String(localized: "They are moved to the Trash with their disks and snapshots.")
             if others > 0 {
-                alert.informativeText += others == 1
-                    ? " One virtual machine that is running or busy stays as it is."
-                    : " \(others) virtual machines that are running or busy stay as they are."
+                alert.informativeText += " " + (others == 1
+                    ? String(localized: "One virtual machine that is running or busy stays as it is.")
+                    : String(localized: "\(others) virtual machines that are running or busy stay as they are."))
             }
-            let delete = alert.addButton(withTitle: permanently ? "Delete" : "Move to Trash")
+            let delete = alert.addButton(withTitle: permanently ? String(localized: "Delete") : String(localized: "Move to Trash"))
             delete.hasDestructiveAction = true
-            alert.addButton(withTitle: "Cancel")
+            alert.addButton(withTitle: String(localized: "Cancel"))
             // Return doesn't delete everything by accident. Escape still cancels.
             delete.keyEquivalent = ""
             model.windows.bringAppForward()

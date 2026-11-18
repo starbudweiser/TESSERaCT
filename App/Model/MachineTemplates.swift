@@ -45,7 +45,7 @@ extension AppModel {
             } catch is CancellationError {
                 // Called off by whoever started it.
             } catch {
-                let problem = VMErrorInfo(title: "Couldn't save “\(machine.name)” as a template", message: error.localizedDescription)
+                let problem = VMErrorInfo(title: String(localized: "Couldn't save “\(machine.name)” as a template"), message: error.localizedDescription)
                 if isShowingTemplates {
                     templateProblem = problem
                 } else {

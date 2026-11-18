@@ -109,9 +109,11 @@ struct TemplatesView: View {
             ContentUnavailableView {
                 Label("No Templates", systemImage: "square.on.square.dashed")
             } description: {
-                Text(model.templates.isDirectoryMissing
-                    ? "The folder for templates, \(model.templates.directory.abbreviatedPath), isn't there. If it is on an external disk, connect the disk."
-                    : "Set a virtual machine up the way new ones should start out, shut it down, and choose Save as Template in its menu.")
+                if model.templates.isDirectoryMissing {
+                    Text("The folder for templates, \(model.templates.directory.abbreviatedPath), isn't there. If it is on an external disk, connect the disk.")
+                } else {
+                    Text("Set a virtual machine up the way new ones should start out, shut it down, and choose Save as Template in its menu.")
+                }
             }
             .frame(maxHeight: .infinity)
         } else {
@@ -188,7 +190,7 @@ struct TemplatesView: View {
         let configuration = template.configuration
         var parts = [Formatting.hardware(of: configuration)]
         if configuration.totalDiskCapacity > 0 {
-            parts.append("\(Formatting.bytes(configuration.totalDiskCapacity)) disk")
+            parts.append(String(localized: "\(Formatting.bytes(configuration.totalDiskCapacity)) disk"))
         }
         parts.append(configuration.os.summary)
         return parts.joined(separator: " · ")
@@ -200,7 +202,7 @@ struct TemplatesView: View {
         do {
             try model.templates.rename(template, to: editedName)
         } catch {
-            model.templateProblem = VMErrorInfo(title: "Couldn't rename “\(template.name)”", message: error.localizedDescription)
+            model.templateProblem = VMErrorInfo(title: String(localized: "Couldn't rename “\(template.name)”"), message: error.localizedDescription)
         }
     }
 
@@ -208,7 +210,7 @@ struct TemplatesView: View {
         do {
             try model.templates.remove(template, movingToTrash: true)
         } catch {
-            model.templateProblem = VMErrorInfo(title: "Couldn't delete “\(template.name)”", message: error.localizedDescription)
+            model.templateProblem = VMErrorInfo(title: String(localized: "Couldn't delete “\(template.name)”"), message: error.localizedDescription)
         }
     }
 }

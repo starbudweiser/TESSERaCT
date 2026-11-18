@@ -68,11 +68,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // can be called off at no cost: the machine is where it was until it has arrived.
             let alert = NSAlert()
             alert.messageText = moving.count == 1
-                ? "“\(moving[0].name)” is still being moved."
-                : "\(moving.count) virtual machines are still being moved."
-            alert.informativeText = "If you quit now, the move is cancelled and the virtual machine stays where it was."
-            alert.addButton(withTitle: "Quit")
-            alert.addButton(withTitle: "Cancel")
+                ? String(localized: "“\(moving[0].name)” is still being moved.")
+                : String(localized: "\(moving.count) virtual machines are still being moved.")
+            alert.informativeText = String(localized: "If you quit now, the move is cancelled and the virtual machine stays where it was.")
+            alert.addButton(withTitle: String(localized: "Quit"))
+            alert.addButton(withTitle: String(localized: "Cancel"))
             guard alert.runModal() == .alertFirstButtonReturn else { return stayOpen() }
             model.cancelMoves()
         }
@@ -82,11 +82,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // off at no cost as well: the machine goes by the disk it had until the new one is whole.
             let alert = NSAlert()
             alert.messageText = converting.count == 1
-                ? "The disk of “\(converting[0].name)” is still being converted."
-                : "The disks of \(converting.count) virtual machines are still being converted."
-            alert.informativeText = "If you quit now, the conversion is cancelled and the disk stays as it was."
-            alert.addButton(withTitle: "Quit")
-            alert.addButton(withTitle: "Cancel")
+                ? String(localized: "The disk of “\(converting[0].name)” is still being converted.")
+                : String(localized: "The disks of \(converting.count) virtual machines are still being converted.")
+            alert.informativeText = String(localized: "If you quit now, the conversion is cancelled and the disk stays as it was.")
+            alert.addButton(withTitle: String(localized: "Quit"))
+            alert.addButton(withTitle: String(localized: "Cancel"))
             guard alert.runModal() == .alertFirstButtonReturn else { return stayOpen() }
             model.cancelConversions()
         }
@@ -96,11 +96,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // off at no cost: the machine it is saved from isn't touched.
             let alert = NSAlert()
             alert.messageText = saving.count == 1
-                ? "“\(saving[0].name)” is still being saved as a template."
-                : "\(saving.count) virtual machines are still being saved as templates."
-            alert.informativeText = "If you quit now, the template isn't saved. The virtual machine stays as it is."
-            alert.addButton(withTitle: "Quit")
-            alert.addButton(withTitle: "Cancel")
+                ? String(localized: "“\(saving[0].name)” is still being saved as a template.")
+                : String(localized: "\(saving.count) virtual machines are still being saved as templates.")
+            alert.informativeText = String(localized: "If you quit now, the template isn't saved. The virtual machine stays as it is.")
+            alert.addButton(withTitle: String(localized: "Quit"))
+            alert.addButton(withTitle: String(localized: "Cancel"))
             guard alert.runModal() == .alertFirstButtonReturn else { return stayOpen() }
             model.cancelTemplateSaves()
         }
@@ -128,11 +128,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if !creating.isEmpty {
             let alert = NSAlert()
             alert.messageText = creating.count == 1
-                ? "“\(creating[0].name)” is still being created."
-                : "\(creating.count) virtual machines are still being created."
-            alert.informativeText = "If you quit now, this is cancelled. A download carries on where it stopped the next time you create the virtual machine; an installation starts over."
-            alert.addButton(withTitle: "Quit")
-            alert.addButton(withTitle: "Cancel")
+                ? String(localized: "“\(creating[0].name)” is still being created.")
+                : String(localized: "\(creating.count) virtual machines are still being created.")
+            alert.informativeText = String(localized: "If you quit now, this is cancelled. A download carries on where it stopped the next time you create the virtual machine; an installation starts over.")
+            alert.addButton(withTitle: String(localized: "Quit"))
+            alert.addButton(withTitle: String(localized: "Cancel"))
             guard alert.runModal() == .alertFirstButtonReturn else { return stayOpen() }
         }
         cancelCreations()
@@ -141,19 +141,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let alert = NSAlert()
         alert.messageText = active.count == 1
-            ? "“\(active[0].name)” is still running."
-            : "\(active.count) virtual machines are still running."
-        alert.informativeText = "Suspend saves their state so they pick up where they left off. Shut Down turns them off without saving state; a virtual machine without the guest tools is stopped at once."
+            ? String(localized: "“\(active[0].name)” is still running.")
+            : String(localized: "\(active.count) virtual machines are still running.")
+        alert.informativeText = String(localized: "Suspend saves their state so they pick up where they left off. Shut Down turns them off without saving state; a virtual machine without the guest tools is stopped at once.")
         if active.contains(where: { !$0.usbDevices.isEmpty }) {
-            alert.informativeText += " Either way their USB devices go back to this Mac, as if they were pulled out of the virtual machine."
+            alert.informativeText += " " + String(localized: "Either way their USB devices go back to this Mac, as if they were pulled out of the virtual machine.")
         }
-        alert.addButton(withTitle: "Suspend and Quit")
+        alert.addButton(withTitle: String(localized: "Suspend and Quit"))
         if active.contains(where: { !$0.canSuspend }) {
             alert.buttons.first?.isEnabled = false
-            alert.informativeText = "A running virtual machine uses GPU acceleration and can't be suspended. Shut down the virtual machines before quitting."
+            alert.informativeText = String(localized: "A running virtual machine uses GPU acceleration and can't be suspended. Shut down the virtual machines before quitting.")
         }
-        alert.addButton(withTitle: "Cancel")
-        alert.addButton(withTitle: "Shut Down and Quit")
+        alert.addButton(withTitle: String(localized: "Cancel"))
+        alert.addButton(withTitle: String(localized: "Shut Down and Quit"))
 
         switch alert.runModal() {
         case .alertFirstButtonReturn:
@@ -216,7 +216,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 // The app may have been opened with the machine, and then can't open a window yet.
                 model.windows.whenReady { model.windows.showMachine(machine.id) }
             } catch {
-                model.generalError = VMErrorInfo(title: "Couldn't open “\(url.lastPathComponent)”", message: error.localizedDescription)
+                model.generalError = VMErrorInfo(title: String(localized: "Couldn't open “\(url.lastPathComponent)”"), message: error.localizedDescription)
             }
         }
     }

@@ -31,7 +31,7 @@ struct PortForwardsEditor: View {
                 Image(systemName: "arrow.right")
                     .foregroundStyle(.secondary)
                     .accessibilityHidden(true)
-                TextField("Port in the guest", text: $guestPort, prompt: Text(hostPortNumber.map(String.init) ?? "Guest port"))
+                TextField("Port in the guest", text: $guestPort, prompt: hostPortNumber.map { Text(String($0)) } ?? Text("Guest port"))
                     .frame(width: 84)
                     .onSubmit(add)
                 Picker("Protocol", selection: $transport) {
@@ -69,10 +69,12 @@ struct PortForwardsEditor: View {
                 .frame(width: 8, height: 8)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 1) {
-                Text("localhost:\(String(forward.hostPort)) → \(String(forward.guestPort))\(forward.transport == .udp ? " UDP" : "")")
+                Text(verbatim: "localhost:\(String(forward.hostPort)) → \(String(forward.guestPort))\(forward.transport == .udp ? " UDP" : "")")
                     .monospacedDigit()
                     // The dot's color and the arrow, in words.
-                    .accessibilityLabel("\(forward.transport == .udp ? "UDP port" : "Port") \(String(forward.hostPort)) on this Mac to port \(String(forward.guestPort)) in the guest, \(statusLabel(for: status))")
+                    .accessibilityLabel(forward.transport == .udp
+                        ? String(localized: "UDP port \(String(forward.hostPort)) on this Mac to port \(String(forward.guestPort)) in the guest, \(statusLabel(for: status))")
+                        : String(localized: "Port \(String(forward.hostPort)) on this Mac to port \(String(forward.guestPort)) in the guest, \(statusLabel(for: status))"))
                 Text(detail(for: forward, status: status))
                     .font(.caption)
                     .foregroundStyle(isFailure(status) ? AnyShapeStyle(.red) : AnyShapeStyle(.secondary))
@@ -97,10 +99,10 @@ struct PortForwardsEditor: View {
 
     private func statusLabel(for status: PortRelay.Status?) -> String {
         switch status {
-        case .listening: "Open"
-        case .starting: "Opening"
-        case .failed: "Not open"
-        case nil: "Closed"
+        case .listening: String(localized: "Open")
+        case .starting: String(localized: "Opening")
+        case .failed: String(localized: "Not open")
+        case nil: String(localized: "Closed")
         }
     }
 
@@ -113,8 +115,14 @@ struct PortForwardsEditor: View {
         if case .failed(let reason) = status {
             return reason
         }
-        let scope = forward.allowsOtherDevices ? "Open to this Mac and other devices on the network" : "Open to this Mac only"
-        return status == nil ? "\(scope), while the virtual machine runs" : scope
+        if status == nil {
+            return forward.allowsOtherDevices
+                ? String(localized: "Open to this Mac and other devices on the network, while the virtual machine runs")
+                : String(localized: "Open to this Mac only, while the virtual machine runs")
+        }
+        return forward.allowsOtherDevices
+            ? String(localized: "Open to this Mac and other devices on the network")
+            : String(localized: "Open to this Mac only")
     }
 
     // MARK: Editing

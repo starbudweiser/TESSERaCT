@@ -1,0 +1,3 @@
+"NSMicrophoneUsageDescription" = "TESSERaCT transmet le son du micro aux machines virtuelles dont le micro est activé.";
+"NSRemovableVolumesUsageDescription" = "TESSERaCT conserve les machines virtuelles, les modèles et les images téléchargées sur les disques que vous choisissez.";
+"NSNetworkVolumesUsageDescription" = "TESSERaCT conserve les machines virtuelles, les modèles et les images téléchargées sur les disques que vous choisissez.";

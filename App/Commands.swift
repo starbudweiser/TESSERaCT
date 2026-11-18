@@ -32,7 +32,7 @@ struct MachineCommands: Commands {
         }
 
         CommandMenu("Virtual Machine") {
-            Button(state == .suspended || state == .paused ? "Resume" : "Start") {
+            Button(state == .suspended || state == .paused ? String(localized: "Resume") : String(localized: "Start")) {
                 guard let machine else { return }
                 Task {
                     if machine.state == .paused {
@@ -136,7 +136,7 @@ struct MachineCommands: Commands {
             }
             .disabled(machine?.configuration.hasSerialConsole != true || AppModel.shared.commandLineToolURL == nil)
 
-            Button(machine.map { AppModel.shared.guestToolsActionTitle(for: $0) } ?? "Install Guest Tools…") {
+            Button(machine.map { AppModel.shared.guestToolsActionTitle(for: $0) } ?? String(localized: "Install Guest Tools…")) {
                 guard let machine else { return }
                 AppModel.shared.installGuestToolsReportingResult(on: machine)
             }

@@ -142,8 +142,8 @@ struct WindowsMachineForm: View {
             Toggle("Graphics acceleration (experimental)", isOn: $settings.acceleratesGraphics)
         } footer: {
             Text(settings.acceleratesGraphics
-                ? "Draws with your Mac's GPU, for smooth 3D and video. With current guest tools and the bundled driver, Windows follows the window as you resize it. Older drivers need a restart to make it sharp at a new size."
-                : "Windows is sharp at any window size, and follows the window as you resize it. Graphics are drawn by the processors, so 3D apps and video are slower.")
+                ? String(localized: "Draws with your Mac's GPU, for smooth 3D and video. With current guest tools and the bundled driver, Windows follows the window as you resize it. Older drivers need a restart to make it sharp at a new size.")
+                : String(localized: "Windows is sharp at any window size, and follows the window as you resize it. Graphics are drawn by the processors, so 3D apps and video are slower."))
         }
     }
 
@@ -186,14 +186,14 @@ struct WindowsMachineForm: View {
     }
 
     private var hardwareSummary: String {
-        "\(settings.cpuCount) processors · \(Int(settings.memoryGigabytes)) GB memory · \(settings.diskGigabytes) GB disk"
+        String(localized: "\(settings.cpuCount) processors · \(Int(settings.memoryGigabytes)) GB memory · \(settings.diskGigabytes) GB disk")
     }
 
     private var sourceNote: String {
         if usesLocalDisc, let localDisc {
-            return "Installs Windows from “\(localDisc.lastPathComponent)”, with the drivers for virtual machines, and sets it up by itself. This takes about half an hour."
+            return String(localized: "Installs Windows from “\(localDisc.lastPathComponent)”, with the drivers for virtual machines, and sets it up by itself. This takes about half an hour.")
         }
-        return "Downloads Windows 11 from Microsoft (about 9 GB) and the drivers for virtual machines, installs Windows and sets it up by itself. This takes a while; you can keep using your Mac."
+        return String(localized: "Downloads Windows 11 from Microsoft (about 9 GB) and the drivers for virtual machines, installs Windows and sets it up by itself. This takes a while; you can keep using your Mac.")
     }
 
     // MARK: The installer
@@ -201,8 +201,8 @@ struct WindowsMachineForm: View {
     private func chooseDisc() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [UTType(filenameExtension: "iso") ?? .diskImage]
-        panel.message = "Choose a Windows 11 installer disc image (ISO) for Arm."
-        panel.prompt = "Choose"
+        panel.message = String(localized: "Choose a Windows 11 installer disc image (ISO) for Arm.")
+        panel.prompt = String(localized: "Choose")
         guard panel.runModal() == .OK, let url = panel.url else { return }
         useLocalDisc(at: url)
     }
@@ -243,7 +243,7 @@ struct WindowsMachineForm: View {
 
     private var nameProblem: String? {
         if trimmedName.isEmpty { return nil }
-        return model.isNameTaken(trimmedName) ? "That name is already in use." : nil
+        return model.isNameTaken(trimmedName) ? String(localized: "That name is already in use.") : nil
     }
 
     private var accountProblem: String? {

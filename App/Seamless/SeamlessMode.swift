@@ -22,16 +22,16 @@ extension AppModel {
         guard !isSeamless(machine) else { return }
         guard machine.canShowGuestWindows else {
             machine.lastError = VMErrorInfo(
-                title: "“\(machine.name)” can't enter Seamless Mode",
-                message: "Seamless Mode needs a running Windows guest with the latest guest tools. Choose Install Guest Tools… to update them."
+                title: String(localized: "“\(machine.name)” can't enter Seamless Mode"),
+                message: String(localized: "Seamless Mode needs a running Windows guest with the latest guest tools. Choose Install Guest Tools… to update them.")
             )
             return
         }
         // A display library from before Seamless Mode draws the whole screen only.
         guard let probe = machine.makeRegionView() else {
             machine.lastError = VMErrorInfo(
-                title: "“\(machine.name)” can't enter Seamless Mode",
-                message: "This copy of TESSERaCT's display can't show the guest's windows one by one."
+                title: String(localized: "“\(machine.name)” can't enter Seamless Mode"),
+                message: String(localized: "This copy of TESSERaCT's display can't show the guest's windows one by one.")
             )
             return
         }
@@ -41,7 +41,7 @@ extension AppModel {
             guard let self, let machine else { return }
             exitSeamlessMode(machine, reopeningWindow: problem != nil)
             if let problem {
-                machine.lastError = VMErrorInfo(title: "“\(machine.name)” left Seamless Mode", message: problem)
+                machine.lastError = VMErrorInfo(title: String(localized: "“\(machine.name)” left Seamless Mode"), message: problem)
             }
         }
         session.onUse = { [weak self] in self?.markSeamlessUse(of: machine.id) }

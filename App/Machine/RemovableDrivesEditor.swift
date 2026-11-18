@@ -68,10 +68,10 @@ struct RemovableDrivesEditor: View {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = ["iso", "cdr", "img", "raw", "asif"].compactMap { UTType(filenameExtension: $0) }
         panel.allowsMultipleSelection = true
-        panel.prompt = "Attach"
-        panel.message = "Choose disc images (ISO) or disk images to plug into “\(machine.name)” as USB drives."
-        let readOnly = NSButton(checkboxWithTitle: "Protect disk images from changes", target: nil, action: nil)
-        readOnly.toolTip = "The guest can read the image but not write to it. Disc images are always protected."
+        panel.prompt = String(localized: "Attach")
+        panel.message = String(localized: "Choose disc images (ISO) or disk images to plug into “\(machine.name)” as USB drives.")
+        let readOnly = NSButton(checkboxWithTitle: String(localized: "Protect disk images from changes"), target: nil, action: nil)
+        readOnly.toolTip = String(localized: "The guest can read the image but not write to it. Disc images are always protected.")
         // A little room around the checkbox, as the panel puts the accessory view edge to edge.
         let accessory = NSStackView(views: [readOnly])
         accessory.edgeInsets = NSEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
@@ -86,7 +86,7 @@ struct RemovableDrivesEditor: View {
                 do {
                     try await machine.attachImage(RemovableImage(url: url, readOnly: protects))
                 } catch {
-                    machine.lastError = VMErrorInfo(title: "Couldn't attach “\(url.lastPathComponent)”", message: error.localizedDescription)
+                    machine.lastError = VMErrorInfo(title: String(localized: "Couldn't attach “\(url.lastPathComponent)”"), message: error.localizedDescription)
                     return
                 }
             }
@@ -98,7 +98,7 @@ struct RemovableDrivesEditor: View {
             do {
                 try await machine.ejectImage(image.id)
             } catch {
-                machine.lastError = VMErrorInfo(title: "Couldn't eject “\(image.name)”", message: error.localizedDescription)
+                machine.lastError = VMErrorInfo(title: String(localized: "Couldn't eject “\(image.name)”"), message: error.localizedDescription)
             }
         }
     }
