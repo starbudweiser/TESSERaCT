@@ -1,7 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <g fill="none" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M264 264 L400 400 M760 264 L624 400 M760 760 L624 624 M264 760 L400 624" stroke="#DDD6FE" stroke-width="56"/>
-    <rect x="224" y="224" width="576" height="576" rx="48" stroke="#FFFFFF" stroke-width="64"/>
-    <rect x="400" y="400" width="224" height="224" rx="24" stroke="#FFFFFF" stroke-width="56"/>
-  </g>
+  <polygon points="512.0,177.0 802.1,344.5 635.8,440.5 512.0,369.0" fill="#ffffff" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="802.1,344.5 802.1,679.5 635.8,583.5 635.8,440.5" fill="#cfc8ff" stroke="#cfc8ff" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="802.1,679.5 512.0,847.0 512.0,655.0 635.8,583.5" fill="#a99dff" stroke="#a99dff" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="512.0,847.0 221.9,679.5 388.2,583.5 512.0,655.0" fill="#e6e2ff" stroke="#e6e2ff" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="221.9,679.5 221.9,344.5 388.2,440.5 388.2,583.5" fill="#8b7bff" stroke="#8b7bff" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="221.9,344.5 512.0,177.0 512.0,369.0 388.2,440.5" fill="#bdb3ff" stroke="#bdb3ff" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="512.0,369.0 635.8,440.5 635.8,583.5 512.0,655.0 388.2,583.5 388.2,440.5" fill="#2a2370" stroke="#2a2370" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="512.0,177.0 802.1,344.5 802.1,679.5 512.0,847.0 221.9,679.5 221.9,344.5" fill="none" stroke="#ece9ff" stroke-width="12" stroke-linejoin="round"/>
 </svg>

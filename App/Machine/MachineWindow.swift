@@ -72,6 +72,11 @@ struct MachineView: View {
                 sharpFits += 1
             }
         }
+        .onChange(of: machine.state, initial: true) {
+            if machine.state == .running, !machine.configuration.display.automaticallyResizes, !machine.startsAtDisplaySize {
+                sharpFits += 1
+            }
+        }
         .onAppear { model.openMachineWindows.insert(machine.id) }
         .onDisappear { model.openMachineWindows.remove(machine.id) }
     }
@@ -141,11 +146,20 @@ struct MachineView: View {
                 displayView: displayView,
                 // Not the firmware's sizes the display shows on its way to its own.
                 sharpFit: machine.startsAtDisplaySize && machine.hasStartingDisplaySize
-                    ? machine.displaySize.map { DisplayFit(size: $0, request: sharpFits) } : nil,
+                    ? machine.displaySize.map { DisplayFit(size: $0, request: sharpFits) } : fixedDisplayFit,
                 appliedFit: appliedSharpFit
             )
             .accessibilityLabel("Display of \(machine.name)")
         }
+    }
+
+    /// A display that doesn't follow the window has a size of its own (Settings → Display): the window
+    /// takes the size that shows it pixel for pixel when the machine starts, if it fits the screen.
+    private var fixedDisplayFit: DisplayFit? {
+        let display = machine.configuration.display
+        guard !display.automaticallyResizes, !machine.startsAtDisplaySize, machine.state == .running else { return nil }
+        let size = DisplayPixels(width: display.widthInPixels, height: display.heightInPixels, scale: Double(display.pixelsPerInch) / 72)
+        return DisplayFit(size: size, request: sharpFits)
     }
 
     private func progressOverlay(_ title: String) -> some View {

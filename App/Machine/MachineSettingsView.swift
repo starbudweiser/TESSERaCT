@@ -711,7 +711,10 @@ struct DisplayResolution: Hashable, Identifiable {
     /// The sizes on offer for a machine, with the one it has, whatever that is.
     static func choices(for configuration: VMConfiguration) -> [DisplayResolution] {
         let current = DisplayResolution(configuration.display)
-        let offered = configuration.os.family == .macOS ? retina : standard
+        // A macOS guest also gets the usual sizes (1920 × 1080…), for a display that isn't as dense as its own.
+        let offered = configuration.os.family == .macOS
+            ? Array(Set(retina + standard)).sorted { ($0.width, $0.height) < ($1.width, $1.height) }
+            : standard
         return offered.contains(current) ? offered : [current] + offered
     }
 
