@@ -11,7 +11,7 @@ nonisolated enum DiscoveryFallback {
     static let json = #"""
 {
   "schema": 1,
-  "revision": 1,
+  "revision": 2,
   "updatedAt": "2026-11-19",
   "entries": [
     {
@@ -515,6 +515,90 @@ nonisolated enum DiscoveryFallback {
         "digest": "3bf0f44bd2c9c75eb02a1795c7253c29926d189e13bc53d0f78673ab4929b1fd",
         "bytes": 1069295616,
         "date": "2026-11-13"
+      }
+    },
+    {
+      "id": "gentoo",
+      "name": "Gentoo Linux",
+      "family": "linux",
+      "summary": {
+        "en": "The source-based, fully customisable Linux: you build your system the way you want it, with Portage. Minimal installation image (a console install, for the curious).",
+        "fr": "Le Linux compilé depuis les sources et entièrement personnalisable : vous construisez votre système comme vous le voulez, avec Portage. Image d'installation minimale (installation en console, pour les curieux).",
+        "es": "El Linux basado en código fuente y totalmente personalizable: construye su sistema como quiere, con Portage. Imagen de instalación mínima (instalación en consola, para curiosos).",
+        "it": "Il Linux basato sui sorgenti e completamente personalizzabile: costruisci il sistema come vuoi, con Portage. Immagine di installazione minimale (installazione da console, per i curiosi)."
+      },
+      "tags": [
+        "experimental",
+        "desktop",
+        "server"
+      ],
+      "featured": false,
+      "color": "#54487a",
+      "defaults": {
+        "cpuCount": 4,
+        "memoryGB": 4,
+        "diskGB": 60,
+        "engine": "virtualization"
+      },
+      "source": {
+        "kind": "listing",
+        "indexURL": "https://distfiles.gentoo.org/releases/arm64/autobuilds/",
+        "dirPattern": "[0-9]{8}T[0-9]{6}Z/",
+        "filePattern": "install-arm64-minimal-[0-9]{8}T[0-9]{6}Z\\.iso",
+        "versionPattern": "minimal-([0-9]{8})T",
+        "checksum": {
+          "url": "{base}{file}.sha256",
+          "algorithm": "sha256"
+        }
+      },
+      "snapshot": {
+        "version": "20261115",
+        "url": "https://distfiles.gentoo.org/releases/arm64/autobuilds/20261115T234600Z/install-arm64-minimal-20261115T234600Z.iso",
+        "algorithm": "sha256",
+        "digest": "a055e6164c67f3ec4c09750a5317ba0506ef61f0c741b51054d77329cc8abff9",
+        "bytes": 866953216,
+        "date": "2026-11-16"
+      }
+    },
+    {
+      "id": "centos-stream",
+      "name": "CentOS Stream",
+      "family": "linux",
+      "summary": {
+        "en": "The rolling preview of the next Red Hat Enterprise Linux minor release: enterprise Linux, one step ahead. Boot (network install) image, Stream 10.",
+        "fr": "L'aperçu continu de la prochaine version de Red Hat Enterprise Linux : un Linux d'entreprise, une longueur d'avance. Image de démarrage (installation réseau), Stream 10.",
+        "es": "La vista previa continua de la próxima versión de Red Hat Enterprise Linux: Linux empresarial, un paso por delante. Imagen de arranque (instalación por red), Stream 10.",
+        "it": "L'anteprima continua della prossima versione di Red Hat Enterprise Linux: Linux enterprise, un passo avanti. Immagine di avvio (installazione di rete), Stream 10."
+      },
+      "tags": [
+        "server",
+        "rolling"
+      ],
+      "featured": false,
+      "color": "#932279",
+      "defaults": {
+        "cpuCount": 2,
+        "memoryGB": 2,
+        "diskGB": 20,
+        "engine": "virtualization"
+      },
+      "source": {
+        "kind": "listing",
+        "indexURL": "https://mirror.stream.centos.org/10-stream/BaseOS/aarch64/iso/",
+        "filePattern": "CentOS-Stream-10-[0-9.]+-aarch64-boot\\.iso",
+        "versionPattern": "CentOS-Stream-(10-[0-9.]+)-aarch64",
+        "checksum": {
+          "url": "{base}{file}.SHA256SUM",
+          "algorithm": "sha256"
+        }
+      },
+      "snapshot": {
+        "version": "10-20261118.0",
+        "url": "https://mirror.stream.centos.org/10-stream/BaseOS/aarch64/iso/CentOS-Stream-10-20261118.0-aarch64-boot.iso",
+        "algorithm": "sha256",
+        "digest": "fe2d97beef5a0fcd5ee28804eb2c9e0e85cfb79ae1ff9d06cdda0045149dbe7b",
+        "bytes": 1058836480,
+        "date": "2026-11-18"
       }
     }
   ]
