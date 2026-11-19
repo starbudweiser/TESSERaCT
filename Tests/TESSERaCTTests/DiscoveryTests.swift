@@ -501,6 +501,73 @@ private let digest512 = String(repeating: "cd", count: 64)
         }
     }
 
+    /// Draws every screen of the app to PNGs, dark and light: `TESSERACT_SCREENS=/folder swift test --filter drawsEveryScreen`.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["TESSERACT_SCREENS"] != nil))
+    func drawsEveryScreen() async throws {
+        let folder = URL(fileURLWithPath: ProcessInfo.processInfo.environment["TESSERACT_SCREENS"]!, isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let directory = URL(fileURLWithPath: "/tmp", isDirectory: true).appending(path: "tctl-app-tests-\(UUID().uuidString)", directoryHint: .isDirectory).standardizedFileURL
+        setenv("TESSERACT_HOME", directory.path, 1)
+        defer { unsetenv("TESSERACT_HOME"); try? FileManager.default.removeItem(at: directory) }
+        let model = AppModel.shared
+        model.stopControlServer()
+        model.library.onChange = nil
+        _ = NSApplication.shared
+
+        // A machine to show: a Linux server with a disk and one snapshot's worth of settings.
+        let disk = DiskConfiguration(fileName: "disk.img", capacity: 1 << 30, format: .raw)
+        let configuration = VMConfiguration(name: "Ubuntu 26.04", os: GuestOS(family: .linux, distribution: "ubuntu-26.04", productName: "Ubuntu 26.04 LTS"),
+                                            cpuCount: 4, memorySize: 8 << 30, disks: [disk], ssh: SSHConfiguration(alias: "ubuntu-2604"))
+        let bundle = try VMBundle.create(at: model.library.makeStagingBundleURL(), configuration: configuration)
+        try Data("disk".utf8).write(to: bundle.diskURL(for: disk))
+        let machine = try model.library.add(staged: bundle)
+        let second = VMConfiguration(name: "FreeBSD 15.1", os: GuestOS(family: .linux, distribution: "freebsd", productName: "FreeBSD"), engine: .qemu, cpuCount: 4, memorySize: 4 << 30, disks: [DiskConfiguration(fileName: "disk.img", capacity: 1 << 30, format: .raw)], ssh: SSHConfiguration(alias: "freebsd"))
+        let bundle2 = try VMBundle.create(at: model.library.makeStagingBundleURL(), configuration: second)
+        try Data("disk".utf8).write(to: bundle2.diskURL(for: second.disks[0]))
+        _ = try model.library.add(staged: bundle2)
+
+        func render<V: View>(_ name: String, _ view: V, size: CGSize? = nil, light: Bool = false) throws {
+            let appearance = NSAppearance(named: light ? .aqua : .darkAqua)
+            NSApplication.shared.appearance = appearance
+            let content = view.environment(model).background(light ? Color(nsColor: Theme.chatNS) : Theme.chat)
+            let host = NSHostingView(rootView: AnyView(size == nil ? AnyView(content.fixedSize()) : AnyView(content.frame(width: size!.width, height: size!.height))))
+            let fitting = host.fittingSize
+            let frame = NSRect(origin: .zero, size: size ?? fitting)
+            let window = NSWindow(contentRect: frame, styleMask: [.titled], backing: .buffered, defer: false)
+            window.appearance = appearance
+            host.frame = frame
+            window.contentView = host
+            window.layoutIfNeeded()
+            host.layoutSubtreeIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(1.2))
+            let bitmap = try #require(host.bitmapImageRepForCachingDisplay(in: host.bounds))
+            host.cacheDisplay(in: host.bounds, to: bitmap)
+            try #require(bitmap.representation(using: .png, properties: [:])).write(to: folder.appending(path: name + (light ? "-light" : "") + ".png"))
+        }
+
+        let big = CGSize(width: 960, height: 700)
+        for light in [false, true] {
+            try render("new-discover", NewMachineView(initialSource: .discover) { _, _ in }, size: big, light: light)
+        }
+        try render("new-linux", NewMachineView(initialSource: .system(.linux)) { _, _ in }, size: big)
+        try render("new-macos", NewMachineView(initialSource: .system(.macOS)) { _, _ in }, size: big)
+        try render("new-windows", NewMachineView(initialSource: .system(.windows)) { _, _ in }, size: big)
+        try render("new-template", NewMachineView(initialSource: .template) { _, _ in }, size: big)
+        let entry = try #require(DiscoveryFallback.catalog.entries.first { $0.id == "haiku" })
+        try render("discovery-sheet", DiscoveryCreateSheet(item: DiscoveryItem(entry: entry, snapshot: entry.snapshot, availability: .available, isNewVersion: false)))
+        for light in [false, true] { try render("settings-general", AppSettingsView(initialPane: .general), light: light) }
+        for pane in [AppSettingsPane.storage, .network, .graphics, .commandLine] { try render("settings-\(pane.rawValue)", AppSettingsView(initialPane: pane)) }
+        for pane in [MachineSettingsPane.general, .hardware, .storage, .sharing, .network, .ssh, .usb, .keyboard, .automation, .startup] {
+            try render("machine-\(pane.rawValue)", MachineSettingsView(machine: machine, initialPane: pane))
+        }
+        try render("machine-hardware-light", MachineSettingsView(machine: machine, initialPane: .hardware), light: true)
+        try render("snapshots", SnapshotsView(machine: machine))
+        try render("templates", TemplatesView(), size: CGSize(width: 540, height: 460))
+        try render("menubar", MenuBarPanel())
+        try render("resize-disk", ResizeDiskView(machine: machine))
+        try render("compress-disk", CompressDiskView(machine: machine))
+    }
+
     // MARK: Downloads
 
     @Test func anImageIsCheckedAgainstTheDigestThatWasPublished() {
