@@ -59,12 +59,16 @@ nonisolated struct DiscoveryResolver: Sendable {
     private func resolveFixed(_ source: DiscoverySource) async throws -> DiscoverySnapshot {
         guard let address = source.url, let url = URL(string: address), let checksum = source.checksum else { throw DiscoveryError.noImage }
         // The address may lead to a file named for its version, which is the one to download and to cache.
-        guard let probe = try await probe(url) else { throw DiscoveryError.unreachable }
+        guard var probe = try await probe(url) else { throw DiscoveryError.unreachable }
+        // A redirect to a signed, short-lived address is no address to keep: the fixed one stays.
+        if probe.url.query != nil { probe.url = url }
         let fileName = probe.url.lastPathComponent
         let checksumURL = checksum.url.replacingOccurrences(of: "{url}", with: address)
         let listing = try await text(URL(string: checksumURL))
         guard let digest = Self.digest(for: fileName, in: listing, algorithm: checksum.algorithm) else { throw DiscoveryError.noChecksum }
-        let version = Self.version(in: [fileName, listing], source: source)
+        var version = Self.version(in: [fileName, listing], source: source)
+        // Without a version in any name, the day the file was put out tells one from the next.
+        if version.isEmpty { version = probe.date ?? "" }
         return DiscoverySnapshot(version: version, url: probe.url, algorithm: checksum.algorithm, digest: digest, bytes: probe.bytes, date: probe.date)
     }
 

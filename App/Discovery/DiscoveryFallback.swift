@@ -11,7 +11,7 @@ nonisolated enum DiscoveryFallback {
     static let json = #"""
 {
   "schema": 1,
-  "revision": 3,
+  "revision": 4,
   "updatedAt": "2026-11-19",
   "entries": [
     {
@@ -55,6 +55,11 @@ nonisolated enum DiscoveryFallback {
         "digest": "e17805c6e5a1323d4a31919053b7b2b25876344f2fada3762a4d8009770f1d7f",
         "bytes": 1196779520,
         "date": "2026-06-12"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/FreeBSD_11.1_with_XFCE_desktop_environment_2017-Oct-04_00-57-49.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:FreeBSD_11.1_with_XFCE_desktop_environment_2017-Oct-04_00-57-49.png"
       }
     },
     {
@@ -100,6 +105,11 @@ nonisolated enum DiscoveryFallback {
         "digest": "6449a657d021e000cebb50987535b3dec6988edc65908107b42a42c2f95c3f6b",
         "bytes": 656941056,
         "date": "2026-10-07"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/OpenBSD_7.0_fvwm_screenshot.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:OpenBSD_7.0_fvwm_screenshot.png"
       }
     },
     {
@@ -144,6 +154,11 @@ nonisolated enum DiscoveryFallback {
         "digest": "f049cbf2a8a706ee3d975037bd44d65720de215681020eacaa7696ddd53cc3373952a2a003d3571effc859dcb65918dd7020d16fcff4fa959b34555a0ba5d642",
         "bytes": 295620608,
         "date": "2026-11-02"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/A_Screenshot_In_NetBSD_10.1_Xorg1.20.14_With_Every_Desktop_Utilities_And_xterm_Windows_Open.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:A_Screenshot_In_NetBSD_10.1_Xorg1.20.14_With_Every_Desktop_Utilities_And_xterm_Windows_Open.png"
       }
     },
     {
@@ -186,6 +201,11 @@ nonisolated enum DiscoveryFallback {
         "digest": "cf88d8ba67389d20d9ed307366b52e487c15d7d3ee3233b62b95f709daa1d430",
         "bytes": 93464576,
         "date": "2026-11-05"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Alpine_Linux_Xfce_-_English.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:Alpine_Linux_Xfce_-_English.png"
       }
     },
     {
@@ -227,6 +247,11 @@ nonisolated enum DiscoveryFallback {
         "digest": "6e93fa1759bd9d4b0fc11e938987de6967ee7de5297dac1be27c3a75cc17024b",
         "bytes": 735358976,
         "date": "2026-09-12"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Debian_13_%28Trixie%29_screenshot_-_using_GNOME_desktop.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:Debian_13_%28Trixie%29_screenshot_-_using_GNOME_desktop.png"
       }
     },
     {
@@ -269,6 +294,11 @@ nonisolated enum DiscoveryFallback {
         "digest": "355cce22d8fa67d9c90d1f712327de4514cd091a3702e6c4732f7b4354e89825",
         "bytes": 1822398464,
         "date": "2026-11-17"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/NixOS_21.11_GNOME_default_desktop_-_English.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:NixOS_21.11_GNOME_default_desktop_-_English.png"
       }
     },
     {
@@ -310,6 +340,11 @@ nonisolated enum DiscoveryFallback {
         "digest": "3542cd8e4b1cfb134666bda26bef9931dcc78cb5e381575f312d24fe93b2f5e3",
         "bytes": 1423998976,
         "date": "2026-11-18"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Gnomesuse.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:Gnomesuse.png"
       }
     },
     {
@@ -351,6 +386,11 @@ nonisolated enum DiscoveryFallback {
         "digest": "c4a7f9bf3a0ff07c8263fe9e9b0edba0cc3d9b408f1d8f06c066df0afce23072",
         "bytes": 4051513344,
         "date": "2026-10-09"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Kali-screenshot-20221021.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:Kali-screenshot-20221021.png"
       }
     },
     {
@@ -392,6 +432,11 @@ nonisolated enum DiscoveryFallback {
         "digest": "b45f052e077359d9c9366a57ada066a9700929542dfc968a3e5d7634ba09ec63",
         "bytes": 1479243776,
         "date": "2026-11-03"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Chimera_Linux_GNOME_-_English.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:Chimera_Linux_GNOME_-_English.png"
       }
     },
     {
@@ -473,6 +518,11 @@ nonisolated enum DiscoveryFallback {
         "digest": "3713f3f4a782c94ecd239c6f756cb18d8a9a287dbf4c5f44e6ad13c8e1b3af6e",
         "bytes": 1062293504,
         "date": "2026-11-12"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Rocky_Linux_10_Workstation.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:Rocky_Linux_10_Workstation.png"
       }
     },
     {
@@ -515,6 +565,11 @@ nonisolated enum DiscoveryFallback {
         "digest": "3bf0f44bd2c9c75eb02a1795c7253c29926d189e13bc53d0f78673ab4929b1fd",
         "bytes": 1069295616,
         "date": "2026-11-13"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/AlmaLinux_9.3_GNOME_default_desktop_-_English.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:AlmaLinux_9.3_GNOME_default_desktop_-_English.png"
       }
     },
     {
@@ -558,6 +613,11 @@ nonisolated enum DiscoveryFallback {
         "digest": "a055e6164c67f3ec4c09750a5317ba0506ef61f0c741b51054d77329cc8abff9",
         "bytes": 866953216,
         "date": "2026-11-16"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Gnome-Desktop_%28Gentoo-Linux%29.jpg?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:Gnome-Desktop_%28Gentoo-Linux%29.jpg"
       }
     },
     {
@@ -599,6 +659,11 @@ nonisolated enum DiscoveryFallback {
         "digest": "fe2d97beef5a0fcd5ee28804eb2c9e0e85cfb79ae1ff9d06cdda0045149dbe7b",
         "bytes": 1058836480,
         "date": "2026-11-18"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/CentOS_Stream_10_GNOME_default_desktop_-_English.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:CentOS_Stream_10_GNOME_default_desktop_-_English.png"
       }
     },
     {
@@ -647,6 +712,11 @@ nonisolated enum DiscoveryFallback {
         "digest": "e838b242881baed20e191107eb3ab5bb26a7692c81b58b4b8a624fa3e2afb13d",
         "bytes": 58819611,
         "date": "2026-11-19"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Haiku_R1_Beta_3_desktop_screenshot.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:Haiku_R1_Beta_3_desktop_screenshot.png"
       }
     },
     {
@@ -737,6 +807,51 @@ nonisolated enum DiscoveryFallback {
         "digest": "77a3802b583a6964ccb868c80f83a6ea0eb5847d3835350b5f0bcbf6f141d1d3",
         "bytes": 14669158,
         "date": "2026-10-18"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/LuCI_Interface%2C_OpenWRT_25.12.2.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:LuCI_Interface%2C_OpenWRT_25.12.2.png"
+      }
+    },
+    {
+      "id": "talos",
+      "name": "Talos Linux",
+      "family": "linux",
+      "summary": {
+        "en": "A Linux with no shell, no SSH and no package manager: the whole system is run through an API, built only to run Kubernetes. Impossible to log in to, wonderful to look at.",
+        "fr": "Un Linux sans shell, sans SSH et sans gestionnaire de paquets : tout le système se pilote par une API, conçu uniquement pour faire tourner Kubernetes. Impossible de s'y connecter, fascinant à observer.",
+        "es": "Un Linux sin shell, sin SSH y sin gestor de paquetes: todo el sistema se controla por una API, creado solo para ejecutar Kubernetes. Imposible iniciar sesión, fascinante de observar.",
+        "it": "Un Linux senza shell, senza SSH e senza gestore di pacchetti: l'intero sistema si governa tramite API, creato solo per eseguire Kubernetes. Impossibile accedervi, affascinante da osservare."
+      },
+      "tags": [
+        "unusual",
+        "containers",
+        "server"
+      ],
+      "featured": false,
+      "color": "#ff7300",
+      "defaults": {
+        "cpuCount": 2,
+        "memoryGB": 4,
+        "diskGB": 16,
+        "engine": "virtualization"
+      },
+      "source": {
+        "kind": "fixed",
+        "url": "https://github.com/siderolabs/talos/releases/latest/download/metal-arm64.iso",
+        "checksum": {
+          "url": "https://github.com/siderolabs/talos/releases/latest/download/sha256sum.txt",
+          "algorithm": "sha256"
+        }
+      },
+      "snapshot": {
+        "version": "2026-11-11",
+        "url": "https://github.com/siderolabs/talos/releases/latest/download/metal-arm64.iso",
+        "algorithm": "sha256",
+        "digest": "40f54686eda7d208164d8eb6c65961bee3542a4820cb52084cfc5eea1c3b193a",
+        "bytes": 227848192,
+        "date": "2026-11-11"
       }
     }
   ]

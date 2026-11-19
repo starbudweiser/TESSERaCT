@@ -262,6 +262,8 @@ private struct DiscoveryCard: View {
                 chip(item.entry.family.title)
                 if item.isNewVersion { newBadge }
             }
+            // Leaves the corner to the screenshot button.
+            .padding(.trailing, item.entry.screenshot == nil ? 0 : 34)
             if let line = metadataLine {
                 Text(verbatim: line)
                     .font(.caption)
@@ -286,6 +288,13 @@ private struct DiscoveryCard: View {
         .padding(isSpotlight ? 18 : 12)
         .frame(maxWidth: .infinity, minHeight: isSpotlight ? 232 : 0, alignment: .topLeading)
         .contentShape(Rectangle())
+        // In the corner, at the same distance from both edges whatever the card.
+        .overlay(alignment: .topTrailing) {
+            if let screenshot = item.entry.screenshot {
+                ScreenshotButton(screenshot: screenshot, name: item.entry.name, onDarkBackground: isSpotlight)
+                    .padding(isSpotlight ? 14 : 8)
+            }
+        }
     }
 
     private var newBadge: some View {
@@ -354,6 +363,100 @@ private struct DiscoveryCard: View {
     }
 }
 
+// MARK: - Screenshots
+
+/// The button that shows what a system's desktop looks like: the picture comes up when the pointer rests
+/// on the button, and stays while the button is clicked.
+struct ScreenshotButton: View {
+    let screenshot: DiscoveryScreenshot
+    let name: String
+    var onDarkBackground = false
+
+    @State private var isShown = false
+    @State private var isPinned = false
+    @State private var pendingShow: Task<Void, Never>?
+
+    var body: some View {
+        Button {
+            isPinned.toggle()
+            isShown = isPinned
+        } label: {
+            Image(systemName: "photo")
+                .font(.system(size: 12, weight: .medium))
+                .frame(width: 28, height: 28)
+                .foregroundStyle(onDarkBackground ? Color.white : Color.primary)
+                .background(Circle().fill(onDarkBackground ? Color.white.opacity(0.18) : Theme.fill))
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .help("Show a screenshot of the desktop")
+        .accessibilityLabel(Text("Screenshot"))
+        .onHover { hovering in
+            pendingShow?.cancel()
+            if hovering {
+                // A moment of rest, so that crossing the card doesn't open pictures.
+                pendingShow = Task {
+                    try? await Task.sleep(for: .milliseconds(350))
+                    if !Task.isCancelled { isShown = true }
+                }
+            } else if !isPinned {
+                isShown = false
+            }
+        }
+        .popover(isPresented: $isShown, arrowEdge: .bottom) {
+            ScreenshotPreview(screenshot: screenshot, name: name)
+                .onDisappear { isPinned = false }
+        }
+    }
+}
+
+/// The picture, at a size that shows a desktop, with where it comes from.
+struct ScreenshotPreview: View {
+    let screenshot: DiscoveryScreenshot
+    let name: String
+    var width: CGFloat = 520
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            AsyncImage(url: screenshot.url) { phase in
+                switch phase {
+                case .success(let image):
+                    image.resizable().scaledToFit()
+                case .failure:
+                    placeholder(String(localized: "The screenshot can't be loaded right now."))
+                default:
+                    placeholder(nil)
+                }
+            }
+            .frame(width: width, height: width * 0.625)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Theme.fill))
+            HStack(spacing: 4) {
+                Text(verbatim: name).font(.caption.weight(.semibold))
+                Spacer(minLength: 8)
+                if let credit = screenshot.credit {
+                    if let page = screenshot.page {
+                        Link(destination: page) { Text("Source: \(credit)") }
+                            .font(.caption)
+                    } else {
+                        Text("Source: \(credit)").font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        .padding(12)
+    }
+
+    @ViewBuilder
+    private func placeholder(_ message: String?) -> some View {
+        if let message {
+            Text(message).font(.callout).foregroundStyle(.secondary).multilineTextAlignment(.center).padding()
+        } else {
+            ProgressView().controlSize(.small)
+        }
+    }
+}
+
 // MARK: - The settings of the machine
 
 /// The sheet that asks for the machine's name and size before the image is downloaded, with the settings
@@ -391,6 +494,11 @@ struct DiscoveryCreateSheet: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            if let screenshot = item.entry.screenshot {
+                ScreenshotPreview(screenshot: screenshot, name: item.entry.name, width: 460)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 4)
+            }
             Form {
                 Section {
                     LabeledContent("System") {

@@ -86,6 +86,8 @@ nonisolated struct DiscoveryEntry: Codable, Sendable, Hashable, Identifiable {
     /// The day the entry was put forward, as `yyyy-MM-dd`.
     var rotationDate: String?
     var defaults: Defaults
+    /// What the desktop looks like.
+    var screenshot: DiscoveryScreenshot?
     var source: DiscoverySource
     /// The newest version known when the catalogue was published: what is shown and used until the app
     /// has looked for itself, and when it can't.
@@ -97,6 +99,15 @@ nonisolated struct DiscoveryEntry: Codable, Sendable, Hashable, Identifiable {
     func summary(for languageCode: String) -> String {
         summary[languageCode] ?? summary["en"] ?? summary.values.sorted().first ?? ""
     }
+}
+
+/// A picture of the system's desktop, which is not part of the app: it is fetched when it is looked at.
+nonisolated struct DiscoveryScreenshot: Codable, Sendable, Hashable {
+    var url: URL
+    /// Where it comes from, in a few words (`Wikimedia Commons`).
+    var credit: String?
+    /// The page that says who made it and under which licence.
+    var page: URL?
 }
 
 /// Where the newest image of a system is found, in the publisher's own listings.

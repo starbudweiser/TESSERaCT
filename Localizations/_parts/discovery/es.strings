@@ -47,3 +47,7 @@
 "Drop an ISO or IPSW file here to make a machine from it." = "Suelte aquí un archivo ISO o IPSW para crear una máquina a partir de él.";
 "Unusual" = "Insólito";
 "Unpacking %@…" = "Descomprimiendo %@…";
+"Screenshot" = "Captura de pantalla";
+"Show a screenshot of the desktop" = "Mostrar una captura del escritorio";
+"The screenshot can't be loaded right now." = "La captura de pantalla no se puede cargar ahora.";
+"Source: %@" = "Fuente: %@";

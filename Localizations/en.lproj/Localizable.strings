@@ -468,6 +468,7 @@
 "Saved %@" = "Saved %@";
 "Saving %@ as a template" = "Saving %@ as a template";
 "Saving “%@”…" = "Saving “%@”…";
+"Screenshot" = "Screenshot";
 "Script" = "Script";
 "Seamless Mode needs a running Windows guest with the latest guest tools. Choose Install Guest Tools… to update them." = "Seamless Mode needs a running Windows guest with the latest guest tools. Choose Install Guest Tools… to update them.";
 "Secure Boot" = "Secure Boot";
@@ -494,6 +495,7 @@
 "Show" = "Show";
 "Show All Systems" = "Show All Systems";
 "Show Start Menu" = "Show Start Menu";
+"Show a screenshot of the desktop" = "Show a screenshot of the desktop";
 "Show in Finder" = "Show in Finder";
 "Shut Down" = "Shut Down";
 "Shut Down and Quit" = "Shut Down and Quit";
@@ -515,6 +517,7 @@
 "Sound is on" = "Sound is on";
 "Sound will be off the next time this virtual machine starts." = "Sound will be off the next time this virtual machine starts.";
 "Sound will be on the next time this virtual machine starts." = "Sound will be on the next time this virtual machine starts.";
+"Source: %@" = "Source: %@";
 "Start" = "Start";
 "Start in Recovery" = "Start in Recovery";
 "Start when ready" = "Start when ready";
@@ -577,6 +580,7 @@
 "The network connection, and ports forwarded from this Mac." = "The network connection, and ports forwarded from this Mac.";
 "The network virtual machines share, and reaching them with ssh." = "The network virtual machines share, and reaching them with ssh.";
 "The password is used to sign in on the console. The account can use sudo without it." = "The password is used to sign in on the console. The account can use sudo without it.";
+"The screenshot can't be loaded right now." = "The screenshot can't be loaded right now.";
 "The scripts run in this order the first time the machine starts." = "The scripts run in this order the first time the machine starts.";
 "The tctl tool creates, starts and connects to virtual machines from Terminal. Installing it puts a link in %@, for which macOS may ask for an administrator's password. Then try “tctl help”." = "The tctl tool creates, starts and connects to virtual machines from Terminal. Installing it puts a link in %@, for which macOS may ask for an administrator's password. Then try “tctl help”.";
 "The template “%@” isn't there any more." = "The template “%@” isn't there any more.";

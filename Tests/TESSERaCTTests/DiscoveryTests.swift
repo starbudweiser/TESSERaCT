@@ -75,6 +75,12 @@ private let digest512 = String(repeating: "cd", count: 64)
             #expect(entry.defaults.memoryGB >= 1 && entry.defaults.diskGB >= 4 && entry.defaults.cpuCount >= 1)
         }
         #expect(Set(catalog.entries.map(\.id)).count == catalog.entries.count)
+        // A screenshot is a picture from a source that says who made it, and most systems have one.
+        for entry in catalog.entries {
+            guard let screenshot = entry.screenshot else { continue }
+            #expect(screenshot.url.scheme == "https" && screenshot.page?.scheme == "https" && screenshot.credit != nil, "\(entry.id)")
+        }
+        #expect(catalog.entries.filter { $0.screenshot != nil }.count >= catalog.entries.count - 4)
     }
 
     @Test func aCatalogueOfANewerLayoutIsLeftAlone() throws {

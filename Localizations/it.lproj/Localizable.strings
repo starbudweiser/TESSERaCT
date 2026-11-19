@@ -468,6 +468,7 @@
 "Saved %@" = "Salvato il %@";
 "Saving %@ as a template" = "Salvataggio di %@ come modello";
 "Saving “%@”…" = "Salvataggio di “%@”…";
+"Screenshot" = "Schermata";
 "Script" = "Script";
 "Seamless Mode needs a running Windows guest with the latest guest tools. Choose Install Guest Tools… to update them." = "La Modalità integrata richiede un ospite Windows in esecuzione con gli ultimi strumenti ospite. Scegli Installa strumenti ospite… per aggiornarli.";
 "Secure Boot" = "Secure Boot";
@@ -494,6 +495,7 @@
 "Show" = "Mostra";
 "Show All Systems" = "Mostra tutti i sistemi";
 "Show Start Menu" = "Mostra il menu Start";
+"Show a screenshot of the desktop" = "Mostra una schermata del desktop";
 "Show in Finder" = "Mostra nel Finder";
 "Shut Down" = "Spegni";
 "Shut Down and Quit" = "Spegni ed esci";
@@ -515,6 +517,7 @@
 "Sound is on" = "L'audio è attivo";
 "Sound will be off the next time this virtual machine starts." = "L'audio sarà disattivato al prossimo avvio di questa macchina virtuale.";
 "Sound will be on the next time this virtual machine starts." = "L'audio sarà attivo al prossimo avvio di questa macchina virtuale.";
+"Source: %@" = "Fonte: %@";
 "Start" = "Avvia";
 "Start in Recovery" = "Avvia in recupero";
 "Start when ready" = "Avvia quando è pronta";
@@ -577,6 +580,7 @@
 "The network connection, and ports forwarded from this Mac." = "La connessione di rete e le porte inoltrate da questo Mac.";
 "The network virtual machines share, and reaching them with ssh." = "La rete condivisa dalle macchine virtuali e come raggiungerle con ssh.";
 "The password is used to sign in on the console. The account can use sudo without it." = "La password serve per accedere dalla console. L'account può usare sudo senza di essa.";
+"The screenshot can't be loaded right now." = "Impossibile caricare la schermata in questo momento.";
 "The scripts run in this order the first time the machine starts." = "Gli script vengono eseguiti in quest'ordine al primo avvio della macchina.";
 "The tctl tool creates, starts and connects to virtual machines from Terminal. Installing it puts a link in %@, for which macOS may ask for an administrator's password. Then try “tctl help”." = "Lo strumento tctl crea, avvia e si collega alle macchine virtuali da Terminale. L'installazione inserisce un collegamento in %@, per cui macOS può chiedere la password di un amministratore. Poi prova “tctl help”.";
 "The template “%@” isn't there any more." = "Il modello “%@” non esiste più.";
