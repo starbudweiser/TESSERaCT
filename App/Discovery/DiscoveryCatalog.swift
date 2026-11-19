@@ -78,6 +78,8 @@ nonisolated struct DiscoveryEntry: Codable, Sendable, Hashable, Identifiable {
     var tags: [String]
     /// Shown in the lead section while ``rotationDate`` has come and is the newest.
     var featured: Bool
+    /// The colour of the system's square, as `#rrggbb`.
+    var color: String?
     /// The day the entry was put forward, as `yyyy-MM-dd`.
     var rotationDate: String?
     var defaults: Defaults

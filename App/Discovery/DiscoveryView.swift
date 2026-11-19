@@ -1,7 +1,8 @@
 import SwiftUI
 import VMCore
 
-/// The discovery window: systems to try in virtual machines, with a pick of the day and of the week.
+/// The systems to try: a pick of the day and of the week, then the whole list. It is the first page of
+/// the New Virtual Machine window.
 struct DiscoveryView: View {
     @Environment(AppModel.self) private var model
     @State private var service = DiscoveryService.shared
@@ -13,24 +14,22 @@ struct DiscoveryView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            header
-            Divider()
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    let all = service.items
-                    if all.isEmpty {
-                        emptyState
-                    } else {
-                        spotlight(all)
-                        filters
-                        grid
-                    }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                header
+                let all = service.items
+                if all.isEmpty {
+                    emptyState
+                } else {
+                    spotlight(all)
+                    filters
+                    grid
                 }
-                .padding(20)
             }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 18)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(width: 800, height: 660)
         .task { await service.refreshIfNeeded() }
         .sheet(item: $itemForNewMachine) { item in
             DiscoveryCreateSheet(item: item)
@@ -40,17 +39,17 @@ struct DiscoveryView: View {
     // MARK: Header
 
     private var header: some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(alignment: .top, spacing: 16) {
             VStack(alignment: .leading, spacing: 3) {
                 Text("Discover Systems")
-                    .font(.headline)
+                    .font(.system(size: 17, weight: .semibold))
                 Text("Try other systems in virtual machines: BSD, alternative Linux distributions and more. The list renews itself every day.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 12)
-            VStack(alignment: .trailing, spacing: 2) {
+            VStack(alignment: .trailing, spacing: 4) {
                 Button {
                     Task { await service.refresh() }
                 } label: {
@@ -60,14 +59,12 @@ struct DiscoveryView: View {
                         Label("Refresh", systemImage: "arrow.clockwise")
                     }
                 }
-                .buttonStyle(PillButtonStyle())
+                .buttonStyle(DiscoveryPillStyle(compact: true))
                 .disabled(service.isRefreshing)
                 updatedLabel
             }
+            .fixedSize()
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 18)
-        .padding(.bottom, 14)
     }
 
     @ViewBuilder
@@ -100,36 +97,74 @@ struct DiscoveryView: View {
 
     private func spotlight(_ all: [DiscoveryItem]) -> some View {
         let picks = service.spotlight(in: all)
-        return HStack(alignment: .top, spacing: 14) {
+        return HStack(alignment: .top, spacing: 12) {
             if let day = picks.day {
-                DiscoveryCard(item: day, heading: String(localized: "Today's Discovery"), prominent: true) { itemForNewMachine = day }
+                DiscoveryCard(item: day, heading: String(localized: "Today's Discovery"), background: Self.dayColor) { itemForNewMachine = day }
             }
             if let week = picks.week {
-                DiscoveryCard(item: week, heading: String(localized: "This Week's Discovery"), prominent: true) { itemForNewMachine = week }
+                DiscoveryCard(item: week, heading: String(localized: "This Week's Discovery"), background: Self.weekColor) { itemForNewMachine = week }
             }
         }
     }
 
+    /// Matt colours that don't change with the appearance: the white text on them always reads.
+    private static let dayColor = Color(red: 0x3B / 255, green: 0x2F / 255, blue: 0x9E / 255)
+    private static let weekColor = Color(red: 0x0F / 255, green: 0x5A / 255, blue: 0x63 / 255)
+
     private var filters: some View {
         HStack(spacing: 8) {
+            Text("All Systems")
+                .font(.system(size: 13, weight: .semibold))
+            Spacer(minLength: 12)
             filterPill(String(localized: "All"), isOn: familyFilter == nil) { familyFilter = nil }
             ForEach(DiscoveryEntry.Family.allCases, id: \.self) { family in
                 filterPill(family.title, isOn: familyFilter == family) { familyFilter = family }
             }
-            Spacer()
         }
     }
 
     private func filterPill(_ title: String, isOn: Bool, action: @escaping () -> Void) -> some View {
         Button(title, action: action)
-            .buttonStyle(PillButtonStyle(prominent: isOn))
+            .buttonStyle(DiscoveryPillStyle(kind: isOn ? .accent : .plain, compact: true))
     }
 
     private var grid: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 340), spacing: 14, alignment: .top)], alignment: .leading, spacing: 14) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 220), spacing: 10, alignment: .top)], alignment: .leading, spacing: 10) {
             ForEach(items) { item in
-                DiscoveryCard(item: item, heading: nil, prominent: false) { itemForNewMachine = item }
+                DiscoveryCard(item: item, heading: nil, background: nil) { itemForNewMachine = item }
             }
+        }
+    }
+}
+
+/// The pills of the discovery page: one height and one inner margin for every button, a label that never
+/// wraps, and (for the main action of a card) the full width of the card, so that it shares its edges.
+struct DiscoveryPillStyle: ButtonStyle {
+    enum Kind { case plain, accent, light }
+
+    var kind: Kind = .plain
+    var compact = false
+    var fullWidth = false
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: compact ? 12 : 12.5, weight: .medium))
+            .lineLimit(1)
+            .fixedSize(horizontal: !fullWidth, vertical: true)
+            .padding(.horizontal, compact ? 14 : 20)
+            .frame(maxWidth: fullWidth ? .infinity : nil)
+            .frame(height: compact ? 28 : 34)
+            .foregroundStyle(kind == .accent ? Color.white : (kind == .light ? Color(white: 0.11) : Color.primary))
+            .background(Capsule().fill(fill(pressed: configuration.isPressed)))
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
+    }
+
+    private func fill(pressed: Bool) -> Color {
+        switch kind {
+        case .plain: pressed ? Theme.fill2 : Theme.fill
+        case .accent: Color.accentColor.opacity(pressed ? 0.8 : 1)
+        case .light: Color.white.opacity(pressed ? 0.8 : 1)
         }
     }
 }
@@ -160,63 +195,106 @@ extension DiscoveryEntry.Tag {
     }
 }
 
+extension DiscoveryEntry {
+    /// The colour of the system's square: the catalogue's, else one that goes with its name.
+    var tint: Color {
+        if let color, let value = UInt32(color.trimmingCharacters(in: CharacterSet(charactersIn: "#")), radix: 16) {
+            return Color(red: Double((value >> 16) & 0xff) / 255, green: Double((value >> 8) & 0xff) / 255, blue: Double(value & 0xff) / 255)
+        }
+        let palette: [Color] = [.orange, .blue, .green, .purple, .pink, .teal, .indigo]
+        return palette[Int(id.utf8.reduce(0) { ($0 &* 31 &+ UInt32($1)) % 1000 }) % palette.count]
+    }
+}
+
 // MARK: - A card
 
-/// A system of the catalogue: what it is, which version, and the button that makes a machine of it.
+/// A system of the catalogue: what it is, which version, and what makes a machine of it. A card with a
+/// `background` is one of the day's picks, with its action in full view; the others are one button.
+/// Everything in a card sits on its left edge; nothing floats to the right of what is above it.
 private struct DiscoveryCard: View {
     let item: DiscoveryItem
     let heading: String?
-    let prominent: Bool
+    let background: Color?
     let create: () -> Void
 
     @Environment(AppModel.self) private var model
 
+    private var isSpotlight: Bool { background != nil }
     private var creation: MachineCreation? {
         model.creations.first { $0.discoveryID == item.id }
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        Group {
+            if isSpotlight {
+                content.background(RoundedRectangle(cornerRadius: Radius.card, style: .continuous).fill(background ?? .clear))
+            } else {
+                Button(action: create) { content }
+                    .buttonStyle(.plain)
+                    .disabled(creation != nil || item.snapshot == nil)
+                    .surface()
+            }
+        }
+    }
+
+    private var content: some View {
+        VStack(alignment: .leading, spacing: 8) {
             if let heading {
                 Text(heading)
-                    .font(.caption.weight(.semibold))
+                    .font(.system(size: 11, weight: .bold))
                     .textCase(.uppercase)
-                    .foregroundStyle(Theme.brand)
+                    .tracking(0.6)
+                    .foregroundStyle(.white.opacity(0.7))
             }
-            HStack(spacing: 8) {
-                Text(verbatim: item.entry.name)
-                    .font(.system(size: prominent ? 17 : 15, weight: .semibold))
-                chip(item.entry.family.title, fill: Theme.fill)
-                Spacer(minLength: 0)
-                if item.isNewVersion {
-                    Text("New version")
-                        .font(.caption.weight(.semibold))
+            HStack(spacing: 9) {
+                if !isSpotlight {
+                    Text(verbatim: String(item.entry.name.prefix(1)))
+                        .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(Capsule().fill(Theme.brand))
+                        .frame(width: 26, height: 26)
+                        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(item.entry.tint))
                 }
+                Text(verbatim: item.entry.name)
+                    .font(.system(size: isSpotlight ? 22 : 14, weight: isSpotlight ? .bold : .semibold))
+                    .foregroundStyle(isSpotlight ? .white : .primary)
+                    .lineLimit(1)
+                chip(item.entry.family.title)
+                if item.isNewVersion { newBadge }
             }
             if let line = metadataLine {
                 Text(verbatim: line)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(isSpotlight ? .white.opacity(0.65) : .secondary)
             }
             Text(item.entry.localizedSummary)
-                .font(.callout)
-                .foregroundStyle(.secondary)
+                .font(isSpotlight ? .callout : .system(size: 12))
+                .foregroundStyle(isSpotlight ? .white.opacity(0.85) : .secondary)
+                .lineLimit(isSpotlight ? nil : 3)
+                .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
             if !item.entry.knownTags.isEmpty {
                 HStack(spacing: 6) {
-                    ForEach(item.entry.knownTags, id: \.self) { chip($0.title, fill: Theme.fill) }
+                    ForEach(item.entry.knownTags, id: \.self) { chip($0.title) }
                 }
             }
             Spacer(minLength: 0)
-            action
+            if isSpotlight || creation != nil {
+                action
+            }
         }
-        .padding(14)
-        .frame(maxWidth: .infinity, minHeight: prominent ? 230 : 210, alignment: .topLeading)
-        .surface()
+        .padding(isSpotlight ? 18 : 12)
+        .frame(maxWidth: .infinity, minHeight: isSpotlight ? 232 : 0, alignment: .topLeading)
+        .contentShape(Rectangle())
+    }
+
+    private var newBadge: some View {
+        Text("New version")
+            .font(.system(size: 11, weight: .semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 2)
+            .background(Capsule().fill(Theme.brand))
+            .fixedSize()
     }
 
     @ViewBuilder
@@ -226,19 +304,19 @@ private struct DiscoveryCard: View {
                 if let message = creation.errorMessage {
                     Text(message)
                         .font(.caption)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(isSpotlight ? Color.white : Color.red)
                         .fixedSize(horizontal: false, vertical: true)
                     Button("Dismiss") { model.dismiss(creation) }
-                        .buttonStyle(PillButtonStyle())
+                        .buttonStyle(DiscoveryPillStyle(kind: isSpotlight ? .light : .plain, compact: true))
                 } else {
                     HStack {
                         Text(creation.status)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(isSpotlight ? .white.opacity(0.8) : .secondary)
                             .lineLimit(1)
                         Spacer(minLength: 8)
                         Button("Cancel") { model.dismiss(creation) }
-                            .buttonStyle(PillButtonStyle())
+                            .buttonStyle(DiscoveryPillStyle(kind: isSpotlight ? .light : .plain, compact: true))
                     }
                     if let fraction = creation.fraction {
                         ProgressView(value: fraction)
@@ -249,17 +327,19 @@ private struct DiscoveryCard: View {
             }
         } else {
             Button("Download and Create Machine", action: create)
-                .buttonStyle(PillButtonStyle(prominent: true))
+                .buttonStyle(DiscoveryPillStyle(kind: .light, fullWidth: true))
                 .disabled(item.snapshot == nil)
         }
     }
 
-    private func chip(_ title: String, fill: Color) -> some View {
+    private func chip(_ title: String) -> some View {
         Text(verbatim: title)
-            .font(.caption)
-            .padding(.horizontal, 8)
+            .font(.system(size: 11))
+            .foregroundStyle(isSpotlight ? .white : .secondary)
+            .padding(.horizontal, 10)
             .padding(.vertical, 2)
-            .background(Capsule().fill(fill))
+            .background(Capsule().fill(isSpotlight ? Color.white.opacity(0.16) : Theme.fill))
+            .fixedSize()
     }
 
     /// `15.1 · 1.2 GB · Jun 12, 2026`

@@ -105,10 +105,6 @@ struct MenuBarPanel: View {
                     model.windows.showTemplates()
                     dismiss()
                 }
-                Button("Discover Systems…") {
-                    model.windows.showDiscovery()
-                    dismiss()
-                }
                 Divider()
                 Button("Delete All Virtual Machines…", role: .destructive, action: confirmDeletingAll)
                     .disabled(model.library.removableMachines.isEmpty)

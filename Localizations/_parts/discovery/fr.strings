@@ -38,3 +38,10 @@
 "No published checksum was found for this system." = "Aucune empreinte publiée n'a été trouvée pour ce système.";
 "The image can't be reached right now." = "L'image n'est pas joignable pour le moment.";
 "Connect to the internet to download this system." = "Connectez-vous à Internet pour télécharger ce système.";
+"Discover" = "Découvrir";
+"Systems to try" = "Systèmes à essayer";
+"Create Another Way" = "Créer autrement";
+"For Arm" = "Pour Arm";
+"From a template" = "Depuis un modèle";
+"Drop an Image" = "Déposer une image";
+"Drop an ISO or IPSW file here to make a machine from it." = "Déposez ici un fichier ISO ou IPSW pour créer une machine à partir de celui-ci.";

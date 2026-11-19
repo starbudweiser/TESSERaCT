@@ -30,6 +30,7 @@ nonisolated enum DiscoveryFallback {
         "experimental"
       ],
       "featured": false,
+      "color": "#c0392b",
       "defaults": {
         "cpuCount": 4,
         "memoryGB": 4,
@@ -72,6 +73,7 @@ nonisolated enum DiscoveryFallback {
         "light"
       ],
       "featured": false,
+      "color": "#e5b80b",
       "defaults": {
         "cpuCount": 2,
         "memoryGB": 2,
@@ -116,6 +118,7 @@ nonisolated enum DiscoveryFallback {
         "retro"
       ],
       "featured": false,
+      "color": "#e67e22",
       "defaults": {
         "cpuCount": 2,
         "memoryGB": 2,
@@ -159,6 +162,7 @@ nonisolated enum DiscoveryFallback {
         "containers"
       ],
       "featured": false,
+      "color": "#0d597f",
       "defaults": {
         "cpuCount": 2,
         "memoryGB": 1,
@@ -199,6 +203,7 @@ nonisolated enum DiscoveryFallback {
         "desktop"
       ],
       "featured": false,
+      "color": "#c2185b",
       "defaults": {
         "cpuCount": 2,
         "memoryGB": 2,
@@ -240,6 +245,7 @@ nonisolated enum DiscoveryFallback {
         "desktop"
       ],
       "featured": true,
+      "color": "#5277c3",
       "rotationDate": "2026-11-19",
       "defaults": {
         "cpuCount": 4,
@@ -281,6 +287,7 @@ nonisolated enum DiscoveryFallback {
         "light"
       ],
       "featured": false,
+      "color": "#2fa34a",
       "defaults": {
         "cpuCount": 4,
         "memoryGB": 4,
@@ -320,6 +327,7 @@ nonisolated enum DiscoveryFallback {
         "desktop"
       ],
       "featured": false,
+      "color": "#367bf0",
       "defaults": {
         "cpuCount": 4,
         "memoryGB": 4,
@@ -360,6 +368,7 @@ nonisolated enum DiscoveryFallback {
         "light"
       ],
       "featured": false,
+      "color": "#8e44ad",
       "defaults": {
         "cpuCount": 2,
         "memoryGB": 2,
@@ -401,6 +410,7 @@ nonisolated enum DiscoveryFallback {
         "experimental"
       ],
       "featured": false,
+      "color": "#294172",
       "defaults": {
         "cpuCount": 2,
         "memoryGB": 2,
@@ -437,6 +447,7 @@ nonisolated enum DiscoveryFallback {
         "server"
       ],
       "featured": false,
+      "color": "#10b981",
       "defaults": {
         "cpuCount": 2,
         "memoryGB": 2,
@@ -478,6 +489,7 @@ nonisolated enum DiscoveryFallback {
         "server"
       ],
       "featured": false,
+      "color": "#0ea5e9",
       "defaults": {
         "cpuCount": 2,
         "memoryGB": 2,

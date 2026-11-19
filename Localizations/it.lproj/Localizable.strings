@@ -174,6 +174,7 @@
 "Couldn't save “%@” as a template" = "Impossibile salvare “%@” come modello";
 "Couldn't take the snapshot" = "Impossibile creare l'istantanea";
 "Create" = "Crea";
+"Create Another Way" = "Crea in altro modo";
 "Create a virtual machine" = "Crea una macchina virtuale";
 "Create a virtual machine to run macOS, Linux or Windows on this Mac." = "Crea una macchina virtuale per eseguire macOS, Linux o Windows su questo Mac.";
 "Create, start and connect to virtual machines from Terminal." = "Crea, avvia e collegati alle macchine virtuali da Terminale.";
@@ -207,6 +208,7 @@
 "Disc and disk images" = "Immagini disco";
 "Disc and disk images are plugged in as USB drives and can be changed while the virtual machine runs." = "Le immagini disco vengono collegate come unità USB e possono essere cambiate mentre la macchina virtuale è in esecuzione.";
 "Discard Saved State" = "Elimina stato salvato";
+"Discover" = "Scopri";
 "Discover Systems" = "Scopri sistemi";
 "Discover Systems…" = "Scopri sistemi…";
 "Disk" = "Disco";
@@ -231,6 +233,8 @@
 "Draws with your Mac's GPU, for a smooth desktop." = "Disegna con la GPU del tuo Mac, per un desktop fluido.";
 "Draws with your Mac's GPU, for smooth 3D and video. With current guest tools and the bundled driver, Windows follows the window as you resize it. Older drivers need a restart to make it sharp at a new size." = "Disegna con la GPU del tuo Mac, per 3D e video fluidi. Con gli strumenti ospite attuali e il driver incluso, Windows segue la finestra quando la ridimensioni. I driver meno recenti richiedono un riavvio per essere nitidi a una nuova dimensione.";
 "Draws with your Mac's GPU. The machine runs on QEMU: it can't be suspended or use Rosetta or nested virtualization, and shared folders added while it runs appear after a restart." = "Disegna con la GPU del tuo Mac. La macchina funziona con QEMU: non può essere sospesa né usare Rosetta o la virtualizzazione nidificata, e le cartelle condivise aggiunte mentre è in esecuzione compaiono dopo un riavvio.";
+"Drop an ISO or IPSW file here to make a machine from it." = "Trascina qui un file ISO o IPSW per creare una macchina da esso.";
+"Drop an Image" = "Trascina un'immagine";
 "Duplicate" = "Duplica";
 "Each folder appears in the guest under %@/<name>, mounted by the guest tools. Folders shared while the machine runs appear after it restarts." = "Ogni cartella compare nell'ospite in %@/<nome>, montata dagli strumenti ospite. Le cartelle condivise mentre la macchina è in esecuzione compaiono dopo il riavvio.";
 "Each folder can be on another disk. Virtual machines, templates and downloads that are there already stay where they are. To move a virtual machine, use Move… in its settings." = "Ogni cartella può trovarsi su un altro disco. Le macchine virtuali, i modelli e i download già presenti restano dove sono. Per spostare una macchina virtuale, usa Sposta… nelle sue impostazioni.";
@@ -253,9 +257,11 @@
 "Folders appear in the guest under “My Shared Files” in the Finder sidebar." = "Le cartelle compaiono nell'ospite sotto “My Shared Files” nella barra laterale del Finder.";
 "Folders then appear under %@. To mount them at every start, also run this once (after installing, not in a live session):" = "Le cartelle compaiono poi in %@. Per montarle a ogni avvio, esegui anche questo una volta (dopo l'installazione, non in una sessione live):";
 "For %@. They run in the order you add them." = "Per %@. Vengono eseguiti nell'ordine in cui li aggiungi.";
+"For Arm" = "Per Arm";
 "Force Stop" = "Forza arresto";
 "From a File" = "Da un file";
 "From a file" = "Da un file";
+"From a template" = "Da un modello";
 "From your folder" = "Dalla tua cartella";
 "Full Name" = "Nome completo";
 "GB" = "GB";
@@ -528,6 +534,7 @@
 "Suspend saves their state so they pick up where they left off. Shut Down turns them off without saving state; a virtual machine without the guest tools is stopped at once." = "Sospendi salva il loro stato in modo che riprendano da dove si erano fermate. Spegni le spegne senza salvare lo stato; una macchina virtuale senza gli strumenti ospite viene arrestata subito.";
 "Suspending…" = "Sospensione…";
 "System" = "Sistema";
+"Systems to try" = "Sistemi da provare";
 "TCP" = "TCP";
 "TESSERaCT keeps a copy of Apple's D3DMetal, found in %@. It stays Apple's software, under Apple's licence. Machines use it the next time they start." = "TESSERaCT conserva una copia del D3DMetal di Apple, trovato in %@. Resta software di Apple, con licenza Apple. Le macchine lo usano al prossimo avvio.";
 "TPM 2.0" = "TPM 2.0";

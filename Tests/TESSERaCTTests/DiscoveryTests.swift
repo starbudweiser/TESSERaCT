@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 import Testing
 import VMCore
 @testable import TESSERaCT
@@ -414,6 +415,35 @@ private let digest512 = String(repeating: "cd", count: 64)
         await creation.task?.value
         #expect(creation.errorMessage != nil)
         #expect(model.library.machines.isEmpty)
+    }
+
+    /// Draws the New Virtual Machine window to a PNG: `TESSERACT_SNAPSHOT=/path/folder swift test --filter drawsTheWindow`.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["TESSERACT_SNAPSHOT"] != nil))
+    func drawsTheWindow() throws {
+        let folder = URL(fileURLWithPath: ProcessInfo.processInfo.environment["TESSERACT_SNAPSHOT"]!, isDirectory: true)
+        let directory = URL(fileURLWithPath: "/tmp", isDirectory: true).appending(path: "tctl-app-tests-\(UUID().uuidString)", directoryHint: .isDirectory)
+        setenv("TESSERACT_HOME", directory.path, 1)
+        defer { unsetenv("TESSERACT_HOME"); try? FileManager.default.removeItem(at: directory) }
+        let model = AppModel.shared
+        model.stopControlServer()
+        NSApplication.shared.appearance = NSAppearance(named: .darkAqua)
+        let iso = directory.appending(path: "disc.iso")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try Data("x".utf8).write(to: iso)
+        let requests: [(String, NewMachineRequest)] = [("nouvelle-machine", NewMachineRequest()), ("nouvelle-machine-linux", try #require(NewMachineRequest(droppedFile: iso)))]
+        for (name, request) in requests {
+            let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 960, height: 700), styleMask: [.titled], backing: .buffered, defer: false)
+            window.appearance = NSAppearance(named: .darkAqua)
+            let host = NSHostingView(rootView: NewMachineView(request: request) { _, _ in }.environment(model).background(Theme.chat))
+            window.contentView = host
+            window.layoutIfNeeded()
+            host.layoutSubtreeIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(1.5))
+            let bitmap = try #require(host.bitmapImageRepForCachingDisplay(in: host.bounds))
+            host.cacheDisplay(in: host.bounds, to: bitmap)
+            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+            try #require(bitmap.representation(using: .png, properties: [:])).write(to: folder.appending(path: "\(name).png"))
+        }
     }
 
     // MARK: Downloads

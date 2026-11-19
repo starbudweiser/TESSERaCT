@@ -83,7 +83,7 @@ struct WindowsMachineForm: View {
             Divider()
             FormButtons(problem: nameProblem ?? diskProblem, canCreate: canCreate, create: create)
         }
-        .frame(height: mode.formHeight)
+        .frame(maxHeight: .infinity)
         .onAppear {
             if let initialDisc {
                 useLocalDisc(at: initialDisc)

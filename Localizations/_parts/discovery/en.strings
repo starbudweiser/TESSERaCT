@@ -38,3 +38,10 @@
 "No published checksum was found for this system." = "No published checksum was found for this system.";
 "The image can't be reached right now." = "The image can't be reached right now.";
 "Connect to the internet to download this system." = "Connect to the internet to download this system.";
+"Discover" = "Discover";
+"Systems to try" = "Systems to try";
+"Create Another Way" = "Create Another Way";
+"For Arm" = "For Arm";
+"From a template" = "From a template";
+"Drop an Image" = "Drop an Image";
+"Drop an ISO or IPSW file here to make a machine from it." = "Drop an ISO or IPSW file here to make a machine from it.";

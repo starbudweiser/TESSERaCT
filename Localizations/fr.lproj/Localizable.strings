@@ -174,6 +174,7 @@
 "Couldn't save “%@” as a template" = "Impossible d'enregistrer « %@ » comme modèle";
 "Couldn't take the snapshot" = "Impossible de prendre l'instantané";
 "Create" = "Créer";
+"Create Another Way" = "Créer autrement";
 "Create a virtual machine" = "Créer une machine virtuelle";
 "Create a virtual machine to run macOS, Linux or Windows on this Mac." = "Créez une machine virtuelle pour exécuter macOS, Linux ou Windows sur ce Mac.";
 "Create, start and connect to virtual machines from Terminal." = "Créez, démarrez et connectez-vous aux machines virtuelles depuis Terminal.";
@@ -207,6 +208,7 @@
 "Disc and disk images" = "Images disque";
 "Disc and disk images are plugged in as USB drives and can be changed while the virtual machine runs." = "Les images disque sont branchées comme lecteurs USB et peuvent être changées pendant que la machine virtuelle tourne.";
 "Discard Saved State" = "Supprimer l'état enregistré";
+"Discover" = "Découvrir";
 "Discover Systems" = "Découvrir des systèmes";
 "Discover Systems…" = "Découvrir des systèmes…";
 "Disk" = "Disque";
@@ -231,6 +233,8 @@
 "Draws with your Mac's GPU, for a smooth desktop." = "Dessine avec le GPU de votre Mac, pour un bureau fluide.";
 "Draws with your Mac's GPU, for smooth 3D and video. With current guest tools and the bundled driver, Windows follows the window as you resize it. Older drivers need a restart to make it sharp at a new size." = "Dessine avec le GPU de votre Mac, pour une 3D et une vidéo fluides. Avec les outils invités actuels et le pilote fourni, Windows suit la fenêtre lorsque vous la redimensionnez. Les anciens pilotes nécessitent un redémarrage pour retrouver la netteté à une nouvelle taille.";
 "Draws with your Mac's GPU. The machine runs on QEMU: it can't be suspended or use Rosetta or nested virtualization, and shared folders added while it runs appear after a restart." = "Dessine avec le GPU de votre Mac. La machine fonctionne avec QEMU : elle ne peut pas être suspendue ni utiliser Rosetta ou la virtualisation imbriquée, et les dossiers partagés ajoutés pendant son exécution n'apparaissent qu'après un redémarrage.";
+"Drop an ISO or IPSW file here to make a machine from it." = "Déposez ici un fichier ISO ou IPSW pour créer une machine à partir de celui-ci.";
+"Drop an Image" = "Déposer une image";
 "Duplicate" = "Dupliquer";
 "Each folder appears in the guest under %@/<name>, mounted by the guest tools. Folders shared while the machine runs appear after it restarts." = "Chaque dossier apparaît dans l'invité sous %@/<nom>, monté par les outils invités. Les dossiers partagés pendant que la machine tourne apparaissent après son redémarrage.";
 "Each folder can be on another disk. Virtual machines, templates and downloads that are there already stay where they are. To move a virtual machine, use Move… in its settings." = "Chaque dossier peut se trouver sur un autre disque. Les machines virtuelles, modèles et téléchargements déjà présents restent où ils sont. Pour déplacer une machine virtuelle, utilisez Déplacer… dans ses réglages.";
@@ -253,9 +257,11 @@
 "Folders appear in the guest under “My Shared Files” in the Finder sidebar." = "Les dossiers apparaissent dans l'invité sous « My Shared Files » dans la barre latérale du Finder.";
 "Folders then appear under %@. To mount them at every start, also run this once (after installing, not in a live session):" = "Les dossiers apparaissent ensuite sous %@. Pour les monter à chaque démarrage, exécutez aussi ceci une fois (après l'installation, pas dans une session live) :";
 "For %@. They run in the order you add them." = "Pour %@. Ils s'exécutent dans l'ordre où vous les ajoutez.";
+"For Arm" = "Pour Arm";
 "Force Stop" = "Forcer l'arrêt";
 "From a File" = "Depuis un fichier";
 "From a file" = "Depuis un fichier";
+"From a template" = "Depuis un modèle";
 "From your folder" = "De votre dossier";
 "Full Name" = "Nom complet";
 "GB" = "Go";
@@ -528,6 +534,7 @@
 "Suspend saves their state so they pick up where they left off. Shut Down turns them off without saving state; a virtual machine without the guest tools is stopped at once." = "Suspendre enregistre leur état pour qu'elles reprennent là où elles s'étaient arrêtées. Éteindre les arrête sans enregistrer leur état ; une machine virtuelle sans les outils invités est arrêtée immédiatement.";
 "Suspending…" = "Suspension…";
 "System" = "Système";
+"Systems to try" = "Systèmes à essayer";
 "TCP" = "TCP";
 "TESSERaCT keeps a copy of Apple's D3DMetal, found in %@. It stays Apple's software, under Apple's licence. Machines use it the next time they start." = "TESSERaCT garde une copie du D3DMetal d'Apple, trouvé dans %@. Il reste un logiciel d'Apple, sous licence Apple. Les machines l'utilisent à leur prochain démarrage.";
 "TPM 2.0" = "TPM 2.0";

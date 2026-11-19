@@ -33,8 +33,22 @@ struct NewMachineRequest: Identifiable {
 
 /// What a new machine is made from: a system to install, or one of the templates.
 enum NewMachineSource: Hashable {
+    /// The systems to try: the catalogue of discoveries, the window's first page.
+    case discover
     case system(GuestFamily)
     case template
+}
+
+private struct NewMachineShellKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    /// Set inside the New Virtual Machine window, whose sidebar picks the kind of system: the forms leave out their own picker for it.
+    var hasNewMachineSidebar: Bool {
+        get { self[NewMachineShellKey.self] }
+        set { self[NewMachineShellKey.self] = newValue }
+    }
 }
 
 /// The form that creates a new virtual machine, shown in the New Virtual Machine window.
@@ -54,6 +68,8 @@ struct NewMachineView: View {
     @State private var requestedMode: NewMachineMode?
     /// The machine is made from a template, instead of a system that is installed.
     @State private var isFromTemplate = false
+    /// The catalogue of discoveries is shown, instead of a form. The window opens on it, unless it was opened for a file.
+    @State private var isDiscovering: Bool
     /// The file the form was opened for.
     private let source: NewMachineRequest.Source
 
@@ -63,8 +79,12 @@ struct NewMachineView: View {
         _preferredMode = AppStorage(wrappedValue: UserDefaults.standard.string(forKey: "newLinuxMachineMode")
             .flatMap(NewMachineMode.init(rawValue:)) ?? .simple, "newMachineMode")
         switch request.source {
-        case .unspecified: _requestedMode = State(initialValue: nil)
-        case .installerDisc, .restoreImage: _requestedMode = State(initialValue: .advanced)
+        case .unspecified:
+            _requestedMode = State(initialValue: nil)
+            _isDiscovering = State(initialValue: true)
+        case .installerDisc, .restoreImage:
+            _requestedMode = State(initialValue: .advanced)
+            _isDiscovering = State(initialValue: false)
         }
         switch request.source {
         case .unspecified:
@@ -77,8 +97,27 @@ struct NewMachineView: View {
     }
 
     var body: some View {
+        // The sidebar and the page share the window's frame: same top, same bottom, the same gap between them.
+        HStack(alignment: .top, spacing: 12) {
+            NewMachineSidebar(selection: sourceBinding)
+                .frame(width: 230)
+            page
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(RoundedRectangle(cornerRadius: Radius.card, style: .continuous).fill(Theme.win))
+                .overlay { RoundedRectangle(cornerRadius: Radius.card, style: .continuous).strokeBorder(Theme.sep, lineWidth: 0.5).allowsHitTesting(false) }
+                .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
+        }
+        .padding(12)
+        .frame(width: 960, height: 700)
+        .environment(\.hasNewMachineSidebar, true)
+    }
+
+    @ViewBuilder
+    private var page: some View {
         VStack(spacing: 0) {
-            if isFromTemplate {
+            if isDiscovering {
+                DiscoveryView()
+            } else if isFromTemplate {
                 TemplateSourceForm(source: sourceBinding, mode: modeBinding, onReady: onReady)
             } else {
                 switch family {
@@ -91,20 +130,23 @@ struct NewMachineView: View {
                 }
             }
         }
-        .frame(width: 600)
     }
 
     /// A file the form was opened for doesn't change what the window opens on the next time. Picking
     /// a system by hand does. A template is picked for the one machine.
     private var sourceBinding: Binding<NewMachineSource> {
-        Binding(get: { isFromTemplate ? .template : .system(family) }, set: { newValue in
+        Binding(get: { isDiscovering ? .discover : isFromTemplate ? .template : .system(family) }, set: { newValue in
             switch newValue {
+            case .discover:
+                isDiscovering = true
             case .system(let newFamily):
                 guard Self.families.contains(newFamily) else { return }
+                isDiscovering = false
                 isFromTemplate = false
                 family = newFamily
                 preferredFamily = newFamily
             case .template:
+                isDiscovering = false
                 isFromTemplate = true
             }
         })
@@ -135,15 +177,19 @@ struct NewMachineView: View {
 /// A normal form row, shared by every source, including the empty template form.
 struct NewMachineSourcePicker: View {
     @Binding var selection: NewMachineSource
+    @Environment(\.hasNewMachineSidebar) private var hasSidebar
 
     var body: some View {
-        Picker("Type", selection: $selection) {
-            ForEach(NewMachineView.families, id: \.self) { family in
-                Text(family.displayName).tag(NewMachineSource.system(family))
+        // In the New Virtual Machine window the sidebar says it.
+        if !hasSidebar {
+            Picker("Type", selection: $selection) {
+                ForEach(NewMachineView.families, id: \.self) { family in
+                    Text(family.displayName).tag(NewMachineSource.system(family))
+                }
+                Text("Template").tag(NewMachineSource.template)
             }
-            Text("Template").tag(NewMachineSource.template)
+            .pickerStyle(.menu)
         }
-        .pickerStyle(.menu)
     }
 }
 
@@ -245,19 +291,9 @@ struct FormButtons: View {
     let create: () -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(AppModel.self) private var model
 
     var body: some View {
         HStack {
-            if takesDroppedFiles {
-                // The catalogue of systems to try, in a window of its own.
-                Button("Discover Systems…") {
-                    model.windows.showDiscovery()
-                    dismiss()
-                }
-                .buttonStyle(.link)
-                .help("Browse BSD, alternative Linux distributions and other systems to try")
-            }
             if let problem {
                 Text(problem)
                     .font(.callout)
@@ -360,7 +396,7 @@ private struct LinuxMachineForm: View {
             Divider()
             FormButtons(problem: nameProblem ?? diskProblem, canCreate: canCreate, create: create)
         }
-        .frame(height: mode.formHeight)
+        .frame(maxHeight: .infinity)
         .sheet(isPresented: $isAddingScripts) {
             if let distribution = selectedDistribution {
                 SetupScriptChooser(distribution: distribution, scripts: $scripts)
@@ -1407,7 +1443,7 @@ private struct MacMachineForm: View {
             Divider()
             FormButtons(problem: nameProblem ?? diskProblem, canCreate: canCreate, create: create)
         }
-        .frame(height: mode.formHeight)
+        .frame(maxHeight: .infinity)
         .task(id: lookupAttempt) { await lookUpLatest() }
         .task {
             if let initialImage {

@@ -9,6 +9,7 @@ struct TemplateSourceForm: View {
     let onReady: (VirtualMachine, Bool) -> Void
 
     @Environment(AppModel.self) private var model
+    @Environment(\.hasNewMachineSidebar) private var hasSidebar
     /// The template that was picked. Until one is, it is the first of the list.
     @State private var templateID: UUID?
 
@@ -20,11 +21,13 @@ struct TemplateSourceForm: View {
                     .id(template.id)
             } else {
                 VStack(spacing: 0) {
-                    Form {
-                        Section { NewMachineSourcePicker(selection: $source) }
+                    if !hasSidebar {
+                        Form {
+                            Section { NewMachineSourcePicker(selection: $source) }
+                        }
+                        .formStyle(.grouped)
+                        .fixedSize(horizontal: false, vertical: true)
                     }
-                    .formStyle(.grouped)
-                    .fixedSize(horizontal: false, vertical: true)
 
                     ContentUnavailableView(
                         model.templates.isDirectoryMissing ? String(localized: "Templates Folder Unavailable") : String(localized: "No Templates Yet"),
@@ -40,7 +43,7 @@ struct TemplateSourceForm: View {
                 }
             }
         }
-        .frame(height: mode.formHeight)
+        .frame(maxHeight: .infinity)
         // One may have been saved, or put in the folder by hand, since the folder was last read.
         .onAppear { model.templates.load() }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
@@ -160,7 +163,7 @@ struct TemplateMachineForm: View {
             Divider()
             FormButtons(problem: nameProblem ?? diskProblem, canCreate: canCreate, takesDroppedFiles: source != nil, create: create)
         }
-        .frame(height: effectiveMode.formHeight)
+        .frame(maxHeight: .infinity)
     }
 
     private var hardwareSummary: String {
