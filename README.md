@@ -1,3 +1,9 @@
+## About
+
+**TESSERaCT** is a free macOS app that creates and runs virtual machines on Apple silicon Macs, with a self-updating catalogue of ARM64 systems to try (Linux, BSD, Haiku, Redox, OpenWrt and more). Part of the DESKTOP MAC TOOLKIT. Authors: Starbudweiser & Claude Code (Anthropic). Apache-2.0 License, provided as is, without warranty. It is a fork of [SwiftVM](https://github.com/swiftvm-app/swiftvm), whose licence and notices are kept.
+
+![The Discover page of TESSERaCT, with the featured system of the day and the catalogue of ARM64 systems to download and try.](docs/screenshot.png)
+
 <p align="center">
   <img src="assets/logo.png" alt="TESSERaCT" width="128" height="128">
 </p>
@@ -34,11 +40,7 @@
 
 TESSERaCT runs on macOS 27 or newer, on Apple silicon.
 
-```bash
-brew install --cask tctl-app/tap/tctl
-```
-
-Or download the DMG from the [latest release](https://github.com/swiftvm-app/swiftvm/releases/latest).
+Download `TESSERaCT.zip` from the [latest release](https://github.com/starbudweiser/TESSERaCT/releases/latest), unzip it and move TESSERaCT to your Applications folder. The build is signed with a Developer ID certificate and notarized.
 
 See [Getting started](docs/user-guide/getting-started.md) for your first virtual machine, the `tctl` command, and beta builds.
 
