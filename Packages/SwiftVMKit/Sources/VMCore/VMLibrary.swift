@@ -458,9 +458,10 @@ public final class VMLibrary {
             let original = source.url
             let isRemoved = await Task.detached { (try? FileManager.default.removeItem(at: original)) != nil }.value
             if !isRemoved {
+                let oldLocation = (original.path as NSString).abbreviatingWithTildeInPath
                 machine.notice = VMErrorInfo(
-                    title: "“\(machine.name)” was moved, but its old files are still there",
-                    message: "They couldn't be removed from \((original.path as NSString).abbreviatingWithTildeInPath). The virtual machine no longer uses them, and you can delete them."
+                    title: String(localized: "“\(machine.name)” was moved, but its old files are still there"),
+                    message: String(localized: "They couldn't be removed from \(oldLocation). The virtual machine no longer uses them, and you can delete them.")
                 )
             }
         }

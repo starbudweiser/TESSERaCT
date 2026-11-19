@@ -37,24 +37,24 @@ public struct SetupScript: Sendable, Hashable, Identifiable {
             switch self {
             case .badFileName(let name):
                 name.isEmpty
-                    ? "Give the script a name. It is saved as a file with that name."
-                    : "“\(name)” can't be the name of the script's file. Keep it under \(SetupScript.maximumNameLength) characters, leave out / and :, and don't start it with a dot or #, or end it with ~."
+                    ? ErrorText.localized("Give the script a name. It is saved as a file with that name.")
+                    : ErrorText.localized("“\(name)” can't be the name of the script's file. Keep it under \(SetupScript.maximumNameLength) characters, leave out / and :, and don't start it with a dot or #, or end it with ~.")
             case .nameTaken(let name):
-                "Your folder has a script called “\(name)” already."
+                ErrorText.localized("Your folder has a script called “\(name)” already.")
             case .nameOfTemplate(let name):
-                "TESSERaCT brings a script called “\(name)”. Give yours another name."
+                ErrorText.localized("TESSERaCT brings a script called “\(name)”. Give yours another name.")
             case .unknown(let name, let system, let available):
-                "No setup script is called “\(name)”. Available for \(system): \(available.joined(separator: ", ")). For a file, give its path, as in ./\(name)."
+                ErrorText.localized("No setup script is called “\(name)”. Available for \(system): \(available.joined(separator: ", ")). For a file, give its path, as in ./\(name).")
             case .notAFile(let file):
-                "“\(file)” isn't a file."
+                ErrorText.localized("“\(file)” isn't a file.")
             case .notText(let file):
-                "“\(file)” isn't a script: it isn't text."
+                ErrorText.localized("“\(file)” isn't a script: it isn't text.")
             case .empty(let file):
-                "“\(file)” is empty."
+                ErrorText.localized("“\(file)” is empty.")
             case .tooLarge(let file):
-                "“\(file)” is larger than a setup script may be (\(SetupScript.maximumSize / 1024) KB)."
+                ErrorText.localized("“\(file)” is larger than a setup script may be (\(SetupScript.maximumSize / 1024) KB).")
             case .badValue(let key, let value, let expected):
-                "The script's header says “\(key): \(value)”, where \(expected) belongs."
+                ErrorText.localized("The script's header says “\(key): \(value)”, where \(expected) belongs.")
             }
         }
     }

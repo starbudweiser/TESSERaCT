@@ -205,7 +205,7 @@ public enum VMConfigurationError: Error, LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .unsupportedSchemaVersion(let version):
-            "This virtual machine was created by a newer version of TESSERaCT (schema \(version))."
+            ErrorText.localized("This virtual machine was created by a newer version of TESSERaCT (schema \(version)).")
         }
     }
 }

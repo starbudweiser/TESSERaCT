@@ -12,7 +12,12 @@ import Virtualization
 
 /// Handles requests from the `tctl` command-line tool.
 extension AppModel {
+    /// The replies to `tctl`, MCP and agents stay in English, whatever the language of the app.
     func handle(_ request: ControlRequest) async -> ControlResponse {
+        await ErrorText.$isForAgents.withValue(true) { await handleRequest(request) }
+    }
+
+    private func handleRequest(_ request: ControlRequest) async -> ControlResponse {
         guard !isQuittingUnattended, !isClosingDown else { return .failure("\(AppIdentity.current.name) is quitting.") }
         switch request.command {
         case .list:
@@ -1409,7 +1414,7 @@ extension AppModel {
         do {
             try machine.updateConfiguration(body)
         } catch {
-            machine.lastError = VMErrorInfo(title: "Couldn't change “\(machine.name)”", message: error.localizedDescription)
+            machine.lastError = VMErrorInfo(title: String(localized: "Couldn't change “\(machine.name)”"), message: error.localizedDescription)
         }
     }
 

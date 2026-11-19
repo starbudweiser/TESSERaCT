@@ -1,4 +1,5 @@
 import Foundation
+import VMCore
 
 /// Where Windows and its drivers come from.
 public enum WindowsDownloads {
@@ -28,9 +29,9 @@ public enum WindowsDownloads {
         public var errorDescription: String? {
             switch self {
             case .refused(let reason):
-                "Microsoft didn't let TESSERaCT download Windows (\(reason)). This often happens over a VPN. Download the Windows 11 Arm64 ISO from Microsoft's website instead, and create the machine from that file."
+                ErrorText.localized("Microsoft didn't let TESSERaCT download Windows (\(reason)). This often happens over a VPN. Download the Windows 11 Arm64 ISO from Microsoft's website instead, and create the machine from that file.")
             case .unexpectedAnswer:
-                "Microsoft's download page answered in a way TESSERaCT doesn't understand. Download the Windows 11 Arm64 ISO from Microsoft's website instead, and create the machine from that file."
+                ErrorText.localized("Microsoft's download page answered in a way TESSERaCT doesn't understand. Download the Windows 11 Arm64 ISO from Microsoft's website instead, and create the machine from that file.")
             }
         }
     }

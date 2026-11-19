@@ -1,5 +1,6 @@
 import Foundation
 import Security
+import VMCore
 import Virtualization
 
 /// Host interfaces macOS allows a guest to bridge to. The BSD identifier is kept in the VM bundle,
@@ -17,9 +18,9 @@ public enum BridgedNetworking {
         public var errorDescription: String? {
             switch self {
             case .notEntitled:
-                "This copy of TESSERaCT doesn't support bridged networking. It needs to be signed with a provisioning profile that grants com.apple.vm.networking."
+                ErrorText.localized("This copy of TESSERaCT doesn't support bridged networking. It needs to be signed with a provisioning profile that grants com.apple.vm.networking.")
             case .interfaceUnavailable(let identifier):
-                "The host network interface “\(identifier)” isn't available for bridging. Connect the adapter or choose another interface in the virtual machine's Network settings."
+                ErrorText.localized("The host network interface “\(identifier)” isn't available for bridging. Connect the adapter or choose another interface in the virtual machine's Network settings.")
             }
         }
     }

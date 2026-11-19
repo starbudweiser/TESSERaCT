@@ -201,7 +201,7 @@ public enum VmnetPortError: Error, LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .couldNotStart(let code):
-            "The virtual machine couldn't join the virtual network (vmnet error \(code))."
+            ErrorText.localized("The virtual machine couldn't join the virtual network (vmnet error \(code)).")
         }
     }
 }

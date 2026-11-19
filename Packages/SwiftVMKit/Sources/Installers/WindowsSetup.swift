@@ -246,9 +246,9 @@ public enum WindowsInstaller {
         public var errorDescription: String? {
             switch self {
             case .notWindows(let name):
-                "“\(name)” isn't a Windows installer."
+                ErrorText.localized("“\(name)” isn't a Windows installer.")
             case .notForArm(let name):
-                "“\(name)” is Windows for Intel and AMD processors. A Mac with Apple silicon runs Windows for Arm: download the Arm64 ISO."
+                ErrorText.localized("“\(name)” is Windows for Intel and AMD processors. A Mac with Apple silicon runs Windows for Arm: download the Arm64 ISO.")
             }
         }
     }

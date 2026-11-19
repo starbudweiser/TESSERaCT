@@ -314,19 +314,19 @@ public enum VMError: Error, LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .noBackendProvider:
-            "No virtualization engine is available."
+            ErrorText.localized("No virtualization engine is available.")
         case .unsupportedEngine(let engine):
-            "The \(engine.rawValue) engine isn't available in this build."
+            ErrorText.localized("The \(engine.rawValue) engine isn't available in this build.")
         case .invalidConfiguration(let reason):
             reason
         case .busy(let name, let activity):
-            "“\(name)” is busy (\(activity.label.lowercased())). Try again in a moment."
+            ErrorText.localized("“\(name)” is busy (\(activity.label.lowercased())). Try again in a moment.")
         case .notStopped(let name, let state):
             state == .suspended
-                ? "“\(name)” is suspended. Resume it and shut it down first."
-                : "Shut down “\(name)” first."
+                ? ErrorText.localized("“\(name)” is suspended. Resume it and shut it down first.")
+                : ErrorText.localized("Shut down “\(name)” first.")
         case .notRunning(let name):
-            "“\(name)” isn't running."
+            ErrorText.localized("“\(name)” isn't running.")
         }
     }
 }
@@ -408,13 +408,13 @@ public enum VMActivity: Sendable, Hashable {
 
     public var label: String {
         switch self {
-        case .takingSnapshot: "Taking Snapshot"
-        case .reverting: "Reverting"
-        case .duplicating: "Duplicating"
-        case .resizingDisk: "Resizing Disk"
-        case .convertingDisk: "Converting Disk"
-        case .moving: "Moving"
-        case .savingTemplate: "Saving Template"
+        case .takingSnapshot: ErrorText.localized("Taking Snapshot")
+        case .reverting: ErrorText.localized("Reverting")
+        case .duplicating: ErrorText.localized("Duplicating")
+        case .resizingDisk: ErrorText.localized("Resizing Disk")
+        case .convertingDisk: ErrorText.localized("Converting Disk")
+        case .moving: ErrorText.localized("Moving")
+        case .savingTemplate: ErrorText.localized("Saving Template")
         }
     }
 }

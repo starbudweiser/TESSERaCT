@@ -59,9 +59,9 @@ public enum NetworkError: Error, LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .creationFailed(let code, let subnet):
-            "Couldn't create the virtual network \(subnet) (vmnet error \(code)). Another app may be using this address range."
+            ErrorText.localized("Couldn't create the virtual network \(String(describing: subnet)) (vmnet error \(code)). Another app may be using this address range.")
         case .noSubnetAvailable:
-            "Couldn't find a free private address range for the virtual network."
+            ErrorText.localized("Couldn't find a free private address range for the virtual network.")
         }
     }
 }

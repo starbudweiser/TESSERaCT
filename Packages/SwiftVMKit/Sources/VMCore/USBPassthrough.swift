@@ -34,17 +34,17 @@ public final class USBPassthrough {
         public var errorDescription: String? {
             switch self {
             case .unavailable(.failed(let reason)):
-                "macOS doesn't let this app use USB devices: \(reason)"
+                ErrorText.localized("macOS doesn't let this app use USB devices: \(reason)")
             case .unavailable(.starting):
-                "The app is still finding out which USB devices it has. Try again in a moment."
+                ErrorText.localized("The app is still finding out which USB devices it has. Try again in a moment.")
             case .unavailable:
-                "This copy of the app can't use USB devices: it was built without the provisioning profile that macOS wants for them."
+                ErrorText.localized("This copy of the app can't use USB devices: it was built without the provisioning profile that macOS wants for them.")
             case .gone(let device):
-                "“\(device)” isn't with this app any more. It was pulled out, or given back to this Mac."
+                ErrorText.localized("“\(device)” isn't with this app any more. It was pulled out, or given back to this Mac.")
             case .inUse(let device, let machine):
-                "“\(device)” is in use by “\(machine)”. Detach it there first."
+                ErrorText.localized("“\(device)” is in use by “\(machine)”. Detach it there first.")
             case .onItsWay(let device):
-                "“\(device)” is being attached right now."
+                ErrorText.localized("“\(device)” is being attached right now.")
             }
         }
     }
@@ -186,7 +186,7 @@ public final class USBPassthrough {
                 // device after all.
                 try? await Task.sleep(for: settlingTime)
                 guard devices.contains(where: { $0.id == device.id }), holder(of: device.id) == nil, machine.state == .running else { return }
-                machine.lastError = VMErrorInfo(title: "Couldn't attach “\(device.name)” to “\(machine.name)”", message: error.localizedDescription)
+                machine.lastError = VMErrorInfo(title: String(localized: "Couldn't attach “\(device.name)” to “\(machine.name)”"), message: error.localizedDescription)
             }
         }
     }

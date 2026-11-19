@@ -135,10 +135,10 @@ public struct GuestToolsReinstallation: Sendable {
 
         public var errorDescription: String? {
             switch self {
-            case .interrupted: "The virtual machine stopped or restarted before the guest tools installation could be verified."
-            case .timedOut: "The guest tools installation couldn't be verified in time. The installer may still be running. Check the guest before trying again, or use the guest tools disc to recover."
-            case .invalidReceipt: "The guest tools returned an installation result that couldn't be read."
-            case .installer(let reason): "The guest tools installer failed: \(reason)"
+            case .interrupted: ErrorText.localized("The virtual machine stopped or restarted before the guest tools installation could be verified.")
+            case .timedOut: ErrorText.localized("The guest tools installation couldn't be verified in time. The installer may still be running. Check the guest before trying again, or use the guest tools disc to recover.")
+            case .invalidReceipt: ErrorText.localized("The guest tools returned an installation result that couldn't be read.")
+            case .installer(let reason): ErrorText.localized("The guest tools installer failed: \(reason)")
             }
         }
     }

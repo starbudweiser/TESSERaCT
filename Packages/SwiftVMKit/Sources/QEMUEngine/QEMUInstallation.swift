@@ -1,4 +1,5 @@
 import Foundation
+import VMCore
 
 /// The QEMU that runs Windows guests and Linux guests with graphics acceleration, as it comes inside the
 /// app: its program with the libraries it loads in `Contents/Helpers/QEMU`, and its firmware in
@@ -131,13 +132,13 @@ public enum QEMUError: Error, LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .notInstalled:
-            "This copy of TESSERaCT was built without QEMU, which runs Windows guests and Linux guests with graphics acceleration."
+            ErrorText.localized("This copy of TESSERaCT was built without QEMU, which runs Windows guests and Linux guests with graphics acceleration.")
         case .didNotStart(let reason):
-            "QEMU couldn't start the virtual machine. \(reason)"
+            ErrorText.localized("QEMU couldn't start the virtual machine. \(reason)")
         case .refused(let reason):
-            "QEMU refused: \(reason)"
+            ErrorText.localized("QEMU refused: \(reason)")
         case .disconnected:
-            "QEMU has stopped."
+            ErrorText.localized("QEMU has stopped.")
         }
     }
 }

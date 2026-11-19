@@ -14,11 +14,11 @@ public enum DiskService {
         public var errorDescription: String? {
             switch self {
             case .capacityTooSmall:
-                "The disk size is too small."
+                ErrorText.localized("The disk size is too small.")
             case .cannotShrink(let current, let requested):
-                "A disk can't be made smaller (\(current) → \(requested) bytes)."
+                ErrorText.localized("A disk can't be made smaller (\(String(current)) → \(String(requested)) bytes).")
             case .cannotConvert(let from, let to):
-                "A disk can't be converted from \(from.rawValue) to \(to.rawValue)."
+                ErrorText.localized("A disk can't be converted from \(from.rawValue) to \(to.rawValue).")
             case .io(let reason):
                 reason
             }

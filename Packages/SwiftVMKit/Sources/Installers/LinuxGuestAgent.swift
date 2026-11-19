@@ -14,7 +14,7 @@ public enum LinuxGuestAgent {
 
         public var errorDescription: String? {
             switch self {
-            case .missingResource(let name): "This copy of TESSERaCT is missing “\(name)”."
+            case .missingResource(let name): ErrorText.localized("This copy of TESSERaCT is missing “\(name)”.")
             }
         }
     }

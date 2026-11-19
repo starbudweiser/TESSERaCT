@@ -14,7 +14,7 @@ public enum MacGuestAgent {
 
         public var errorDescription: String? {
             switch self {
-            case .missingProgram: "This copy of TESSERaCT is missing the guest agent for macOS."
+            case .missingProgram: ErrorText.localized("This copy of TESSERaCT is missing the guest agent for macOS.")
             }
         }
     }

@@ -14,8 +14,8 @@ public enum ProcessRunner {
 
         public var errorDescription: String? {
             let detail = output.standardError.trimmingCharacters(in: .whitespacesAndNewlines)
-            let reason = detail.isEmpty ? "exit status \(output.status)" : detail
-            return "\(command) failed: \(reason)"
+            let reason = detail.isEmpty ? ErrorText.localized("exit status \(Int(output.status))") : detail
+            return ErrorText.localized("\(command) failed: \(reason)")
         }
     }
 

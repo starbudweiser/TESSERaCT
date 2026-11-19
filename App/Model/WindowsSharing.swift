@@ -16,8 +16,8 @@ extension AppModel {
         guard machine.configuration.networkInterfaces.first?.usesSharedNetwork == true else {
             if !machine.configuration.sharedFolders.isEmpty {
                 machine.notice = VMErrorInfo(
-                    title: "Shared folders need shared networking",
-                    message: "Windows shared folders aren't available with bridged networking. Switch this machine to Shared (NAT) to use them."
+                    title: String(localized: "Shared folders need shared networking"),
+                    message: String(localized: "Windows shared folders aren't available with bridged networking. Switch this machine to Shared (NAT) to use them.")
                 )
             }
             return nil
@@ -28,7 +28,7 @@ extension AppModel {
                 IPv4Address(peer).map(subnet.contains) ?? false
             }
         } catch {
-            machine.notice = VMErrorInfo(title: "The shared folders aren't available in “\(machine.name)”", message: error.localizedDescription)
+            machine.notice = VMErrorInfo(title: String(localized: "The shared folders aren't available in “\(machine.name)”"), message: error.localizedDescription)
             return nil
         }
         sharedFolderServer.share(Self.sharedLocations(of: machine.configuration), for: machine.id.uuidString)

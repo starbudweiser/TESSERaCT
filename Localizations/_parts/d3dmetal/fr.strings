@@ -1,5 +1,5 @@
 "D3DMetal isn't on this Mac" = "D3DMetal n'est pas sur ce Mac";
 "D3DMetal comes with Apple's Game Porting Toolkit, and with CrossOver. Download the toolkit from developer.apple.com, open its disk image, then come back and choose Install… or Choose…." = "D3DMetal est fourni avec le Game Porting Toolkit d'Apple, et avec CrossOver. Téléchargez le toolkit sur developer.apple.com, ouvrez son image disque, puis revenez choisir Installer… ou Choisir….";
 "Open Download Page" = "Ouvrir la page de téléchargement";
-"Install D3DMetal from %@?" = "Installer D3DMetal depuis %@ ?";
+"Install D3DMetal from %@?" = "Installer D3DMetal depuis %@ ?";
 "TESSERaCT keeps a copy of Apple's D3DMetal, found in %@. It stays Apple's software, under Apple's licence. Machines use it the next time they start." = "TESSERaCT garde une copie du D3DMetal d'Apple, trouvé dans %@. Il reste un logiciel d'Apple, sous licence Apple. Les machines l'utilisent à leur prochain démarrage.";

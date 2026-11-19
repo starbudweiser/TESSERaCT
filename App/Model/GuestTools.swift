@@ -189,7 +189,7 @@ extension AppModel {
     func installGuestToolsReportingResult(on machine: VirtualMachine) {
         Task {
             guard !isInstallingGuestTools(on: machine) else { return }
-            let failureTitle = "Couldn't install the guest tools in “\(machine.name)”"
+            let failureTitle = String(localized: "Couldn't install the guest tools in “\(machine.name)”")
             let isMac = machine.configuration.os.family == .macOS
             let isWindows = machine.configuration.os.family == .windows
             let isReinstall = machine.agent.version != nil
@@ -203,10 +203,12 @@ extension AppModel {
                         do {
                             try await installGuestToolsUnchecked(on: machine)
                             machine.notice = VMErrorInfo(
-                                title: "The guest tools are \(isReinstall ? "reinstalled" : "installed") in “\(machine.name)”",
+                                title: isReinstall
+                                    ? String(localized: "The guest tools are reinstalled in “\(machine.name)”")
+                                    : String(localized: "The guest tools are installed in “\(machine.name)”"),
                                 message: isWindows
-                                    ? "The guest tools have connected again. Restart Windows to finish applying any driver changes."
-                                    : "TESSERaCT now sees the system's version and addresses, keeps its clock right after a suspend, and shuts it down through the guest tools."
+                                    ? String(localized: "The guest tools have connected again. Restart Windows to finish applying any driver changes.")
+                                    : String(localized: "TESSERaCT now sees the system's version and addresses, keeps its clock right after a suspend, and shuts it down through the guest tools.")
                             )
                             return
                         } catch let failure as ProcessRunner.Failure {
@@ -223,15 +225,16 @@ extension AppModel {
                     let command = guestToolsInstallCommand(for: machine)
                     if isWindows {
                         machine.notice = VMErrorInfo(
-                            title: "Install the guest tools in “\(machine.name)”",
-                            message: "The guest tools disc and the drivers for virtual machines are now plugged in. \(command) Restart Windows afterwards, so that its display follows the window."
+                            title: String(localized: "Install the guest tools in “\(machine.name)”"),
+                            message: String(localized: "The guest tools disc and the drivers for virtual machines are now plugged in. \(command) Restart Windows afterwards, so that its display follows the window.")
                         )
                         return
                     }
-                    let terminal = isMac ? "in Terminal in the virtual machine" : "in a terminal in the virtual machine"
                     machine.notice = VMErrorInfo(
-                        title: "Install the guest tools in “\(machine.name)”",
-                        message: "The guest tools disc is now plugged in. To install from it, run this \(terminal), and eject the disc afterwards:\n\n\(command)",
+                        title: String(localized: "Install the guest tools in “\(machine.name)”"),
+                        message: isMac
+                            ? String(localized: "The guest tools disc is now plugged in. To install from it, run this in Terminal in the virtual machine, and eject the disc afterwards:\n\n\(command)")
+                            : String(localized: "The guest tools disc is now plugged in. To install from it, run this in a terminal in the virtual machine, and eject the disc afterwards:\n\n\(command)"),
                         copyableText: command
                     )
                 }

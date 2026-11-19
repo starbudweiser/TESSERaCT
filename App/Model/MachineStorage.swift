@@ -129,7 +129,7 @@ extension AppModel {
             do {
                 try await duplicate(machine)
             } catch {
-                machine.lastError = VMErrorInfo(title: "Couldn't duplicate “\(machine.name)”", message: error.localizedDescription)
+                machine.lastError = VMErrorInfo(title: String(localized: "Couldn't duplicate “\(machine.name)”"), message: error.localizedDescription)
             }
         }
     }
@@ -164,7 +164,7 @@ extension AppModel {
             } catch is CancellationError {
                 // Called off by whoever started it.
             } catch {
-                machine.lastError = VMErrorInfo(title: "Couldn't move “\(machine.name)”", message: error.localizedDescription)
+                machine.lastError = VMErrorInfo(title: String(localized: "Couldn't move “\(machine.name)”"), message: error.localizedDescription)
             }
         }
     }
@@ -175,7 +175,7 @@ extension AppModel {
             do {
                 try await machine.takeSnapshot()
             } catch {
-                machine.lastError = VMErrorInfo(title: "Couldn't take a snapshot of “\(machine.name)”", message: error.localizedDescription)
+                machine.lastError = VMErrorInfo(title: String(localized: "Couldn't take a snapshot of “\(machine.name)”"), message: error.localizedDescription)
             }
         }
     }
@@ -310,7 +310,7 @@ if ($max -gt $c.Size + 1MB) {
                 // Called off by whoever started it.
             } catch {
                 machine.lastError = VMErrorInfo(
-                    title: enabled ? "Couldn't compress the disk of “\(machine.name)”" : "Couldn't turn off compression for “\(machine.name)”",
+                    title: enabled ? String(localized: "Couldn't compress the disk of “\(machine.name)”") : String(localized: "Couldn't turn off compression for “\(machine.name)”"),
                     message: error.localizedDescription
                 )
             }

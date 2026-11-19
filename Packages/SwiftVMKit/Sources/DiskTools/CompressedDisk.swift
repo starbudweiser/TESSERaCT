@@ -1,5 +1,6 @@
 import Compression
 import Foundation
+import VMCore
 import os
 import zlib
 
@@ -32,13 +33,13 @@ public final class CompressedDisk: @unchecked Sendable {
 
         public var errorDescription: String? {
             switch self {
-            case .notACompressedDisk: "The file isn't a compressed disk."
-            case .unsupportedVersion(let version): "The compressed disk was made by a newer TESSERaCT (format \(version))."
-            case .corrupted(let what): "The compressed disk is damaged: \(what)."
-            case .outOfRange: "A request went past the end of the disk."
-            case .readOnly: "The compressed disk is open for reading only."
-            case .closed: "The compressed disk is closed."
-            case .cannotShrink: "A disk can't be made smaller."
+            case .notACompressedDisk: ErrorText.localized("The file isn't a compressed disk.")
+            case .unsupportedVersion(let version): ErrorText.localized("The compressed disk was made by a newer TESSERaCT (format \(String(version))).")
+            case .corrupted(let what): ErrorText.localized("The compressed disk is damaged: \(what).")
+            case .outOfRange: ErrorText.localized("A request went past the end of the disk.")
+            case .readOnly: ErrorText.localized("The compressed disk is open for reading only.")
+            case .closed: ErrorText.localized("The compressed disk is closed.")
+            case .cannotShrink: ErrorText.localized("A disk can't be made smaller.")
             case .io(let code): String(cString: strerror(code))
             }
         }

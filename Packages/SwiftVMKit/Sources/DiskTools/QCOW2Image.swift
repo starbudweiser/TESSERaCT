@@ -1,5 +1,6 @@
 import Compression
 import Foundation
+import VMCore
 
 /// Reads a QCOW2 disk image (the format most Linux cloud images ship in) and converts it to a raw image.
 ///
@@ -15,10 +16,10 @@ public struct QCOW2Image: Sendable {
 
         public var errorDescription: String? {
             switch self {
-            case .notQCOW2: "The file isn't a QCOW2 disk image."
-            case .unsupportedVersion(let version): "QCOW2 version \(version) isn't supported."
-            case .unsupportedFeature(let feature): "This QCOW2 image uses \(feature), which isn't supported."
-            case .corrupt(let reason): "The QCOW2 image is damaged: \(reason)."
+            case .notQCOW2: ErrorText.localized("The file isn't a QCOW2 disk image.")
+            case .unsupportedVersion(let version): ErrorText.localized("QCOW2 version \(String(version)) isn't supported.")
+            case .unsupportedFeature(let feature): ErrorText.localized("This QCOW2 image uses \(feature), which isn't supported.")
+            case .corrupt(let reason): ErrorText.localized("The QCOW2 image is damaged: \(reason).")
             case .io(let reason): reason
             }
         }

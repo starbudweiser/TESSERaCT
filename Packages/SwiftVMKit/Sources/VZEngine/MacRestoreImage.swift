@@ -19,7 +19,7 @@ public struct MacRestoreImage: Sendable, Hashable {
         public var errorDescription: String? {
             switch self {
             case .notAFile(let url):
-                "“\(url.lastPathComponent)” isn't a file on this Mac."
+                ErrorText.localized("“\(url.lastPathComponent)” isn't a file on this Mac.")
             }
         }
     }

@@ -1,4 +1,5 @@
 import Foundation
+import VMCore
 
 /// Where a Windows guest's Direct3D is drawn on the Mac. Windows' 3D driver hands its Direct3D calls to
 /// virglrenderer's render server, which replays them on one of these.
@@ -46,13 +47,13 @@ public enum D3DMetal {
         public var errorDescription: String? {
             switch self {
             case .notFound(let path):
-                "There's no D3DMetal.framework in “\(path)”. Open the Game Porting Toolkit's “Evaluation environment for Windows games” disk image, and choose it."
+                ErrorText.localized("There's no D3DMetal.framework in “\(path)”. Open the Game Porting Toolkit's “Evaluation environment for Windows games” disk image, and choose it.")
             case .insideDiskImage(let name):
-                "D3DMetal is in “\(name)”, inside this disk image. Open that one too, and choose it."
+                ErrorText.localized("D3DMetal is in “\(name)”, inside this disk image. Open that one too, and choose it.")
             case .notForIntel(let path):
-                "“\(path)” isn't the D3DMetal that the Game Porting Toolkit brings: it has no code for Intel processors."
+                ErrorText.localized("“\(path)” isn't the D3DMetal that the Game Porting Toolkit brings: it has no code for Intel processors.")
             case .rosetta(let reason):
-                "Rosetta couldn't be installed. \(reason)"
+                ErrorText.localized("Rosetta couldn't be installed. \(reason)")
             }
         }
     }

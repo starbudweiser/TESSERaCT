@@ -1,5 +1,6 @@
 import CryptoKit
 import Foundation
+import VMCore
 
 /// Downloads images into a cache directory and verifies them against published checksums.
 public struct ImageDownloader: Sendable {
@@ -13,15 +14,15 @@ public struct ImageDownloader: Sendable {
         public var errorDescription: String? {
             switch self {
             case .badResponse(let status):
-                "The download server answered with HTTP status \(status)."
+                ErrorText.localized("The download server answered with HTTP status \(status).")
             case .checksumMismatch(let fileName):
-                "\(fileName) is damaged: its checksum doesn't match the published one. Try the download again."
+                ErrorText.localized("\(fileName) is damaged: its checksum doesn't match the published one. Try the download again.")
             case .checksumUnavailable(let fileName):
-                "Couldn't find a published checksum for \(fileName)."
+                ErrorText.localized("Couldn't find a published checksum for \(fileName).")
             case .invalidManifest:
-                "The image release has invalid or incompatible download metadata. Try again later."
+                ErrorText.localized("The image release has invalid or incompatible download metadata. Try again later.")
             case .noCompatibleImage:
-                "Couldn't find a published image compatible with this version of TESSERaCT."
+                ErrorText.localized("Couldn't find a published image compatible with this version of TESSERaCT.")
             }
         }
     }

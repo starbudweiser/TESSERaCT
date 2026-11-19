@@ -1,5 +1,6 @@
 import CZstd
 import Foundation
+import VMCore
 
 /// Unpacks the images that are published compressed: Zstandard (Redox), gzip (OpenWrt), zip (Haiku).
 public enum ArchiveExtractor {
@@ -14,9 +15,9 @@ public enum ArchiveExtractor {
 
         public var errorDescription: String? {
             switch self {
-            case .corrupt: "The downloaded archive is damaged and can't be unpacked."
-            case .noMember: "The archive doesn't hold the image that was expected."
-            case .toolFailed(let status): "Unpacking the archive failed (status \(status))."
+            case .corrupt: ErrorText.localized("The downloaded archive is damaged and can't be unpacked.")
+            case .noMember: ErrorText.localized("The archive doesn't hold the image that was expected.")
+            case .toolFailed(let status): ErrorText.localized("Unpacking the archive failed (status \(Int(status))).")
             }
         }
     }

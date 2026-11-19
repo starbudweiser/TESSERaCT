@@ -287,8 +287,8 @@ public final class VirtualMachine: Identifiable {
                 // QEMU gives each folder of a Linux guest a device, and adds none while it runs.
                 if updated.engine == .qemu, updated.os.family == .linux {
                     notice = VMErrorInfo(
-                        title: "“\(updated.name)” sees the change to its shared folders the next time it starts",
-                        message: "A machine with graphics acceleration gets its shared folders when it starts. Restart it to use them."
+                        title: String(localized: "“\(updated.name)” sees the change to its shared folders the next time it starts"),
+                        message: String(localized: "A machine with graphics acceleration gets its shared folders when it starts. Restart it to use them.")
                     )
                 }
             }
@@ -493,10 +493,12 @@ public final class VirtualMachine: Identifiable {
         guard setupFailureRecordChanges < Self.maximumSetupFailureRecordChanges else { return }
         setupFailureRecordChanges += 1
         if hasFailed {
-            let place = status.step.map { " at “\($0)”" } ?? ""
+            let logPath = GuestIntegration.setupLogPath
+            let retryCommand = GuestIntegration.setupRetryCommand
             notice = VMErrorInfo(
-                title: status.name.map { "\($0) couldn't be set up in “\(name)”" } ?? "The setup script failed in “\(name)”",
-                message: "The setup script stopped with an error\(place). What it printed is in \(GuestIntegration.setupLogPath) in the virtual machine. To run it again, run this there:\n\n\(GuestIntegration.setupRetryCommand)",
+                title: status.name.map { String(localized: "\($0) couldn't be set up in “\(name)”") } ?? String(localized: "The setup script failed in “\(name)”"),
+                message: status.step.map { String(localized: "The setup script stopped with an error at “\($0)”. What it printed is in \(logPath) in the virtual machine. To run it again, run this there:\n\n\(retryCommand)") }
+                    ?? String(localized: "The setup script stopped with an error. What it printed is in \(logPath) in the virtual machine. To run it again, run this there:\n\n\(retryCommand)"),
                 copyableText: GuestIntegration.setupRetryCommand
             )
         }
@@ -829,18 +831,18 @@ public final class VirtualMachine: Identifiable {
             if restoring, isHostLocked() {
                 // The saved memory is fine; it just can't be read back right now.
                 lastError = VMErrorInfo(
-                    title: "Couldn't resume “\(name)”",
-                    message: "This Mac is locked, and a suspended virtual machine can only be resumed while it is unlocked. Unlock the Mac and resume “\(name)” again. (\(error.localizedDescription))"
+                    title: String(localized: "Couldn't resume “\(name)”"),
+                    message: String(localized: "This Mac is locked, and a suspended virtual machine can only be resumed while it is unlocked. Unlock the Mac and resume “\(name)” again. (\(error.localizedDescription))")
                 )
             } else if restoring {
                 // Trying again won't help if the saved memory doesn't fit the machine any more, and
                 // nothing else can be changed while it is there. Say what the way out is.
                 lastError = VMErrorInfo(
-                    title: "Couldn't resume “\(name)”",
-                    message: "\(error.localizedDescription)\n\nIf this keeps happening, choose Discard Saved State from the virtual machine's menu. It then starts up fresh, without what the guest had open."
+                    title: String(localized: "Couldn't resume “\(name)”"),
+                    message: String(localized: "\(error.localizedDescription)\n\nIf this keeps happening, choose Discard Saved State from the virtual machine's menu. It then starts up fresh, without what the guest had open.")
                 )
             } else {
-                report(error, title: "Couldn't start “\(name)”")
+                report(error, title: String(localized: "Couldn't start “\(name)”"))
             }
         }
     }
@@ -911,7 +913,7 @@ public final class VirtualMachine: Identifiable {
         do {
             try await backend.stop()
         } catch {
-            report(error, title: "Couldn't stop “\(name)”")
+            report(error, title: String(localized: "Couldn't stop “\(name)”"))
         }
         finishStop()
     }
@@ -925,7 +927,7 @@ public final class VirtualMachine: Identifiable {
             guard isCurrent(backend), state == .running else { return }
             state = .paused
         } catch {
-            report(error, title: "Couldn't pause “\(name)”")
+            report(error, title: String(localized: "Couldn't pause “\(name)”"))
         }
     }
 
@@ -942,7 +944,7 @@ public final class VirtualMachine: Identifiable {
             clockStandstills += 1
             Task { await lookAfterGuest() }
         } catch {
-            report(error, title: "Couldn't resume “\(name)”")
+            report(error, title: String(localized: "Couldn't resume “\(name)”"))
         }
     }
 
@@ -952,7 +954,7 @@ public final class VirtualMachine: Identifiable {
         do {
             try await performSuspend()
         } catch {
-            report(error, title: "Couldn't suspend “\(name)”")
+            report(error, title: String(localized: "Couldn't suspend “\(name)”"))
         }
     }
 
@@ -1224,10 +1226,10 @@ public final class VirtualMachine: Identifiable {
                     await performStart()
                 }
             } else {
-                lastError = VMErrorInfo(title: "“\(name)” stopped unexpectedly", message: message)
+                lastError = VMErrorInfo(title: String(localized: "“\(name)” stopped unexpectedly"), message: message)
             }
         case .networkDisconnected(let message):
-            lastError = VMErrorInfo(title: "Network disconnected in “\(name)”", message: message)
+            lastError = VMErrorInfo(title: String(localized: "Network disconnected in “\(name)”"), message: message)
         case .usbDeviceDisconnected(let id):
             // Pulling a device out is nothing to report.
             usbDevices.removeAll { $0.id == id }

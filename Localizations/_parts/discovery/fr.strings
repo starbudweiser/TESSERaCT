@@ -1,6 +1,6 @@
 "Discover Systems" = "Découvrir des systèmes";
 "Discover Systems…" = "Découvrir des systèmes…";
-"Try other systems in virtual machines: BSD, alternative Linux distributions and more. The list renews itself every day." = "Essayez d'autres systèmes dans des machines virtuelles : BSD, distributions Linux alternatives et plus encore. La liste se renouvelle chaque jour.";
+"Try other systems in virtual machines: BSD, alternative Linux distributions and more. The list renews itself every day." = "Essayez d'autres systèmes dans des machines virtuelles : BSD, distributions Linux alternatives et plus encore. La liste se renouvelle chaque jour.";
 "Browse BSD, alternative Linux distributions and other systems to try" = "Parcourir les BSD, distributions Linux alternatives et autres systèmes à essayer";
 "Refresh" = "Actualiser";
 "Offline: showing the last known list." = "Hors ligne : dernière liste connue affichée.";
@@ -26,9 +26,9 @@
 "Downloads %@, checks it against the checksum its publisher publishes, then creates the machine and starts it." = "Télécharge %@, le vérifie avec l'empreinte publiée par son éditeur, puis crée la machine et la démarre.";
 "Enter a name." = "Saisissez un nom.";
 "A virtual machine with this name already exists." = "Une machine virtuelle porte déjà ce nom.";
-"Processors: %lld" = "Processeurs : %lld";
-"Memory: %lld GB" = "Mémoire : %lld Go";
-"Disk Size: %lld GB" = "Taille du disque : %lld Go";
+"Processors: %lld" = "Processeurs : %lld";
+"Memory: %lld GB" = "Mémoire : %lld Go";
+"Disk Size: %lld GB" = "Taille du disque : %lld Go";
 "Engine" = "Moteur";
 "Apple Virtualization" = "Virtualisation Apple";
 "QEMU starts almost any system that boots with UEFI, at a fixed display size." = "QEMU démarre presque tous les systèmes qui démarrent en UEFI, avec un affichage de taille fixe.";

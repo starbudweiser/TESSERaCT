@@ -10,7 +10,7 @@ public enum LinuxImageInstaller {
         public var errorDescription: String? {
             switch self {
             case .imageLargerThanDisk(let imageSize, let capacity):
-                "The image needs \(imageSize) bytes but the disk is only \(capacity) bytes."
+                ErrorText.localized("The image needs \(String(imageSize)) bytes but the disk is only \(String(capacity)) bytes.")
             }
         }
     }

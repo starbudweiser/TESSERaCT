@@ -14,9 +14,9 @@ public final class VZBackendProvider: VMBackendProvider {
         public var errorDescription: String? {
             switch self {
             case .virtualizationUnavailable:
-                "Virtualization isn't available on this Mac."
+                ErrorText.localized("Virtualization isn't available on this Mac.")
             case .networkUnavailable:
-                "The virtual network isn't available."
+                ErrorText.localized("The virtual network isn't available.")
             }
         }
     }

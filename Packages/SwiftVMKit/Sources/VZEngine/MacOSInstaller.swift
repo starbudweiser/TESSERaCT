@@ -13,9 +13,9 @@ public enum MacOSInstaller {
         public var errorDescription: String? {
             switch self {
             case .unsupportedImage(let productName):
-                "This Mac can't run \(productName) in a virtual machine."
+                ErrorText.localized("This Mac can't run \(productName) in a virtual machine.")
             case .imageNotDownloaded:
-                "The restore image has to be downloaded before it can be installed."
+                ErrorText.localized("The restore image has to be downloaded before it can be installed.")
             }
         }
     }

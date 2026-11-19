@@ -19,19 +19,19 @@ public struct VZConfigurationBuilder {
         public var errorDescription: String? {
             switch self {
             case .unsupportedGuest(let family):
-                "\(family.displayName) guests can't run on the Virtualization engine."
+                ErrorText.localized("\(family.displayName) guests can't run on the Virtualization engine.")
             case .missingFile(let name):
-                "The virtual machine is missing “\(name)”."
+                ErrorText.localized("The virtual machine is missing “\(name)”.")
             case .missingImage(let name):
-                "The disk image “\(name)” can't be found. Put it back, or eject it in the virtual machine's settings."
+                ErrorText.localized("The disk image “\(name)” can't be found. Put it back, or eject it in the virtual machine's settings.")
             case .unsupportedHardwareModel:
-                "This Mac can't run the macOS version installed in this virtual machine."
+                ErrorText.localized("This Mac can't run the macOS version installed in this virtual machine.")
             case .invalidMACAddress(let address):
-                "“\(address)” isn't a valid MAC address."
+                ErrorText.localized("“\(address)” isn't a valid MAC address.")
             case .rosettaNotInstalled:
-                "Rosetta isn't installed on this Mac."
+                ErrorText.localized("Rosetta isn't installed on this Mac.")
             case .nestedVirtualizationUnsupported:
-                "This Mac can't run virtual machines inside a virtual machine: that takes an M3 or later. Turn off Nested Virtualization in the machine's settings."
+                ErrorText.localized("This Mac can't run virtual machines inside a virtual machine: that takes an M3 or later. Turn off Nested Virtualization in the machine's settings.")
             }
         }
     }

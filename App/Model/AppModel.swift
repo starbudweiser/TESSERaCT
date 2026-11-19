@@ -163,7 +163,7 @@ final class AppModel {
             self.backendProvider = router
             library.backendProvider = router
         } catch {
-            generalError = VMErrorInfo(title: "Virtual networking isn't available", message: error.localizedDescription)
+            generalError = VMErrorInfo(title: String(localized: "Virtual networking isn't available"), message: error.localizedDescription)
         }
 
         library.onChange = { [weak self] in
@@ -574,7 +574,7 @@ final class AppModel {
         do {
             try sshWriter.write(entries)
         } catch {
-            generalError = VMErrorInfo(title: "Couldn't update the SSH configuration", message: error.localizedDescription)
+            generalError = VMErrorInfo(title: String(localized: "Couldn't update the SSH configuration"), message: error.localizedDescription)
         }
     }
 
@@ -588,7 +588,7 @@ final class AppModel {
                 try sshWriter.removeInclude()
             }
         } catch {
-            generalError = VMErrorInfo(title: "Couldn't change ~/.ssh/config", message: error.localizedDescription)
+            generalError = VMErrorInfo(title: String(localized: "Couldn't change ~/.ssh/config"), message: error.localizedDescription)
         }
         isSSHIncludeInstalled = sshWriter.isIncludeInstalled
     }
@@ -652,7 +652,7 @@ final class AppModel {
             try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: script.path)
             NSWorkspace.shared.open(script)
         } catch {
-            generalError = VMErrorInfo(title: "Couldn't open Terminal", message: error.localizedDescription)
+            generalError = VMErrorInfo(title: String(localized: "Couldn't open Terminal"), message: error.localizedDescription)
         }
     }
 
@@ -788,7 +788,7 @@ final class AppModel {
         do {
             try remove(machine)
         } catch {
-            generalError = VMErrorInfo(title: "Couldn't delete “\(machine.name)”", message: error.localizedDescription)
+            generalError = VMErrorInfo(title: String(localized: "Couldn't delete “\(machine.name)”"), message: error.localizedDescription)
         }
     }
 
@@ -805,7 +805,7 @@ final class AppModel {
         }
         guard !problems.isEmpty else { return }
         generalError = VMErrorInfo(
-            title: problems.count == 1 ? "Couldn't delete a virtual machine" : "Couldn't delete \(problems.count) virtual machines",
+            title: problems.count == 1 ? String(localized: "Couldn't delete a virtual machine") : String(localized: "Couldn't delete \(problems.count) virtual machines"),
             message: problems.joined(separator: "\n")
         )
     }
