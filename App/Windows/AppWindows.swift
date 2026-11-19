@@ -7,6 +7,7 @@ enum WindowID {
     static let machineSettings = "machine-settings"
     static let snapshots = "snapshots"
     static let templates = "templates"
+    static let discovery = "discovery"
     static let settings = "settings"
 }
 
@@ -59,6 +60,10 @@ final class AppWindows {
 
     func showTemplates() {
         show(activatingApp: true) { $0(id: WindowID.templates) }
+    }
+
+    func showDiscovery() {
+        show(activatingApp: true) { $0(id: WindowID.discovery) }
     }
 
     func showAppSettings() {

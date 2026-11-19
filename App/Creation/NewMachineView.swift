@@ -245,9 +245,19 @@ struct FormButtons: View {
     let create: () -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppModel.self) private var model
 
     var body: some View {
         HStack {
+            if takesDroppedFiles {
+                // The catalogue of systems to try, in a window of its own.
+                Button("Discover Systems…") {
+                    model.windows.showDiscovery()
+                    dismiss()
+                }
+                .buttonStyle(.link)
+                .help("Browse BSD, alternative Linux distributions and other systems to try")
+            }
             if let problem {
                 Text(problem)
                     .font(.callout)

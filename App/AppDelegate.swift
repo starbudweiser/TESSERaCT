@@ -7,6 +7,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         DockPresence.shared.start()
         AppAppearance.apply()
         UpdateService.shared.start()
+        // Looks for new systems in the background, at most once a day.
+        DiscoveryService.shared.start()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

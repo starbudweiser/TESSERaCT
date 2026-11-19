@@ -41,14 +41,17 @@ public struct RemoteImage: Codable, Sendable, Hashable {
     /// The SHA-256 digest of the file, where its publisher lists none to check it against and the app
     /// knows the one it expects.
     public var sha256: String?
+    /// The SHA-512 digest of the file, for a publisher that lists no other.
+    public var sha512: String?
     /// Download these in order instead of `url`, which names the assembled image. Each piece and the
     /// complete image must have a SHA-256 digest; interrupted pieces resume like any other download.
     public var parts: [Part]?
 
     public init(
         url: URL, checksumsURL: URL? = nil, checksumAlgorithm: ChecksumAlgorithm? = nil,
-        sha256: String? = nil, parts: [Part]? = nil, latestRelease: LatestRelease? = nil
+        sha256: String? = nil, parts: [Part]? = nil, latestRelease: LatestRelease? = nil, sha512: String? = nil
     ) {
+        self.sha512 = sha512
         self.url = url
         self.latestRelease = latestRelease
         self.checksumsURL = checksumsURL

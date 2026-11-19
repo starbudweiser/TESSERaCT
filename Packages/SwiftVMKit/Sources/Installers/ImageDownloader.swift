@@ -300,6 +300,15 @@ public struct ImageDownloader: Sendable {
     // MARK: Verification
 
     private func verify(_ file: URL, against image: RemoteImage) async throws {
+        if let expected = image.sha512 {
+            let actual = try await Task.detached(priority: .userInitiated) {
+                try Self.digest(of: file, algorithm: .sha512)
+            }.value
+            guard actual.caseInsensitiveCompare(expected) == .orderedSame else {
+                throw DownloadError.checksumMismatch(fileName: image.fileName)
+            }
+            return
+        }
         if let expected = image.sha256 {
             let actual = try await Task.detached(priority: .userInitiated) {
                 try Self.digest(of: file, algorithm: .sha256)
@@ -328,7 +337,7 @@ public struct ImageDownloader: Sendable {
 
     /// Finds the digest listed for `fileName` in a `SHA256SUMS`-style listing (`<hex>  <name>` or `<hex> *<name>`),
     /// or in a BSD-style one as Fedora signs it (`SHA256 (<name>) = <hex>`).
-    static func expectedDigest(for fileName: String, in listing: String) -> String? {
+    public static func expectedDigest(for fileName: String, in listing: String) -> String? {
         for line in listing.split(whereSeparator: \.isNewline) {
             // BSD style: the algorithm, the name in parentheses, then the digest.
             if let open = line.firstIndex(of: "("), let close = line.range(of: ") = ", options: .backwards),
@@ -352,7 +361,7 @@ public struct ImageDownloader: Sendable {
         return nil
     }
 
-    static func digest(of file: URL, algorithm: RemoteImage.ChecksumAlgorithm) throws -> String {
+    public static func digest(of file: URL, algorithm: RemoteImage.ChecksumAlgorithm) throws -> String {
         let handle = try FileHandle(forReadingFrom: file)
         defer { try? handle.close() }
         let chunkSize = 4 << 20

@@ -65,6 +65,14 @@ struct TESSERaCTApp: App {
         }
         .auxiliaryWindow()
 
+        Window("Discover Systems", id: WindowID.discovery) {
+            DiscoveryView()
+                .environment(model)
+                .flatRoundWindow()
+                .background(WindowSpaceBehavior())
+        }
+        .auxiliaryWindow()
+
         // A window like the others rather than a Settings scene: it is opened from the menu bar panel,
         // by the same means as every other window.
         Window("\(AppIdentity.current.name) Settings", id: WindowID.settings) {

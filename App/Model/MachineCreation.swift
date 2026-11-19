@@ -19,6 +19,8 @@ final class MachineCreation: Identifiable {
     var fraction: Double?
     /// Set when creation failed; the row stays until the user dismisses it.
     var errorMessage: String?
+    /// The system of the discovery catalogue this machine is made from, if it is.
+    var discoveryID: String?
     @ObservationIgnored var task: Task<Void, Never>?
     /// Called once with the outcome, for callers that wait for creation to finish.
     @ObservationIgnored var onFinish: ((Result<VirtualMachine, any Error>) -> Void)?
@@ -78,6 +80,20 @@ struct LinuxInstallerRequest {
     var compressesDisk = false
     /// Draw with the Mac's GPU, on QEMU.
     var acceleratesGraphics = false
+    /// The engine to run on, where it isn't the one that goes with the system. `nil` is that one.
+    var engine: VMEngineKind?
+    /// The folder to keep the machine in. `nil` is the folder for new machines.
+    var location: URL?
+}
+
+/// Everything needed to download a system of the discovery catalogue and make a machine that boots it.
+struct DiscoveryInstallRequest {
+    var name: String
+    var item: DiscoveryItem
+    var cpuCount: Int
+    var memorySize: UInt64
+    var diskCapacity: UInt64
+    var engine: VMEngineKind
     /// The folder to keep the machine in. `nil` is the folder for new machines.
     var location: URL?
 }
@@ -161,6 +177,18 @@ extension AppModel {
         }
         return run(MachineCreation(name: request.name, os: os), onReady: onReady) { creation in
             try await self.performInstallerCreate(request, os: os, creation: creation)
+        }
+    }
+
+    /// Starts downloading a system of the discovery catalogue and making a machine that boots it.
+    @discardableResult
+    func create(_ request: DiscoveryInstallRequest, onReady: @escaping (VirtualMachine) -> Void = { _ in }) -> MachineCreation {
+        let entry = request.item.entry
+        let os = GuestOS(family: .linux, distribution: entry.id, productName: entry.name)
+        let creation = MachineCreation(name: request.name, os: os)
+        creation.discoveryID = entry.id
+        return run(creation, onReady: onReady) { creation in
+            try await self.performDiscoveryCreate(request, os: os, creation: creation)
         }
     }
 
@@ -321,15 +349,16 @@ extension AppModel {
 
         creation.update(String(localized: "Creating disk…"))
         // QEMU reads no ASIF disk: a machine on it has a plain one.
+        let engine: VMEngineKind? = request.acceleratesGraphics ? .qemu : request.engine
         let disk = request.compressesDisk
             ? DiskConfiguration(fileName: "disk.\(CompressedDisk.fileExtension)", capacity: request.diskCapacity, bus: .virtio, format: .compressed)
-            : request.acceleratesGraphics
+            : engine == .qemu
             ? DiskConfiguration(fileName: "disk.img", capacity: request.diskCapacity, bus: .virtio, format: .raw)
             : DiskConfiguration(fileName: "disk.asif", capacity: request.diskCapacity, bus: .virtio, format: .asif)
         let configuration = VMConfiguration(
             name: request.name,
             os: os,
-            engine: request.acceleratesGraphics ? .qemu : nil,
+            engine: engine,
             cpuCount: request.cpuCount,
             memorySize: request.memorySize,
             disks: [disk],
@@ -348,6 +377,29 @@ extension AppModel {
             library.discard(staged: bundle)
             throw error
         }
+    }
+
+    private func performDiscoveryCreate(_ request: DiscoveryInstallRequest, os: GuestOS, creation: MachineCreation) async throws -> VirtualMachine {
+        guard let snapshot = request.item.snapshot else { throw DiscoveryError.noImage }
+        let name = request.item.entry.name
+        if request.engine == .qemu, qemuProvider == nil {
+            throw VMError.unsupportedEngine(.qemu)
+        }
+        // The image is looked for again just now, and the machine is made from what is found, so that a
+        // version that was replaced since the catalogue was read is not asked for.
+        creation.update(String(localized: "Checking for the latest \(name) image…"))
+        let resolved = (try? await DiscoveryResolver().resolve(request.item.entry)) ?? snapshot
+        try Task.checkCancellation()
+        let image = DiscoveryDownloads.image(for: resolved)
+        // A file that is in the cache under this name must be the one that was published: a rolling
+        // release keeps its name from one day to the next.
+        try await DiscoveryDownloads.discardStaleCopy(of: image, in: downloader, expecting: resolved)
+        let installer = LinuxInstallerRequest(
+            name: request.name, media: .localFile(try await download(image, named: name, creation: creation)),
+            cpuCount: request.cpuCount, memorySize: request.memorySize, diskCapacity: request.diskCapacity,
+            engine: request.engine, location: request.location
+        )
+        return try await performInstallerCreate(installer, os: os, creation: creation)
     }
 
     private func performMacInstall(_ request: MacInstallRequest, creation: MachineCreation) async throws -> VirtualMachine {

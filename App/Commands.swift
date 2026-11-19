@@ -29,6 +29,7 @@ struct MachineCommands: Commands {
             Button("New Virtual Machine…") { AppModel.shared.windows.showNewMachine() }
                 .keyboardShortcut("n")
             Button("Templates…") { AppModel.shared.windows.showTemplates() }
+            Button("Discover Systems…") { AppModel.shared.windows.showDiscovery() }
         }
 
         CommandMenu("Virtual Machine") {
