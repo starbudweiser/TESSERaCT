@@ -73,7 +73,8 @@ struct NewMachineView: View {
     /// The file the form was opened for.
     private let source: NewMachineRequest.Source
 
-    init(request: NewMachineRequest = NewMachineRequest(), onReady: @escaping (VirtualMachine, Bool) -> Void) {
+    /// - Parameter initialSource: The page to open on, instead of the one the window opens on by itself.
+    init(request: NewMachineRequest = NewMachineRequest(), initialSource: NewMachineSource? = nil, onReady: @escaping (VirtualMachine, Bool) -> Void) {
         self.onReady = onReady
         source = request.source
         _preferredMode = AppStorage(wrappedValue: UserDefaults.standard.string(forKey: "newLinuxMachineMode")
@@ -93,6 +94,18 @@ struct NewMachineView: View {
             _family = State(initialValue: remembered.flatMap { Self.families.contains($0) ? $0 : nil } ?? .linux)
         case .installerDisc(let url): _family = State(initialValue: WindowsInstaller.looksLikeWindows(url) ? .windows : .linux)
         case .restoreImage: _family = State(initialValue: .macOS)
+        }
+        switch initialSource {
+        case .discover:
+            _isDiscovering = State(initialValue: true)
+        case .system(let family):
+            _isDiscovering = State(initialValue: false)
+            _family = State(initialValue: family)
+        case .template:
+            _isDiscovering = State(initialValue: false)
+            _isFromTemplate = State(initialValue: true)
+        case nil:
+            break
         }
     }
 

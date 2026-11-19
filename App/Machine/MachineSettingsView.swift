@@ -106,6 +106,11 @@ struct MachineSettingsView: View {
     @State private var isChangingCompression = false
     @State private var bridgeInterfaces: [BridgedNetworking.Interface] = []
 
+    init(machine: VirtualMachine, initialPane: MachineSettingsPane = .general) {
+        self.machine = machine
+        _selection = State(initialValue: initialPane)
+    }
+
     private var configuration: VMConfiguration { machine.configuration }
     private var isActive: Bool { machine.state != .stopped }
 

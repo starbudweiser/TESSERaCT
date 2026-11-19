@@ -11,7 +11,7 @@ nonisolated enum DiscoveryFallback {
     static let json = #"""
 {
   "schema": 1,
-  "revision": 5,
+  "revision": 6,
   "updatedAt": "2026-11-19",
   "entries": [
     {
@@ -851,6 +851,52 @@ nonisolated enum DiscoveryFallback {
         "digest": "40f54686eda7d208164d8eb6c65961bee3542a4820cb52084cfc5eea1c3b193a",
         "bytes": 227848192,
         "date": "2026-11-11"
+      }
+    },
+    {
+      "id": "elementary",
+      "name": "elementary OS",
+      "family": "linux",
+      "summary": {
+        "en": "A Linux desktop designed like a Mac: a dock, rounded windows, apps drawn to match and no telemetry. Official ARM64 image, built for people who want it to just look right.",
+        "fr": "Un bureau Linux dessiné comme un Mac : dock, fenêtres arrondies, applications assorties et aucune télémétrie. Image ARM64 officielle, pour qui veut que tout soit beau d'emblée.",
+        "es": "Un escritorio Linux diseñado como un Mac: dock, ventanas redondeadas, aplicaciones a juego y sin telemetría. Imagen ARM64 oficial, para quien quiere que todo luzca bien desde el principio.",
+        "it": "Un desktop Linux disegnato come un Mac: dock, finestre arrotondate, app coordinate e nessuna telemetria. Immagine ARM64 ufficiale, per chi vuole che tutto sia bello da subito."
+      },
+      "tags": [
+        "desktop"
+      ],
+      "featured": false,
+      "color": "#64baff",
+      "defaults": {
+        "cpuCount": 4,
+        "memoryGB": 4,
+        "diskGB": 32,
+        "engine": "virtualization"
+      },
+      "screenshot": {
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Elementary_OS_8.0_Code_-_English.png?width=1040",
+        "credit": "Wikimedia Commons",
+        "page": "https://commons.wikimedia.org/wiki/File:Elementary_OS_8.0_Code_-_English.png"
+      },
+      "source": {
+        "kind": "listing",
+        "absoluteLinks": true,
+        "indexURL": "https://elementary.io/",
+        "filePattern": "elementaryos-[0-9.]+-stable-arm64\\.[0-9]+\\.iso",
+        "versionPattern": "elementaryos-([0-9.]+)-stable",
+        "checksum": {
+          "url": "https://elementary.io/docs/installation",
+          "algorithm": "sha256"
+        }
+      },
+      "snapshot": {
+        "version": "8.1",
+        "url": "https://dl.elementaryos.org/MTc5NTEwMzMxOQ==/elementaryos-8.1-stable-arm64.20260219.iso",
+        "algorithm": "sha256",
+        "digest": "85116d48c406ae7cd60c936050a099d4b8610321273f6f0a694796db4d4e86ba",
+        "bytes": 3191691264,
+        "date": "2026-09-23"
       }
     }
   ]

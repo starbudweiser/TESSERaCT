@@ -105,7 +105,9 @@ nonisolated struct DiscoveryResolver: Sendable {
             guard let digest = Self.digest(for: file, in: listing, algorithm: checksum.algorithm) else { throw DiscoveryError.noChecksum }
             let probe = try await probe(url)
             let version = Self.version(in: [file, folder.name], source: source)
-            return DiscoverySnapshot(version: version, url: probe?.url ?? url, algorithm: checksum.algorithm, digest: digest, bytes: probe?.bytes, date: probe?.date)
+            // A redirect to a signed, short-lived address is no address to keep: the listed one stays.
+            let kept = probe.flatMap { $0.url.query == nil ? $0.url : nil } ?? url
+            return DiscoverySnapshot(version: version, url: kept, algorithm: checksum.algorithm, digest: digest, bytes: probe?.bytes, date: probe?.date)
         }
         throw DiscoveryError.noImage
     }
@@ -189,11 +191,22 @@ nonisolated struct DiscoveryResolver: Sendable {
         if let listed = ImageDownloader.expectedDigest(for: fileName, in: listing), isDigest(listed, algorithm) {
             return listed.lowercased()
         }
+        // A web page that gives the digest after the file name, in a command to run or a sentence.
+        if let near = digestNear(fileName, in: listing, algorithm: algorithm) { return near }
         guard let token = try? NSRegularExpression(pattern: "\\b[0-9a-fA-F]{\(algorithm.hexLength)}\\b") else { return nil }
         let tokens = Set(token.matches(in: listing, range: NSRange(listing.startIndex..., in: listing)).compactMap {
             Range($0.range, in: listing).map { listing[$0].lowercased() }
         })
         return tokens.count == 1 ? tokens.first : nil
+    }
+
+    /// The first digest within a short distance after an occurrence of `fileName`, in text that isn't a listing.
+    static func digestNear(_ fileName: String, in text: String, algorithm: DiscoveryDigest.Algorithm) -> String? {
+        guard let expression = try? NSRegularExpression(
+            pattern: NSRegularExpression.escapedPattern(for: fileName) + "[^0-9a-fA-F]{0,160}?\\b([0-9a-fA-F]{\(algorithm.hexLength)})\\b"
+        ), let match = expression.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)), let range = Range(match.range(at: 1), in: text)
+        else { return nil }
+        return text[range].lowercased()
     }
 
     static func isDigest(_ value: String, _ algorithm: DiscoveryDigest.Algorithm) -> Bool {

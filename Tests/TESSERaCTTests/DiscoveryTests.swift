@@ -124,6 +124,14 @@ private let digest512 = String(repeating: "cd", count: 64)
         #expect(DiscoveryResolver.digest(for: "a.iso", in: "SHA512 (a.iso) = \(digest512)", algorithm: .sha512) == digest512)
     }
 
+    @Test func aDigestIsFoundAfterTheFileNameInAWebPage() {
+        let arm = String(repeating: "85", count: 32), amd = String(repeating: "bd", count: 32)
+        let page = "shasum -a 256 ~/Downloads/os-amd64.iso \(amd)\n If you use ARM: shasum -a 256 ~/Downloads/os-arm64.iso \(arm)\n"
+        #expect(DiscoveryResolver.digest(for: "os-arm64.iso", in: page, algorithm: .sha256) == arm)
+        #expect(DiscoveryResolver.digest(for: "os-amd64.iso", in: page, algorithm: .sha256) == amd)
+        #expect(DiscoveryResolver.digest(for: "os-riscv.iso", in: page, algorithm: .sha256) == nil)
+    }
+
     @Test func versionsAreReadFromNames() {
         var source = DiscoverySource(kind: .listing)
         source.versionPattern = #"install([0-9]+)\.iso"#

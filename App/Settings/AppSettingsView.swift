@@ -63,6 +63,10 @@ struct AppSettingsView: View {
     /// D3DMetal is being copied, or Rosetta installed.
     @State private var isChangingGraphics = false
 
+    init(initialPane: AppSettingsPane = .general) {
+        _selection = State(initialValue: initialPane)
+    }
+
     private var panes: [AppSettingsPane] {
         var panes: [AppSettingsPane] = [.general, .storage, .network]
         if model.qemuProvider?.canAccelerateWindowsGraphics == true {
