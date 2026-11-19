@@ -191,6 +191,7 @@ extension DiscoveryEntry.Tag {
         case .rolling: String(localized: "Rolling release")
         case .containers: String(localized: "Containers")
         case .unix: String(localized: "Unix")
+        case .unusual: String(localized: "Unusual")
         }
     }
 }

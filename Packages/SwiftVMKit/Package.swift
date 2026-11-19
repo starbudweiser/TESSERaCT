@@ -30,9 +30,12 @@ let package = Package(
         .target(name: "DiskTools", dependencies: ["VMCore"]),
         .target(name: "VMNetworking", dependencies: ["VMCore"]),
         .target(name: "SSHIntegration", dependencies: ["VMCore"]),
+        // Zstandard's decoder (BSD licence, one file made by the project's own script from 1.5.7), for the
+        // images that are published compressed with it.
+        .target(name: "CZstd", exclude: ["LICENSE"], publicHeadersPath: "include"),
         .target(
             name: "Installers",
-            dependencies: ["VMCore", "DiskTools", "GuestChannel"],
+            dependencies: ["VMCore", "DiskTools", "GuestChannel", "CZstd"],
             resources: [.process("Resources")]
         ),
         .target(name: "VZEngine", dependencies: ["VMCore", "VMNetworking", "DiskTools"]),

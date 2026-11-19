@@ -398,6 +398,47 @@ private let digest512 = String(repeating: "cd", count: 64)
         try? model.library.remove(machine, movingToTrash: false)
     }
 
+    /// Downloads a system that comes packed, unpacks it and makes a machine of it, on a pretend engine:
+    /// `TESSERACT_LIVE_TESTS=1 swift test --filter unpacksAndCreates`.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["TESSERACT_LIVE_TESTS"] == "1"), arguments: ["openwrt", "haiku", "redox"])
+    func unpacksAndCreatesAMachineFromAPackedImage(id: String) async throws {
+        let directory = URL(fileURLWithPath: "/tmp", isDirectory: true)
+            .appending(path: "tctl-app-tests-\(UUID().uuidString)", directoryHint: .isDirectory).standardizedFileURL
+        setenv("TESSERACT_HOME", directory.path, 1)
+        defer { unsetenv("TESSERACT_HOME"); try? FileManager.default.removeItem(at: directory) }
+        let model = AppModel.shared
+        model.stopControlServer()
+        model.library.onChange = nil
+        let entry = try #require(DiscoveryFallback.catalog.entries.first { $0.id == id })
+        let snapshot = try await DiscoveryResolver().resolve(entry)
+        let item = DiscoveryItem(entry: entry, snapshot: snapshot, availability: .available, isNewVersion: false)
+        let name = "Test \(id)"
+        let creation = model.create(DiscoveryInstallRequest(
+            name: name, item: item, cpuCount: 2, memorySize: 1 << 30, diskCapacity: 1 << 30, engine: .virtualization, location: nil
+        ))
+        await creation.task?.value
+        try #require(creation.errorMessage == nil, "\(creation.errorMessage ?? "")")
+        let machine = try #require(model.library.machines.first { $0.name == name })
+        let configuration = machine.configuration
+        if entry.source.media == .disk {
+            #expect(configuration.removableImages.isEmpty)
+            let disk = try #require(configuration.disks.first)
+            let url = machine.bundle.diskURL(for: disk)
+            let size = (try FileManager.default.attributesOfItem(atPath: url.path)[.size] as? UInt64) ?? 0
+            #expect(size == disk.capacity && size >= 1 << 30)
+            #expect(disk.bus == (entry.defaults.diskBus == "usb" ? .usb : .virtio))
+            // The start of the image is what was published: a partition table or a boot sector.
+            let head = try FileHandle(forReadingFrom: url).read(upToCount: 512) ?? Data()
+            #expect(head.suffix(2) == Data([0x55, 0xAA]))
+        } else {
+            let image = try #require(configuration.removableImages.first)
+            let size = (try FileManager.default.attributesOfItem(atPath: image.url.path)[.size] as? UInt64) ?? 0
+            #expect(size > 100_000_000 && image.url.pathExtension == "iso")
+        }
+        print("LIVE created \(name)")
+        try? model.library.remove(machine, movingToTrash: false)
+    }
+
     @Test func aQEMUMachineIsRefusedWhereThereIsNoQEMU() async throws {
         let directory = URL(fileURLWithPath: "/tmp", isDirectory: true)
             .appending(path: "tctl-app-tests-\(UUID().uuidString)", directoryHint: .isDirectory).standardizedFileURL

@@ -11,7 +11,7 @@ nonisolated enum DiscoveryFallback {
     static let json = #"""
 {
   "schema": 1,
-  "revision": 2,
+  "revision": 3,
   "updatedAt": "2026-11-19",
   "entries": [
     {
@@ -599,6 +599,144 @@ nonisolated enum DiscoveryFallback {
         "digest": "fe2d97beef5a0fcd5ee28804eb2c9e0e85cfb79ae1ff9d06cdda0045149dbe7b",
         "bytes": 1058836480,
         "date": "2026-11-18"
+      }
+    },
+    {
+      "id": "haiku",
+      "name": "Haiku",
+      "family": "other",
+      "summary": {
+        "en": "The open-source heir of BeOS: a fast, coherent desktop built from scratch, with its own filesystem and a charming 90s design. The ARM64 port is experimental, from the daily build.",
+        "fr": "L'héritier libre de BeOS : un bureau rapide et cohérent, écrit de zéro, avec son propre système de fichiers et un charme des années 90. Le portage ARM64 est expérimental, issu de la version du jour.",
+        "es": "El heredero libre de BeOS: un escritorio rápido y coherente, escrito desde cero, con su propio sistema de archivos y el encanto de los años 90. El port ARM64 es experimental, de la compilación del día.",
+        "it": "L'erede libero di BeOS: un desktop veloce e coerente, scritto da zero, con un filesystem proprio e il fascino degli anni '90. Il port ARM64 è sperimentale, dalla build del giorno."
+      },
+      "tags": [
+        "unusual",
+        "desktop",
+        "retro",
+        "experimental"
+      ],
+      "featured": false,
+      "color": "#e8a317",
+      "defaults": {
+        "cpuCount": 2,
+        "memoryGB": 2,
+        "diskGB": 8,
+        "engine": "qemu",
+        "diskBus": "usb"
+      },
+      "source": {
+        "kind": "listing",
+        "archive": "zip",
+        "member": ".image",
+        "media": "disk",
+        "absoluteLinks": true,
+        "indexURL": "https://download.haiku-os.org/nightly-images/arm64/",
+        "filePattern": "haiku-master-hrev[0-9]+-arm64-mmc\\.zip",
+        "versionPattern": "(hrev[0-9]+)",
+        "checksum": {
+          "url": "{url}.sha256",
+          "algorithm": "sha256"
+        }
+      },
+      "snapshot": {
+        "version": "hrev60437",
+        "url": "https://haiku-nightly.cdn.haiku-os.org/arm64/haiku-master-hrev60437-arm64-mmc.zip",
+        "algorithm": "sha256",
+        "digest": "e838b242881baed20e191107eb3ab5bb26a7692c81b58b4b8a624fa3e2afb13d",
+        "bytes": 58819611,
+        "date": "2026-11-19"
+      }
+    },
+    {
+      "id": "redox",
+      "name": "Redox OS",
+      "family": "other",
+      "summary": {
+        "en": "A Unix-like microkernel system written entirely in Rust, with its own display server and apps. Daily live image with the desktop; experimental on ARM64.",
+        "fr": "Un système de type Unix à micronoyau écrit entièrement en Rust, avec son propre serveur d'affichage et ses applications. Image live du jour avec le bureau ; expérimental sur ARM64.",
+        "es": "Un sistema tipo Unix con microkernel escrito íntegramente en Rust, con su propio servidor de pantalla y aplicaciones. Imagen live diaria con el escritorio; experimental en ARM64.",
+        "it": "Un sistema di tipo Unix a microkernel scritto interamente in Rust, con il proprio server grafico e le proprie app. Immagine live giornaliera con il desktop; sperimentale su ARM64."
+      },
+      "tags": [
+        "unusual",
+        "experimental",
+        "unix"
+      ],
+      "featured": false,
+      "color": "#d4413a",
+      "defaults": {
+        "cpuCount": 4,
+        "memoryGB": 4,
+        "diskGB": 8,
+        "engine": "qemu"
+      },
+      "source": {
+        "kind": "listing",
+        "archive": "zstd",
+        "media": "disc",
+        "indexURL": "https://static.redox-os.org/img/aarch64/",
+        "filePattern": "redox_desktop_aarch64_[0-9_-]+_livedisk\\.iso\\.zst",
+        "versionPattern": "aarch64_([0-9-]+_[0-9]+)_livedisk",
+        "checksum": {
+          "url": "{base}SHA256SUM",
+          "algorithm": "sha256"
+        }
+      },
+      "snapshot": {
+        "version": "2026-11-18_589",
+        "url": "https://static.redox-os.org/img/aarch64/redox_desktop_aarch64_2026-11-18_589_livedisk.iso.zst",
+        "algorithm": "sha256",
+        "digest": "08cbc7cdaf741cab88069e168471219a742321f0846baf60999bce8d8d8f86b2",
+        "bytes": 135334251,
+        "date": "2026-11-19"
+      }
+    },
+    {
+      "id": "openwrt",
+      "name": "OpenWrt",
+      "family": "linux",
+      "summary": {
+        "en": "The Linux that runs the world's routers, with its own LuCI web interface. In a virtual machine it becomes a lab router you can break and rebuild. Ready-to-boot disk image.",
+        "fr": "Le Linux des routeurs du monde entier, avec sa propre interface web LuCI. Dans une machine virtuelle, c'est un routeur de laboratoire qu'on peut casser et refaire. Image disque prête à démarrer.",
+        "es": "El Linux de los routers de medio mundo, con su propia interfaz web LuCI. En una máquina virtual es un router de laboratorio que se puede romper y rehacer. Imagen de disco lista para arrancar.",
+        "it": "Il Linux dei router di tutto il mondo, con la propria interfaccia web LuCI. In una macchina virtuale diventa un router da laboratorio che si può rompere e rifare. Immagine disco pronta all'avvio."
+      },
+      "tags": [
+        "unusual",
+        "light",
+        "server"
+      ],
+      "featured": false,
+      "color": "#00a1e0",
+      "defaults": {
+        "cpuCount": 2,
+        "memoryGB": 1,
+        "diskGB": 4,
+        "engine": "qemu"
+      },
+      "source": {
+        "kind": "listing",
+        "archive": "gzip",
+        "media": "disk",
+        "indexURL": "https://downloads.openwrt.org/releases/",
+        "dirPattern": "[0-9]+\\.[0-9]+\\.[0-9]+/",
+        "subpath": "targets/armsr/armv8/",
+        "filePattern": "openwrt-[0-9.]+-armsr-armv8-generic-ext4-combined-efi\\.img\\.gz",
+        "versionPattern": "openwrt-([0-9.]+)-armsr",
+        "checksum": {
+          "url": "{base}sha256sums",
+          "algorithm": "sha256"
+        }
+      },
+      "snapshot": {
+        "version": "25.12.6",
+        "url": "https://downloads.openwrt.org/releases/25.12.6/targets/armsr/armv8/openwrt-25.12.6-armsr-armv8-generic-ext4-combined-efi.img.gz",
+        "algorithm": "sha256",
+        "digest": "77a3802b583a6964ccb868c80f83a6ea0eb5847d3835350b5f0bcbf6f141d1d3",
+        "bytes": 14669158,
+        "date": "2026-10-18"
       }
     }
   ]

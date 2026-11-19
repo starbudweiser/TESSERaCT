@@ -394,12 +394,81 @@ extension AppModel {
         // A file that is in the cache under this name must be the one that was published: a rolling
         // release keeps its name from one day to the next.
         try await DiscoveryDownloads.discardStaleCopy(of: image, in: downloader, expecting: resolved)
+        let downloaded = try await download(image, named: name, creation: creation)
+        try Task.checkCancellation()
+        let source = request.item.entry.source
+        // An image that is published packed is unpacked once it is known to be the file that was published.
+        var media = downloaded
+        if let format = source.archive, source.media != .disk {
+            let unpacked = downloader.cacheDirectory.appending(path: "Extracted/" + downloaded.deletingPathExtension().lastPathComponent)
+            if !FileManager.default.fileExists(atPath: unpacked.path) {
+                try await unpack(downloaded, format: format, member: source.member, to: unpacked, named: name, creation: creation)
+            }
+            media = unpacked
+        }
+        if source.media == .disk, let format = source.archive {
+            return try await performDiscoveryDiskCreate(request, os: os, archive: downloaded, format: format, creation: creation)
+        }
         let installer = LinuxInstallerRequest(
-            name: request.name, media: .localFile(try await download(image, named: name, creation: creation)),
+            name: request.name, media: .localFile(media),
             cpuCount: request.cpuCount, memorySize: request.memorySize, diskCapacity: request.diskCapacity,
             engine: request.engine, location: request.location
         )
         return try await performInstallerCreate(installer, os: os, creation: creation)
+    }
+
+    private func unpack(
+        _ archive: URL, format: ArchiveExtractor.Format, member: String?, to destination: URL, named name: String, creation: MachineCreation
+    ) async throws {
+        creation.update(String(localized: "Unpacking \(name)…"), fraction: 0)
+        let progress = ProgressRelay { fraction in creation.fraction = fraction }
+        try await ArchiveExtractor.extract(archive, format: format, member: member, to: destination) { progress.report($0) }
+    }
+
+    /// A system that is published as a disk that boots: the unpacked image becomes the machine's disk,
+    /// grown to the size that was asked for.
+    private func performDiscoveryDiskCreate(
+        _ request: DiscoveryInstallRequest, os: GuestOS, archive: URL, format: ArchiveExtractor.Format, creation: MachineCreation
+    ) async throws -> VirtualMachine {
+        let entry = request.item.entry
+        try prepareLocation(request.location)
+        let unpacked = downloader.cacheDirectory.appending(path: "Extracted/\(UUID().uuidString).img")
+        defer { try? FileManager.default.removeItem(at: unpacked) }
+        try await unpack(archive, format: format, member: entry.source.member, to: unpacked, named: entry.name, creation: creation)
+        try Task.checkCancellation()
+        let imageSize = (try FileManager.default.attributesOfItem(atPath: unpacked.path)[.size] as? UInt64) ?? 0
+        // The disk can't be smaller than the image; a size that isn't a whole number of MiB is rounded up.
+        let capacity = max(request.diskCapacity, (imageSize + (1 << 20) - 1) / (1 << 20) * (1 << 20))
+
+        creation.update(String(localized: "Creating disk…"))
+        let bus: DiskConfiguration.Bus = entry.defaults.diskBus == "usb" ? .usb : .virtio
+        let disk = DiskConfiguration(fileName: "disk.img", capacity: capacity, bus: bus, format: .raw)
+        let configuration = VMConfiguration(
+            name: request.name,
+            os: os,
+            engine: request.engine,
+            cpuCount: request.cpuCount,
+            memorySize: request.memorySize,
+            disks: [disk],
+            display: DisplayConfiguration(),
+            networkInterfaces: [NetworkInterfaceConfiguration()],
+            clipboard: ClipboardConfiguration(isShared: false),
+            boot: BootConfiguration(),
+            ssh: SSHConfiguration(alias: uniqueAlias(for: request.name))
+        )
+        let bundle = try VMBundle.create(at: library.makeStagingBundleURL(in: request.location), configuration: configuration)
+        do {
+            let diskURL = bundle.diskURL(for: disk)
+            try? FileManager.default.removeItem(at: diskURL)
+            try FileManager.default.moveItem(at: unpacked, to: diskURL)
+            let handle = try FileHandle(forWritingTo: diskURL)
+            defer { try? handle.close() }
+            try handle.truncate(atOffset: capacity)
+            return try addToLibrary(staged: bundle)
+        } catch {
+            library.discard(staged: bundle)
+            throw error
+        }
     }
 
     private func performMacInstall(_ request: MacInstallRequest, creation: MachineCreation) async throws -> VirtualMachine {

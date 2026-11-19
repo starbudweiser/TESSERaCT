@@ -618,6 +618,8 @@
 "Unavailable" = "No disponible";
 "Uninstall…" = "Desinstalar…";
 "Unix" = "Unix";
+"Unpacking %@…" = "Descomprimiendo %@…";
+"Unusual" = "Insólito";
 "Updated %@" = "Actualizado %@";
 "Updates" = "Actualizaciones";
 "Updates aren't available" = "Las actualizaciones no están disponibles";

@@ -76,7 +76,7 @@ nonisolated struct DiscoveryResolver: Sendable {
         if let dirPattern = source.dirPattern {
             let page = try await text(URL(string: index))
             // The newest release may not have its images yet, or may only be a beta: look at a few.
-            folders = Self.links(in: page, matching: dirPattern).prefix(3).map { (index + $0 + subpath, $0.trimmingCharacters(in: CharacterSet(charactersIn: "/"))) }
+            folders = Self.links(in: page, matching: dirPattern, allowsAbsolute: false).prefix(3).map { (index + $0 + subpath, $0.trimmingCharacters(in: CharacterSet(charactersIn: "/"))) }
         }
         for folder in folders {
             let page: String
@@ -87,14 +87,18 @@ nonisolated struct DiscoveryResolver: Sendable {
             } catch {
                 continue
             }
-            guard let file = Self.links(in: page, matching: filePattern).first else { continue }
+            guard let link = Self.links(in: page, matching: filePattern, allowsAbsolute: source.absoluteLinks == true).first else { continue }
+            // A link may be a whole address, to a server of its own.
+            let fileAddress = link.contains("://") ? link : folder.base + link
+            guard let url = URL(string: fileAddress) else { continue }
+            let file = url.lastPathComponent
             let checksumURL = checksum.url
                 .replacingOccurrences(of: "{base}", with: folder.base)
+                .replacingOccurrences(of: "{url}", with: fileAddress)
                 .replacingOccurrences(of: "{file}", with: file)
                 .replacingOccurrences(of: "{dir}", with: folder.name)
             let listing = try await text(URL(string: checksumURL))
             guard let digest = Self.digest(for: file, in: listing, algorithm: checksum.algorithm) else { throw DiscoveryError.noChecksum }
-            guard let url = URL(string: folder.base + file) else { continue }
             let probe = try await probe(url)
             let version = Self.version(in: [file, folder.name], source: source)
             return DiscoverySnapshot(version: version, url: probe?.url ?? url, algorithm: checksum.algorithm, digest: digest, bytes: probe?.bytes, date: probe?.date)
@@ -155,7 +159,7 @@ nonisolated struct DiscoveryResolver: Sendable {
     // MARK: Reading what the publishers wrote
 
     /// The links of a directory listing that are wholly matched by `pattern`, the newest first.
-    static func links(in html: String, matching pattern: String) -> [String] {
+    static func links(in html: String, matching pattern: String, allowsAbsolute: Bool = false) -> [String] {
         guard let anchor = try? NSRegularExpression(pattern: #"href="([^"?#]+)""#),
               let match = try? NSRegularExpression(pattern: "^(?:\(pattern))$")
         else { return [] }
@@ -164,9 +168,12 @@ nonisolated struct DiscoveryResolver: Sendable {
         for result in anchor.matches(in: html, range: range) {
             guard let swiftRange = Range(result.range(at: 1), in: html) else { continue }
             let link = String(html[swiftRange]).removingPercentEncoding ?? String(html[swiftRange])
-            // Only what is in this folder: no other site, no way back up.
-            guard !link.hasPrefix("/"), !link.hasPrefix("."), !link.contains("://") else { continue }
-            if match.firstMatch(in: link, range: NSRange(link.startIndex..., in: link)) != nil {
+            // Only what is in this folder: no way back up, and no other site unless the listing is of those.
+            guard !link.hasPrefix("/"), !link.hasPrefix(".") else { continue }
+            let isAbsolute = link.contains("://")
+            guard allowsAbsolute || !isAbsolute else { continue }
+            let name = isAbsolute ? (link.split(separator: "/").last.map(String.init) ?? link) : link
+            if match.firstMatch(in: name, range: NSRange(name.startIndex..., in: name)) != nil {
                 found.insert(link)
             }
         }

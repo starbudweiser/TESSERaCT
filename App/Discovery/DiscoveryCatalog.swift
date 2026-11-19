@@ -1,4 +1,5 @@
 import Foundation
+import Installers
 import VMCore
 
 // MARK: - The catalogue file
@@ -53,7 +54,7 @@ nonisolated struct DiscoveryEntry: Codable, Sendable, Hashable, Identifiable {
 
     /// The tags that can be shown. A tag the app doesn't know is not shown.
     enum Tag: String, Codable, Sendable, CaseIterable {
-        case light, desktop, server, experimental, retro, security, rolling, containers, unix
+        case light, desktop, server, experimental, retro, security, rolling, containers, unix, unusual
     }
 
     /// The engine a machine made from the entry starts on.
@@ -68,6 +69,8 @@ nonisolated struct DiscoveryEntry: Codable, Sendable, Hashable, Identifiable {
         var memoryGB: Int
         var diskGB: Int
         var engine: Engine
+        /// How the disk is attached, where the system needs it a certain way: `usb` or `virtio`.
+        var diskBus: String?
     }
 
     var id: String
@@ -114,7 +117,22 @@ nonisolated struct DiscoverySource: Codable, Sendable, Hashable {
         var algorithm: DiscoveryDigest.Algorithm
     }
 
+    /// What the downloaded file is for the machine.
+    enum Media: String, Codable, Sendable {
+        /// An installer or live disc, which the machine boots from, with a disk of its own.
+        case disc
+        /// A disk image that is ready to boot: it becomes the machine's disk.
+        case disk
+    }
+
     var kind: Kind
+    /// How the file is packed, if it is: it is unpacked after the checked download.
+    var archive: ArchiveExtractor.Format?
+    /// For a zip: the end of the name of the image inside it.
+    var member: String?
+    var media: Media?
+    /// The listing links to files on other servers, with their whole address.
+    var absoluteLinks: Bool?
     var indexURL: String?
     /// For the folders of a listing that are releases; the newest ones are tried first.
     var dirPattern: String?

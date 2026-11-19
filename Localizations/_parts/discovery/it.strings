@@ -45,3 +45,5 @@
 "From a template" = "Da un modello";
 "Drop an Image" = "Trascina un'immagine";
 "Drop an ISO or IPSW file here to make a machine from it." = "Trascina qui un file ISO o IPSW per creare una macchina da esso.";
+"Unusual" = "Insolito";
+"Unpacking %@…" = "Decompressione di %@…";
