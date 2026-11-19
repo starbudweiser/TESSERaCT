@@ -11,7 +11,7 @@ nonisolated enum DiscoveryFallback {
     static let json = #"""
 {
   "schema": 1,
-  "revision": 4,
+  "revision": 5,
   "updatedAt": "2026-11-19",
   "entries": [
     {
@@ -296,9 +296,9 @@ nonisolated enum DiscoveryFallback {
         "date": "2026-11-17"
       },
       "screenshot": {
-        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/NixOS_21.11_GNOME_default_desktop_-_English.png?width=1040",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/NixOS_21.11_GNOME_main_menu_-_English.png?width=1040",
         "credit": "Wikimedia Commons",
-        "page": "https://commons.wikimedia.org/wiki/File:NixOS_21.11_GNOME_default_desktop_-_English.png"
+        "page": "https://commons.wikimedia.org/wiki/File:NixOS_21.11_GNOME_main_menu_-_English.png"
       }
     },
     {
@@ -306,15 +306,14 @@ nonisolated enum DiscoveryFallback {
       "name": "openSUSE Tumbleweed",
       "family": "linux",
       "summary": {
-        "en": "A tested rolling release: always up to date, with a lightweight Xfce live desktop you can try before installing.",
-        "fr": "Une rolling release testée : toujours à jour, avec un bureau Xfce léger en session live à essayer avant d'installer.",
-        "es": "Una rolling release probada: siempre al día, con un escritorio Xfce ligero en sesión live para probar antes de instalar.",
-        "it": "Una rolling release testata: sempre aggiornata, con un desktop Xfce leggero in sessione live da provare prima di installare."
+        "en": "A tested rolling release: always up to date, with the KDE Plasma desktop in a live session you can try before installing.",
+        "fr": "Une rolling release testée : toujours à jour, avec le bureau KDE Plasma en session live à essayer avant d'installer.",
+        "es": "Una rolling release probada: siempre al día, con el escritorio KDE Plasma en sesión live para probar antes de instalar.",
+        "it": "Una rolling release testata: sempre aggiornata, con il desktop KDE Plasma in sessione live da provare prima di installare."
       },
       "tags": [
         "rolling",
-        "desktop",
-        "light"
+        "desktop"
       ],
       "featured": false,
       "color": "#2fa34a",
@@ -326,7 +325,7 @@ nonisolated enum DiscoveryFallback {
       },
       "source": {
         "kind": "fixed",
-        "url": "https://download.opensuse.org/ports/aarch64/tumbleweed/iso/openSUSE-Tumbleweed-XFCE-Live-aarch64-Current.iso",
+        "url": "https://download.opensuse.org/ports/aarch64/tumbleweed/iso/openSUSE-Tumbleweed-KDE-Live-aarch64-Current.iso",
         "versionPattern": "Snapshot([0-9]+)",
         "checksum": {
           "url": "{url}.sha256",
@@ -335,16 +334,16 @@ nonisolated enum DiscoveryFallback {
       },
       "snapshot": {
         "version": "20261117",
-        "url": "https://downloadcontent.opensuse.org/ports/aarch64/tumbleweed/iso/openSUSE-Tumbleweed-XFCE-Live-aarch64-Snapshot20261117-Media.iso",
+        "url": "https://downloadcontent.opensuse.org/ports/aarch64/tumbleweed/iso/openSUSE-Tumbleweed-KDE-Live-aarch64-Snapshot20261117-Media.iso",
         "algorithm": "sha256",
-        "digest": "3542cd8e4b1cfb134666bda26bef9931dcc78cb5e381575f312d24fe93b2f5e3",
-        "bytes": 1423998976,
+        "digest": "5bd3c2db7a460c551ad0ab411eda3e13f4f9276f5f068681f0a1b391c76ff00b",
+        "bytes": 1467299840,
         "date": "2026-11-18"
       },
       "screenshot": {
-        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Gnomesuse.png?width=1040",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/OpenSUSE_Tumbleweed_in_KDE_6.jpg?width=1040",
         "credit": "Wikimedia Commons",
-        "page": "https://commons.wikimedia.org/wiki/File:Gnomesuse.png"
+        "page": "https://commons.wikimedia.org/wiki/File:OpenSUSE_Tumbleweed_in_KDE_6.jpg"
       }
     },
     {
@@ -520,9 +519,9 @@ nonisolated enum DiscoveryFallback {
         "date": "2026-11-12"
       },
       "screenshot": {
-        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Rocky_Linux_10_Workstation.png?width=1040",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Rocky_Linux_8.4_Workstation_Application_picker_screenshot.png?width=1040",
         "credit": "Wikimedia Commons",
-        "page": "https://commons.wikimedia.org/wiki/File:Rocky_Linux_10_Workstation.png"
+        "page": "https://commons.wikimedia.org/wiki/File:Rocky_Linux_8.4_Workstation_Application_picker_screenshot.png"
       }
     },
     {
@@ -567,9 +566,9 @@ nonisolated enum DiscoveryFallback {
         "date": "2026-11-13"
       },
       "screenshot": {
-        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/AlmaLinux_9.3_GNOME_default_desktop_-_English.png?width=1040",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/AlmaLinux_9.3_Xfce_default_desktop_-_English.png?width=1040",
         "credit": "Wikimedia Commons",
-        "page": "https://commons.wikimedia.org/wiki/File:AlmaLinux_9.3_GNOME_default_desktop_-_English.png"
+        "page": "https://commons.wikimedia.org/wiki/File:AlmaLinux_9.3_Xfce_default_desktop_-_English.png"
       }
     },
     {
@@ -661,9 +660,9 @@ nonisolated enum DiscoveryFallback {
         "date": "2026-11-18"
       },
       "screenshot": {
-        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/CentOS_Stream_10_GNOME_default_desktop_-_English.png?width=1040",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/CentOS_Stream_9_Cinnamon_GNOME_Terminal_3.40.3_-_English.png?width=1040",
         "credit": "Wikimedia Commons",
-        "page": "https://commons.wikimedia.org/wiki/File:CentOS_Stream_10_GNOME_default_desktop_-_English.png"
+        "page": "https://commons.wikimedia.org/wiki/File:CentOS_Stream_9_Cinnamon_GNOME_Terminal_3.40.3_-_English.png"
       }
     },
     {
