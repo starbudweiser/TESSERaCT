@@ -289,11 +289,10 @@ final class DisplayContainerView: NSView {
         // A display larger than the screen stays scaled; the title bar says how to make it sharp.
         guard size.width <= visible.width, size.height <= visible.height else { return }
         var frame = window.frame
-        // Grown or shrunk from its top left corner, and kept on the screen.
-        frame.origin.y += frame.height - size.height
+        // Grown or shrunk around the middle of the screen, where the app's windows always are.
         frame.size = size
-        frame.origin.x = min(max(frame.minX, visible.minX), visible.maxX - size.width)
-        frame.origin.y = min(max(frame.minY, visible.minY), visible.maxY - size.height)
+        frame.origin.x = visible.midX - size.width / 2
+        frame.origin.y = visible.midY - size.height / 2
         window.setFrame(frame, display: true, animate: true)
     }
 

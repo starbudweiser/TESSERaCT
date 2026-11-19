@@ -105,10 +105,28 @@ struct WindowSpaceBehavior: NSViewRepresentable {
     func updateNSView(_ view: WindowView, context: Context) {}
 
     final class WindowView: NSView {
+        private var restoreObserver: NSObjectProtocol?
+
         override func viewDidMoveToWindow() {
             super.viewDidMoveToWindow()
-            window?.collectionBehavior.insert(.moveToActiveSpace)
-            window?.backgroundColor = Theme.chatNS
+            guard let window else { return }
+            window.collectionBehavior.insert(.moveToActiveSpace)
+            window.backgroundColor = Theme.chatNS
+            // Centered on the screen as it opens, and again whenever it comes back from the Dock.
+            // After SwiftUI has sized it.
+            DispatchQueue.main.async { [weak window] in window?.centerOnScreen() }
+            restoreObserver.map(NotificationCenter.default.removeObserver)
+            restoreObserver = NotificationCenter.default.addObserver(
+                forName: NSWindow.didDeminiaturizeNotification, object: window, queue: .main
+            ) { [weak window] _ in window?.centerOnScreen() }
         }
+    }
+}
+
+extension NSWindow {
+    /// Puts the window in the middle of the room for windows of its screen.
+    func centerOnScreen() {
+        guard !styleMask.contains(.fullScreen), let visible = (screen ?? NSScreen.main)?.visibleFrame else { return }
+        setFrameOrigin(NSPoint(x: visible.midX - frame.width / 2, y: visible.midY - frame.height / 2))
     }
 }
