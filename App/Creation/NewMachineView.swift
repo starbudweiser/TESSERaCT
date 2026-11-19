@@ -400,6 +400,7 @@ private struct LinuxMachineForm: View {
         .sheet(isPresented: $isAddingScripts) {
             if let distribution = selectedDistribution {
                 SetupScriptChooser(distribution: distribution, scripts: $scripts)
+                    .flatRoundSheet()
             }
         }
         .onAppear { suggestName() }

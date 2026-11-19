@@ -33,6 +33,7 @@ struct DiscoveryView: View {
         .task { await service.refreshIfNeeded() }
         .sheet(item: $itemForNewMachine) { item in
             DiscoveryCreateSheet(item: item)
+                .flatRoundSheet()
         }
     }
 
@@ -405,6 +406,7 @@ struct ScreenshotButton: View {
         }
         .popover(isPresented: $isShown, arrowEdge: .bottom) {
             ScreenshotPreview(screenshot: screenshot, name: name)
+                .flatRoundPopover()
                 .onDisappear { isPinned = false }
         }
     }

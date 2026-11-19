@@ -60,6 +60,7 @@ struct TemplatesView: View {
                 }
             }
             .frame(width: 520)
+            .flatRoundSheet()
         }
         .confirmationDialog(
             "Delete the template “\(templatePendingDeletion?.name ?? "")”?",

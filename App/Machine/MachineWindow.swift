@@ -52,9 +52,11 @@ struct MachineView: View {
         ))
         .sheet(isPresented: $isShowingSettings) {
             MachineSettingsView(machine: machine)
+                .flatRoundSheet()
         }
         .sheet(isPresented: $isShowingSnapshots) {
             SnapshotsView(machine: machine)
+                .flatRoundSheet()
         }
         .alert(
             machine.message?.title ?? "",
