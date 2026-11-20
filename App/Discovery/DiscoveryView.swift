@@ -6,11 +6,36 @@ import VMCore
 struct DiscoveryView: View {
     @Environment(AppModel.self) private var model
     @State private var service = DiscoveryService.shared
-    @State private var familyFilter: DiscoveryEntry.Family?
+    @State private var filter: Filter?
     @State private var itemForNewMachine: DiscoveryItem?
 
     private var items: [DiscoveryItem] {
-        service.items.filter { familyFilter == nil || $0.entry.family == familyFilter }
+        service.items.filter { filter?.matches($0.entry) ?? true }
+    }
+
+    /// What the list can be narrowed to: a family of systems, or a quality they have.
+    private enum Filter: CaseIterable {
+        case linux, bsd, light, server, security
+
+        var title: String {
+            switch self {
+            case .linux: DiscoveryEntry.Family.linux.title
+            case .bsd: DiscoveryEntry.Family.bsd.title
+            case .light: DiscoveryEntry.Tag.light.title
+            case .server: DiscoveryEntry.Tag.server.title
+            case .security: DiscoveryEntry.Tag.security.title
+            }
+        }
+
+        func matches(_ entry: DiscoveryEntry) -> Bool {
+            switch self {
+            case .linux: entry.family == .linux
+            case .bsd: entry.family == .bsd
+            case .light: entry.knownTags.contains(.light)
+            case .server: entry.knownTags.contains(.server)
+            case .security: entry.knownTags.contains(.security)
+            }
+        }
     }
 
     var body: some View {
@@ -75,14 +100,25 @@ struct DiscoveryView: View {
                 .font(.caption)
                 .foregroundStyle(.orange)
         } else if let last = service.state.lastRefresh {
-            Text("Updated \(last.formatted(.relative(presentation: .named)))")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            // Worked out again every minute, so "2 h ago" doesn't stay what it said when the page opened.
+            TimelineView(.everyMinute) { context in
+                Text("Updated \(Self.ago(last, now: context.date))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         } else {
             Text("Not updated yet")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
+    }
+
+    /// "2 h ago", in the language of the app.
+    private static func ago(_ date: Date, now: Date) -> String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .abbreviated
+        formatter.dateTimeStyle = .named
+        return formatter.localizedString(for: min(date, now), relativeTo: now)
     }
 
     // MARK: Content
@@ -117,9 +153,9 @@ struct DiscoveryView: View {
             Text("All Systems")
                 .font(.system(size: 13, weight: .semibold))
             Spacer(minLength: 12)
-            filterPill(String(localized: "All"), isOn: familyFilter == nil) { familyFilter = nil }
-            ForEach(DiscoveryEntry.Family.allCases, id: \.self) { family in
-                filterPill(family.title, isOn: familyFilter == family) { familyFilter = family }
+            filterPill(String(localized: "All"), isOn: filter == nil) { filter = nil }
+            ForEach(Filter.allCases, id: \.self) { option in
+                filterPill(option.title, isOn: filter == option) { filter = option }
             }
         }
     }
