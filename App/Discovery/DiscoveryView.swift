@@ -75,7 +75,7 @@ struct DiscoveryView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 12)
-            VStack(alignment: .trailing, spacing: 4) {
+            VStack(alignment: .center, spacing: 4) {
                 Button {
                     Task { await service.refresh() }
                 } label: {
@@ -116,7 +116,7 @@ struct DiscoveryView: View {
     /// "2 h ago", in the language of the app.
     private static func ago(_ date: Date, now: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .abbreviated
+        formatter.unitsStyle = .short
         formatter.dateTimeStyle = .named
         return formatter.localizedString(for: min(date, now), relativeTo: now)
     }
