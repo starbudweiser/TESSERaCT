@@ -145,6 +145,7 @@
 "Choose…" = "Choisir…";
 "Clipboard" = "Presse-papiers";
 "Closed" = "Fermé";
+"Coming soon" = "Bientôt";
 "Command Line" = "Ligne de commande";
 "Command Line Tool" = "Outil en ligne de commande";
 "Compress" = "Compresser";
@@ -749,6 +750,7 @@
 "Virtual machines for macOS: Windows, Linux and macOS, driven by you or by AI agents." = "Des machines virtuelles pour macOS : Windows, Linux et macOS, pilotées par vous ou par des agents IA.";
 "Virtual networking isn't available" = "Le réseau virtuel n'est pas disponible";
 "Virtualization isn't available on this Mac." = "La virtualisation n'est pas disponible sur ce Mac.";
+"Visit Website" = "Visiter le site";
 "What the tctl command may do in the virtual machine." = "Ce que la commande tctl peut faire dans la machine virtuelle.";
 "Where system shortcuts go while the virtual machine has focus." = "Où vont les raccourcis système tant que la machine virtuelle est active.";
 "Where virtual machines, templates and downloaded images are kept." = "L'emplacement des machines virtuelles, des modèles et des images téléchargées.";

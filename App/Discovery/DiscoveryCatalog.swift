@@ -89,6 +89,8 @@ nonisolated struct DiscoveryEntry: Codable, Sendable, Hashable, Identifiable {
     /// What the desktop looks like.
     var screenshot: DiscoveryScreenshot?
     var source: DiscoverySource
+    /// Set while the system has no image to download yet: it is shown as coming soon, with a link to its site.
+    var soon: DiscoverySoon?
     /// The newest version known when the catalogue was published: what is shown and used until the app
     /// has looked for itself, and when it can't.
     var snapshot: DiscoverySnapshot?
@@ -99,6 +101,11 @@ nonisolated struct DiscoveryEntry: Codable, Sendable, Hashable, Identifiable {
     func summary(for languageCode: String) -> String {
         summary[languageCode] ?? summary["en"] ?? summary.values.sorted().first ?? ""
     }
+}
+
+/// A system that isn't released yet (or has no image for this Mac yet): nothing is downloaded, only its site is offered.
+nonisolated struct DiscoverySoon: Codable, Sendable, Hashable {
+    var url: URL
 }
 
 /// A picture of the system's desktop, which is not part of the app: it is fetched when it is looked at.

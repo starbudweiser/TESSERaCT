@@ -112,7 +112,7 @@ final class DiscoveryService {
     /// rotation date has come; without one, the picks go round the list: a new one each day, each week.
     func spotlight(in items: [DiscoveryItem]) -> (day: DiscoveryItem?, week: DiscoveryItem?) {
         guard !items.isEmpty else { return (nil, nil) }
-        let pool = items.sorted { $0.id < $1.id }
+        let pool = items.filter { $0.entry.soon == nil }.sorted { $0.id < $1.id }
         let today = DiscoveryDates.dayNumber(now)
         let editorial = pool
             .filter { $0.entry.featured }
@@ -168,7 +168,7 @@ final class DiscoveryService {
         // 2. The newest image of each system, at its publisher.
         let resolver = self.resolver
         let results = await withTaskGroup(of: (String, Result<DiscoverySnapshot, any Error>).self) { group in
-            for entry in catalog.entries {
+            for entry in catalog.entries where entry.soon == nil {
                 group.addTask {
                     do {
                         let snapshot = try await resolver.resolve(entry)

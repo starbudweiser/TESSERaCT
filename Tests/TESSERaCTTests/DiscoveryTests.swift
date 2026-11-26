@@ -68,6 +68,11 @@ private let digest512 = String(repeating: "cd", count: 64)
                 #expect(!(entry.summary[language] ?? "").isEmpty, "\(entry.id) has no \(language) description")
             }
             #expect(entry.knownTags.count == entry.tags.count, "\(entry.id) has an unknown tag")
+            // A system that is not released yet has a site to visit and nothing to download.
+            if let soon = entry.soon {
+                #expect(soon.url.scheme == "https" && entry.snapshot == nil, "\(entry.id) is coming soon but has an image")
+                continue
+            }
             let snapshot = try #require(entry.snapshot, "\(entry.id) has no snapshot")
             #expect(snapshot.url.scheme == "https")
             #expect(DiscoveryResolver.isDigest(snapshot.digest, snapshot.algorithm))
@@ -338,7 +343,7 @@ private let digest512 = String(repeating: "cd", count: 64)
         await service.refresh()
         #expect(service.isOffline)
         #expect(service.items.count == DiscoveryFallback.catalog.entries.count)
-        #expect(service.items.allSatisfy { $0.availability == .unchecked && $0.snapshot != nil })
+        #expect(service.items.allSatisfy { $0.availability == .unchecked && ($0.snapshot != nil || $0.entry.soon != nil) })
         // Nothing was learned, so the next start looks again.
         #expect(service.state.lastRefresh == nil)
     }

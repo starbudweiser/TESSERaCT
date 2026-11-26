@@ -266,6 +266,9 @@ private struct DiscoveryCard: View {
         Group {
             if isSpotlight {
                 content.background(RoundedRectangle(cornerRadius: Radius.card, style: .continuous).fill(background ?? .clear))
+            } else if item.entry.soon != nil {
+                // Nothing to download yet: the card is not a button, its site is.
+                content.surface()
             } else {
                 Button(action: create) { content }
                     .buttonStyle(.plain)
@@ -297,7 +300,7 @@ private struct DiscoveryCard: View {
                     .foregroundStyle(isSpotlight ? .white : .primary)
                     .lineLimit(1)
                 chip(item.entry.family.title)
-                if item.isNewVersion { newBadge }
+                if item.entry.soon != nil { soonBadge } else if item.isNewVersion { newBadge }
             }
             // Leaves the corner to the screenshot button.
             .padding(.trailing, item.entry.screenshot == nil ? 0 : 34)
@@ -318,7 +321,12 @@ private struct DiscoveryCard: View {
                 }
             }
             Spacer(minLength: 0)
-            if isSpotlight || creation != nil {
+            if let soon = item.entry.soon {
+                Link(destination: soon.url) {
+                    Label("Visit Website", systemImage: "arrow.up.right")
+                }
+                .buttonStyle(DiscoveryPillStyle(compact: true))
+            } else if isSpotlight || creation != nil {
                 action
             }
         }
@@ -332,6 +340,16 @@ private struct DiscoveryCard: View {
                     .padding(isSpotlight ? 14 : 8)
             }
         }
+    }
+
+    private var soonBadge: some View {
+        Text("Coming soon")
+            .font(.system(size: 11, weight: .semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 2)
+            .background(Capsule().fill(Color.orange))
+            .fixedSize()
     }
 
     private var newBadge: some View {

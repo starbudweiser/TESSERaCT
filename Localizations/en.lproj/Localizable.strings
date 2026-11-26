@@ -145,6 +145,7 @@
 "Choose…" = "Choose…";
 "Clipboard" = "Clipboard";
 "Closed" = "Closed";
+"Coming soon" = "Coming soon";
 "Command Line" = "Command Line";
 "Command Line Tool" = "Command Line Tool";
 "Compress" = "Compress";
@@ -749,6 +750,7 @@
 "Virtual machines for macOS: Windows, Linux and macOS, driven by you or by AI agents." = "Virtual machines for macOS: Windows, Linux and macOS, driven by you or by AI agents.";
 "Virtual networking isn't available" = "Virtual networking isn't available";
 "Virtualization isn't available on this Mac." = "Virtualization isn't available on this Mac.";
+"Visit Website" = "Visit Website";
 "What the tctl command may do in the virtual machine." = "What the tctl command may do in the virtual machine.";
 "Where system shortcuts go while the virtual machine has focus." = "Where system shortcuts go while the virtual machine has focus.";
 "Where virtual machines, templates and downloaded images are kept." = "Where virtual machines, templates and downloaded images are kept.";

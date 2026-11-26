@@ -11,8 +11,8 @@ nonisolated enum DiscoveryFallback {
     static let json = #"""
 {
   "schema": 1,
-  "revision": 6,
-  "updatedAt": "2026-11-19",
+  "revision": 7,
+  "updatedAt": "2026-11-26",
   "entries": [
     {
       "id": "freebsd",
@@ -897,6 +897,34 @@ nonisolated enum DiscoveryFallback {
         "digest": "85116d48c406ae7cd60c936050a099d4b8610321273f6f0a694796db4d4e86ba",
         "bytes": 3191691264,
         "date": "2026-09-23"
+      }
+    },
+    {
+      "id": "lunariaos",
+      "name": "LunariaOS",
+      "family": "linux",
+      "summary": {
+        "en": "A new Debian-based Linux desktop with Wine built in. Not released yet: a Developer Beta is announced for early 2027. It will appear here with a download as soon as an ARM64 image exists.",
+        "fr": "Un nouveau bureau Linux basé sur Debian, avec Wine intégré. Pas encore publié : une Developer Beta est annoncée pour début 2027. Il passera ici en téléchargement dès qu'une image ARM64 existera.",
+        "es": "Un nuevo escritorio Linux basado en Debian, con Wine integrado. Aún no publicado: se anuncia una Developer Beta para principios de 2027. Aparecerá aquí con descarga en cuanto exista una imagen ARM64.",
+        "it": "Un nuovo desktop Linux basato su Debian, con Wine integrato. Non ancora pubblicato: una Developer Beta è annunciata per inizio 2027. Comparirà qui con il download appena esisterà un'immagine ARM64."
+      },
+      "tags": [
+        "desktop"
+      ],
+      "featured": false,
+      "color": "#6c63ff",
+      "defaults": {
+        "cpuCount": 4,
+        "memoryGB": 4,
+        "diskGB": 32,
+        "engine": "virtualization"
+      },
+      "source": {
+        "kind": "fixed"
+      },
+      "soon": {
+        "url": "https://lunariaos.com/"
       }
     }
   ]
